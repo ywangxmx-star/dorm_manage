@@ -1,0 +1,8 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "task-card": "../../components/TaskCard",
+    "bill-card": "../../components/BillCard",
+    "empty-state": "../../components/EmptyState"
+  }
+}

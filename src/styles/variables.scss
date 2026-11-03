@@ -1,61 +1,73 @@
 // ============================================
-// Design Tokens - 舍管Pro
+// Design Tokens - 舍小圈「晴空 + 柠檬」主题
+// 明亮通透的天空蓝为主色，柠檬黄做点睛，
+// 薄荷绿 / 珊瑚红作为状态色，整体清爽不压抑。
 // ============================================
 
 // -- Color Palette --
-$primary: #6366F1;
-$primary-light: #818CF8;
-$primary-dark: #4F46E5;
-$primary-bg: rgba(99, 102, 241, 0.08);
-$primary-gradient: linear-gradient(135deg, #6366F1, #818CF8);
+$primary: #2F7CF6;
+$primary-light: #5B9BFF;
+$primary-lighter: #8EC5FF;
+$primary-dark: #1E63D6;
+$primary-bg: rgba(47, 124, 246, 0.08);
+$primary-gradient: linear-gradient(135deg, #2F7CF6, #5B9BFF);
 
-$success: #10B981;
-$success-light: #34D399;
-$success-bg: rgba(16, 185, 129, 0.08);
-$success-gradient: linear-gradient(135deg, #10B981, #34D399);
+// 页面顶部 Hero 区域专用渐变（天空蓝 → 晴空浅蓝）
+$hero-gradient: linear-gradient(155deg, #2F7CF6 0%, #4C9BFF 55%, #7DC2FF 100%);
 
-$warning: #F59E0B;
-$warning-light: #FBBF24;
-$warning-bg: rgba(245, 158, 11, 0.08);
-$warning-gradient: linear-gradient(135deg, #F59E0B, #FBBF24);
+// 柠檬黄：品牌点睛色，用于高亮、徽标、重点数字
+$accent-lemon: #FFC83D;
+$accent-lemon-soft: #FFF4D1;
+$accent-lemon-text: #8A5A00;
 
-$danger: #EF4444;
-$danger-light: #F87171;
-$danger-bg: rgba(239, 68, 68, 0.08);
-$danger-gradient: linear-gradient(135deg, #EF4444, #F87171);
+$success: #14B88A;
+$success-light: #4FD1A5;
+$success-bg: rgba(20, 184, 138, 0.1);
+$success-gradient: linear-gradient(135deg, #14B88A, #4FD1A5);
 
-// -- Warm Accent Colors --
-$accent-rose: #F43F5E;
-$accent-rose-bg: rgba(244, 63, 94, 0.08);
-$accent-amber: #F59E0B;
-$accent-amber-bg: rgba(245, 158, 11, 0.08);
-$accent-teal: #14B8A6;
-$accent-teal-bg: rgba(20, 184, 166, 0.08);
-$accent-sky: #0EA5E9;
-$accent-sky-bg: rgba(14, 165, 233, 0.08);
-$accent-violet: #8B5CF6;
-$accent-violet-bg: rgba(139, 92, 246, 0.08);
+$warning: #FF9F2E;
+$warning-light: #FFC83D;
+$warning-bg: rgba(255, 159, 46, 0.1);
+$warning-gradient: linear-gradient(135deg, #FF9F2E, #FFC83D);
+
+$danger: #FF5A5F;
+$danger-light: #FF8A8E;
+$danger-bg: rgba(255, 90, 95, 0.1);
+$danger-gradient: linear-gradient(135deg, #FF5A5F, #FF8A8E);
+
+// -- Accent Colors --
+$accent-rose: #FF6B8B;
+$accent-rose-bg: rgba(255, 107, 139, 0.1);
+$accent-amber: #FF9F2E;
+$accent-amber-bg: rgba(255, 159, 46, 0.1);
+$accent-teal: #12B5A5;
+$accent-teal-bg: rgba(18, 181, 165, 0.1);
+$accent-sky: #22A6F2;
+$accent-sky-bg: rgba(34, 166, 242, 0.1);
+// 原 violet 槽位改为活力粉，避免紫色调
+$accent-violet: #FF7AB6;
+$accent-violet-bg: rgba(255, 122, 182, 0.1);
 
 // -- Text Colors --
-$text-primary: #0F172A;
-$text-secondary: #64748B;
-$text-hint: #94A3B8;
+$text-primary: #152238;
+$text-secondary: #5B6B82;
+$text-hint: #9AA8BC;
 $text-white: #FFFFFF;
 
 // -- Background --
-$bg-page: #F8FAFC;
+$bg-page: #F3F7FD;
 $bg-card: #FFFFFF;
-$bg-hover: #F1F5F9;
-$bg-section-task: #F8F7FF;
-$bg-section-bill: #F0FDF9;
-$bg-section-room: #FDF8F0;
-$bg-section-quick: #EFF6FF;
+$bg-hover: #EDF3FC;
+$bg-section-task: #F2F7FF;
+$bg-section-bill: #EFFBF6;
+$bg-section-room: #FFF8E6;
+$bg-section-quick: #EEF8FF;
 
 // -- Border --
-$border-color: #E2E8F0;
-$border-light: #F1F5F9;
+$border-color: #E3EAF4;
+$border-light: #EEF3FA;
 
-// -- Spacing Scale (遵循ui.md推荐的generous spacing) --
+// -- Spacing Scale --
 $space-1: 8rpx;
 $space-2: 16rpx;
 $space-3: 24rpx;
@@ -70,20 +82,20 @@ $space-12: 96rpx;
 $space-14: 112rpx;
 $space-16: 128rpx;
 
-// -- Border Radius --
-$radius-xs: 8rpx;
-$radius-sm: 16rpx;
+// -- Border Radius（更圆润，更年轻）--
+$radius-xs: 10rpx;
+$radius-sm: 18rpx;
 $radius-md: 28rpx;
-$radius-lg: 32rpx;
-$radius-xl: 40rpx;
+$radius-lg: 36rpx;
+$radius-xl: 44rpx;
 $radius-full: 9999rpx;
 
-// -- Shadows --
-$shadow-sm: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
-$shadow-md: 0 8rpx 30rpx rgba(0, 0, 0, 0.08);
-$shadow-lg: 0 16rpx 60rpx rgba(0, 0, 0, 0.12);
-$shadow-card: 0 8rpx 30rpx rgba(0, 0, 0, 0.08);
-$shadow-primary: 0 4rpx 16rpx rgba(99, 102, 241, 0.15);
+// -- Shadows（蓝调柔和阴影，替代灰黑阴影）--
+$shadow-sm: 0 4rpx 18rpx rgba(47, 124, 246, 0.06);
+$shadow-md: 0 10rpx 32rpx rgba(47, 124, 246, 0.09);
+$shadow-lg: 0 18rpx 60rpx rgba(47, 124, 246, 0.14);
+$shadow-card: 0 10rpx 32rpx rgba(47, 124, 246, 0.09);
+$shadow-primary: 0 8rpx 24rpx rgba(47, 124, 246, 0.28);
 
 // -- Typography --
 $font-xs: 24rpx;
@@ -95,7 +107,7 @@ $font-xl: 64rpx;
 $font-xxl: 80rpx;
 
 // -- Font Family --
-$font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+$font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'HarmonyOS Sans SC', 'Helvetica Neue', sans-serif;
 
 // -- Transitions --
 $transition-fast: all 0.15s ease;
@@ -106,7 +118,6 @@ $transition-slow: all 0.3s ease;
 // Backward-compatible aliases
 // ============================================
 $primary-color: $primary;
-$text-white: #FFFFFF;
 $bg-color: $bg-page;
 $bg-white: $bg-card;
 $spacing-xs: $space-1;

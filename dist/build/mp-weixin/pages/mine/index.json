@@ -1,0 +1,7 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "member-avatar": "../../components/MemberAvatar",
+    "room-picker-sheet": "../../components/RoomPickerSheet"
+  }
+}

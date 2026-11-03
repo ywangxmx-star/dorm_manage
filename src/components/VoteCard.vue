@@ -45,10 +45,10 @@ const props = defineProps<{
 
 defineEmits(['click'])
 
-const statusInfo = computed(() => VOTE_STATUS_MAP[props.vote.status] || { text: '未知', color: '#94A3B8' })
+const statusInfo = computed(() => VOTE_STATUS_MAP[props.vote.status] || { text: '未知', color: '#9AA8BC' })
 
 const voteTypeText = computed(() => VOTE_TYPE_MAP[props.vote.vote_type] || '未知')
-const voteTypeColor = computed(() => props.vote.vote_type === 1 ? '#10B981' : '#6366F1')
+const voteTypeColor = computed(() => props.vote.vote_type === 1 ? '#14B88A' : '#2F7CF6')
 
 function formatDeadline(deadline: string) {
   const date = new Date(deadline)

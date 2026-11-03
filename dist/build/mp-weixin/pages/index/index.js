@@ -1,0 +1,1 @@
+"use strict";const e=require("../../common/vendor.js"),n=e.defineComponent({__name:"index",setup:n=>(e.onLoad(function(){e.index.switchTab({url:"/pages/home/index",fail:()=>e.index.reLaunch({url:"/pages/home/index"})})}),(e,n)=>({}))});wx.createPage(n);

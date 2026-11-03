@@ -72,7 +72,7 @@
 
       <view class="row-line">
         <text class="row-label">周期任务</text>
-        <switch :checked="form.is_cycle" @change="form.is_cycle = $event.detail.value" color="#6366F1" />
+        <switch :checked="form.is_cycle" @change="form.is_cycle = $event.detail.value" color="#2F7CF6" />
       </view>
 
       <template v-if="form.is_cycle">
@@ -96,7 +96,7 @@
         </picker>
         <view class="row-line row-line-sub">
           <text class="row-label-sub">结束时间</text>
-          <switch :checked="hasCycleEnd" @change="hasCycleEnd = $event.detail.value" color="#6366F1" />
+          <switch :checked="hasCycleEnd" @change="hasCycleEnd = $event.detail.value" color="#2F7CF6" />
         </view>
         <picker v-if="hasCycleEnd" mode="date" :value="cycleEndDate" @change="onCycleEndDateChange">
           <view class="row-line row-line-sub">
@@ -229,7 +229,7 @@ function toggleExecutor(userId: number) {
   }
 }
 
-const avatarColors = ['#6366F1', '#14B8A6', '#F59E0B', '#F43F5E', '#0EA5E9', '#8B5CF6', '#10B981', '#EF4444']
+const avatarColors = ['#2F7CF6', '#12B5A5', '#FF9F2E', '#FF6B8B', '#22A6F2', '#FF7AB6', '#14B88A', '#FF5A5F']
 function getAvatarColor(name: string) {
   let hash = 0
   for (let i = 0; i < name.length; i++) {
@@ -312,7 +312,7 @@ async function handleSubmit() {
 
 /* ---------- 标题 ---------- */
 .task-input-area {
-  background: linear-gradient(135deg, #F8F7FF 0%, #F0F0FF 100%);
+  background: linear-gradient(135deg, #F2F7FF 0%, #E8F1FF 100%);
   border-radius: $radius-xl;
   padding: $space-4;
   margin-bottom: $space-4;

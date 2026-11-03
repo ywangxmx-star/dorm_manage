@@ -1,0 +1,1 @@
+"use strict";const o=require("../stores/room.js"),e=require("../common/vendor.js"),t=require("../api/room.js");exports.useRoom=function(){const s=o.useRoomStore(),{currentRoom:r,myRooms:m}=e.storeToRefs(s);return{currentRoom:r,myRooms:m,loadRooms:async function(){await s.fetchMyRooms()},selectRoom:async function(o){const e=await t.getRoomDetail(o);s.setCurrentRoom(e.data)}}};

@@ -469,7 +469,7 @@ async function handleSubmit() {
 
 .page-header {
   flex-shrink: 0;
-  background: linear-gradient(135deg, #F0FDF9, #E6FFFA);
+  background: linear-gradient(135deg, #EFFBF6, #E6FFFA);
   border-bottom: 1rpx solid rgba($success, 0.06);
 }
 
@@ -763,12 +763,12 @@ async function handleSubmit() {
     color: $text-white;
     font-size: $font-base;
 
-    &.avatar-purple { background: linear-gradient(135deg, #6366F1, #818CF8); }
-    &.avatar-green { background: linear-gradient(135deg, #10B981, #34D399); }
-    &.avatar-amber { background: linear-gradient(135deg, #F59E0B, #FBBF24); }
-    &.avatar-blue { background: linear-gradient(135deg, #0EA5E9, #38BDF8); }
-    &.avatar-rose { background: linear-gradient(135deg, #F43F5E, #FB7185); }
-    &.avatar-teal { background: linear-gradient(135deg, #14B8A6, #2DD4BF); }
+    &.avatar-purple { background: linear-gradient(135deg, #2F7CF6, #5B9BFF); }
+    &.avatar-green { background: linear-gradient(135deg, #14B88A, #4FD1A5); }
+    &.avatar-amber { background: linear-gradient(135deg, #FF9F2E, #FFC83D); }
+    &.avatar-blue { background: linear-gradient(135deg, #22A6F2, #5CC2FF); }
+    &.avatar-rose { background: linear-gradient(135deg, #FF6B8B, #FF9AAE); }
+    &.avatar-teal { background: linear-gradient(135deg, #12B5A5, #3DD6C4); }
   }
 
   .member-avatar-text {
@@ -999,7 +999,7 @@ async function handleSubmit() {
   height: 100rpx;
   border-radius: $radius-xl;
   background: $primary-gradient;
-  box-shadow: 0 8rpx 32rpx rgba(99, 102, 241, 0.35);
+  box-shadow: 0 8rpx 32rpx rgba(47, 124, 246, 0.35);
   border: none;
   display: flex;
   align-items: center;

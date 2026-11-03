@@ -313,7 +313,7 @@ function goCreate() {
   top: 0;
   z-index: 100;
   overflow: hidden;
-  background: linear-gradient(160deg, #6366F1 0%, #818CF8 55%, #A5B4FC 100%);
+  background: $hero-gradient;
   padding-bottom: $space-3;
 }
 

@@ -6,7 +6,7 @@
           v-model="content"
           class="textarea-field"
           placeholder="请详细描述您遇到的问题或建议"
-          placeholder-style="font-size: 32rpx; line-height: 44rpx; color: #94A3B8"
+          placeholder-style="font-size: 32rpx; line-height: 44rpx; color: #9AA8BC"
           maxlength="500"
         />
         <text class="char-count">{{ content.length }}/500</text>

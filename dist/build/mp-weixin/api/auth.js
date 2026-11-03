@@ -1,0 +1,1 @@
+"use strict";const e=require("./request.js");exports.getUserInfo=function(){return e.get("/auth/me")},exports.login=function(t){return e.post("/auth/login",{code:t})},exports.refreshToken=function(t){return e.post("/auth/refresh",{refresh_token:t})},exports.updateProfile=function(t){return e.put("/auth/profile",t)};

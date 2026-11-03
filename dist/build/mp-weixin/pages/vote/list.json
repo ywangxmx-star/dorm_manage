@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "",
+  "navigationBarBackgroundColor": "#F0FDFA",
+  "usingComponents": {
+    "vote-card": "../../components/VoteCard",
+    "empty-state": "../../components/EmptyState",
+    "page-loading": "../../components/PageLoading"
+  }
+}

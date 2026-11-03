@@ -1,0 +1,1 @@
+"use strict";const e=require("../common/vendor.js"),t=e.defineComponent({__name:"PageLoading",props:{text:{default:"加载中..."}},setup:t=>(t,o)=>({a:e.t(t.text)})}),o=e._export_sfc(t,[["__scopeId","data-v-64605166"]]);wx.createComponent(o);

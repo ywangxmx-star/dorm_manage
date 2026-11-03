@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "成员管理",
+  "usingComponents": {
+    "member-avatar": "../../components/MemberAvatar",
+    "empty-state": "../../components/EmptyState"
+  }
+}

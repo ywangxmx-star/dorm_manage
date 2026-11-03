@@ -1,0 +1,8 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "task-card": "../../components/TaskCard",
+    "empty-state": "../../components/EmptyState",
+    "page-loading": "../../components/PageLoading"
+  }
+}

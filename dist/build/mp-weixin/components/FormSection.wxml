@@ -1,0 +1,1 @@
+<view class="form-section data-v-c2ed8497"><view wx:if="{{a}}" class="form-label data-v-c2ed8497"><text class="data-v-c2ed8497">{{b}}</text><text wx:if="{{c}}" class="required data-v-c2ed8497">*</text></view><slot/><text wx:if="{{d}}" class="form-desc data-v-c2ed8497">{{e}}</text></view>

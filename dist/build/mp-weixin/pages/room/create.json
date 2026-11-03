@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "创建宿舍",
+  "usingComponents": {
+    "form-section": "../../components/FormSection"
+  }
+}

@@ -43,7 +43,7 @@
       :refresher-enabled="refresherEnabled"
       :refresher-threshold="REFRESHER_THRESHOLD"
       refresher-default-style="black"
-      refresher-background="#F8FAFC"
+      refresher-background="#F3F7FD"
       :upper-threshold="30"
       :refresher-triggered="refreshing"
       @scroll="onContentScroll"
@@ -352,7 +352,7 @@ function goCreate() {
   top: 0;
   z-index: 100;
   overflow: hidden;
-  background: linear-gradient(160deg, #6366F1 0%, #818CF8 55%, #A5B4FC 100%);
+  background: $hero-gradient;
   padding-bottom: $space-3;
 }
 

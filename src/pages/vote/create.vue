@@ -7,7 +7,7 @@
           v-model="form.title"
           class="form-input"
           placeholder="请输入投票标题"
-          placeholder-style="font-size: 32rpx; line-height: 88rpx; color: #94A3B8"
+          placeholder-style="font-size: 32rpx; line-height: 88rpx; color: #9AA8BC"
           maxlength="128"
         />
       </view>
@@ -18,7 +18,7 @@
           v-model="form.description"
           class="form-textarea"
           placeholder="请输入投票描述（选填）"
-          placeholder-style="font-size: 32rpx; line-height: 44rpx; color: #94A3B8"
+          placeholder-style="font-size: 32rpx; line-height: 44rpx; color: #9AA8BC"
           :maxlength="500"
         />
       </view>

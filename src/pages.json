@@ -142,8 +142,8 @@
     }
   ],
   "tabBar": {
-    "color": "#94A3B8",
-    "selectedColor": "#6366F1",
+    "color": "#9AA8BC",
+    "selectedColor": "#2F7CF6",
     "borderStyle": "white",
     "list": [
       {
@@ -176,7 +176,7 @@
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "舍小圈",
     "navigationBarBackgroundColor": "#ffffff",
-    "backgroundColor": "#F8FAFC",
+    "backgroundColor": "#F3F7FD",
     "mp-weixin": {
       "enableShareAppMessage": true,
       "enableShareTimeline": true

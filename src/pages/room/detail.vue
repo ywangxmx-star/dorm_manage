@@ -203,7 +203,7 @@ function handleLeave() {
   uni.showModal({
     title: '退出宿舍',
     content: `确定要退出「${room.value.room_name}」吗？`,
-    confirmColor: '#EF4444',
+    confirmColor: '#FF5A5F',
     success: async (res) => {
       if (!res.confirm || !room.value) return
       try {
@@ -223,7 +223,7 @@ function handleDissolve() {
   uni.showModal({
     title: '解散宿舍',
     content: `确定要解散「${room.value.room_name}」吗？此操作不可恢复，所有成员将被移除。`,
-    confirmColor: '#EF4444',
+    confirmColor: '#FF5A5F',
     success: async (res) => {
       if (!res.confirm || !room.value) return
       try {

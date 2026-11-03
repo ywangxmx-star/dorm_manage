@@ -1,0 +1,1 @@
+"use strict";const e=require("../common/vendor.js"),n=require("../stores/auth.js");exports.useRequireLogin=function(){const o=n.useAuthStore();return{requireLogin:function(n){o.isLoggedIn?n():e.index.showModal({title:"需要登录",content:"该功能需要登录后使用，是否前往登录？",cancelText:"暂不登录",confirmText:"去登录",success:n=>{n.confirm&&e.index.navigateTo({url:"/pages/login/index"})}})}}};

@@ -1,0 +1,1 @@
+"use strict";const e=require("../common/vendor.js"),o=e.defineComponent({__name:"FormSection",props:{label:{},required:{type:Boolean},description:{}},setup:o=>(o,r)=>e.e({a:o.label},o.label?e.e({b:e.t(o.label),c:o.required},(o.required,{})):{},{d:o.description},o.description?{e:e.t(o.description)}:{})}),r=e._export_sfc(o,[["__scopeId","data-v-c2ed8497"]]);wx.createComponent(r);

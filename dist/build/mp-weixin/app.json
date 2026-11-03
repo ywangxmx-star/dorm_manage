@@ -1,0 +1,67 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/home/index",
+    "pages/task/list",
+    "pages/mine/index",
+    "pages/login/index",
+    "pages/login/agreement",
+    "pages/login/privacy",
+    "pages/room/create",
+    "pages/room/detail",
+    "pages/room/join",
+    "pages/room/members",
+    "pages/room/list",
+    "pages/task/create",
+    "pages/task/detail",
+    "pages/task/complete",
+    "pages/bill/list",
+    "pages/bill/create",
+    "pages/bill/detail",
+    "pages/mine/feedback",
+    "pages/mine/profile",
+    "pages/vote/list",
+    "pages/vote/create",
+    "pages/vote/detail"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "舍小圈",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#F3F7FD",
+    "enableShareAppMessage": true,
+    "enableShareTimeline": true
+  },
+  "tabBar": {
+    "color": "#9AA8BC",
+    "selectedColor": "#2F7CF6",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页",
+        "iconPath": "static/tab/home.png",
+        "selectedIconPath": "static/tab/home-active.png"
+      },
+      {
+        "pagePath": "pages/task/list",
+        "text": "任务",
+        "iconPath": "static/tab/task.png",
+        "selectedIconPath": "static/tab/task-active.png"
+      },
+      {
+        "pagePath": "pages/bill/list",
+        "text": "账单",
+        "iconPath": "static/tab/bill.png",
+        "selectedIconPath": "static/tab/bill-active.png"
+      },
+      {
+        "pagePath": "pages/mine/index",
+        "text": "我的",
+        "iconPath": "static/tab/mine.png",
+        "selectedIconPath": "static/tab/mine-active.png"
+      }
+    ]
+  },
+  "usingComponents": {}
+}

@@ -42,19 +42,19 @@ page {
 }
 
 .section-card-task {
-  background: linear-gradient(135deg, #F8F7FF, #EEF2FF);
+  background: $bg-section-task;
 }
 
 .section-card-bill {
-  background: linear-gradient(135deg, #F0FDF9, #ECFDF5);
+  background: $bg-section-bill;
 }
 
 .section-card-room {
-  background: linear-gradient(135deg, #FDF8F0, #FFFBEB);
+  background: $bg-section-room;
 }
 
 .section-card-quick {
-  background: linear-gradient(135deg, #EFF6FF, #F0F9FF);
+  background: $bg-section-quick;
 }
 
 // -- Section Header --
@@ -140,13 +140,13 @@ button {
   font-weight: 600;
   border: none;
   transition: $transition-base;
-  box-shadow: 0 2rpx 8rpx rgba(99, 102, 241, 0.2);
+  box-shadow: $shadow-primary;
   min-height: 60rpx;
 
   &:active {
     transform: scale(0.97);
     opacity: 0.9;
-    box-shadow: 0 1rpx 4rpx rgba(99, 102, 241, 0.2);
+    box-shadow: 0 2rpx 8rpx rgba(47, 124, 246, 0.2);
   }
 
   &[disabled] {
@@ -213,7 +213,7 @@ button {
   font-weight: 600;
   border: none;
   transition: $transition-base;
-  box-shadow: 0 2rpx 8rpx rgba(239, 68, 68, 0.2);
+  box-shadow: 0 6rpx 18rpx rgba(255, 90, 95, 0.25);
   min-height: 60rpx;
 
   &:active {
@@ -369,6 +369,11 @@ button.btn-restore {
   color: $danger;
 }
 
+.tag-lemon {
+  background-color: $accent-lemon-soft;
+  color: $accent-lemon-text;
+}
+
 // -- Form --
 .form-group {
   margin-bottom: $space-7;
@@ -404,6 +409,7 @@ button.btn-restore {
   border-radius: $radius-md;
   transition: $transition-base;
   box-sizing: border-box;
+  caret-color: $primary;
   display: flex;
   align-items: center;
 

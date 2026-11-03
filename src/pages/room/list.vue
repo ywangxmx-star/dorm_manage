@@ -85,12 +85,12 @@ const totalMembers = computed(() =>
 )
 
 const avatarColors = [
-  'linear-gradient(135deg, #6366F1, #818CF8)',
-  'linear-gradient(135deg, #14B8A6, #34D399)',
-  'linear-gradient(135deg, #F59E0B, #FBBF24)',
-  'linear-gradient(135deg, #F43F5E, #FB7185)',
-  'linear-gradient(135deg, #0EA5E9, #38BDF8)',
-  'linear-gradient(135deg, #8B5CF6, #A78BFA)',
+  'linear-gradient(135deg, #2F7CF6, #5B9BFF)',
+  'linear-gradient(135deg, #12B5A5, #4FD1A5)',
+  'linear-gradient(135deg, #FF9F2E, #FFC83D)',
+  'linear-gradient(135deg, #FF6B8B, #FF9AAE)',
+  'linear-gradient(135deg, #22A6F2, #5CC2FF)',
+  'linear-gradient(135deg, #FF7AB6, #FFA3CB)',
 ]
 
 onShow(async () => {

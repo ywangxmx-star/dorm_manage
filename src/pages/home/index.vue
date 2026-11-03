@@ -60,7 +60,7 @@
           :refresher-enabled="refresherEnabled"
           :refresher-threshold="REFRESHER_THRESHOLD"
           refresher-default-style="black"
-          refresher-background="#F8FAFC"
+          refresher-background="#F3F7FD"
           :upper-threshold="30"
           :refresher-triggered="refreshing"
           @scroll="onContentScroll"
@@ -537,7 +537,7 @@ function goBillDetail(id: number) { uni.navigateTo({ url: `/pages/bill/detail?id
   position: relative;
   flex-shrink: 0;
   overflow: hidden;
-  background: linear-gradient(160deg, #6366F1 0%, #818CF8 50%, #A5B4FC 100%);
+  background: $hero-gradient;
   padding: calc(var(--status-bar-height) + 48rpx) $space-5 $space-5;
 
   .header-bg-decor {
@@ -589,18 +589,19 @@ function goBillDetail(id: number) { uni.navigateTo({ url: `/pages/bill/detail?id
   width: 88rpx;
   height: 88rpx;
   border-radius: $radius-lg;
-  background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.1) 100%);
+  background: $accent-lemon;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border: 1rpx solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+  border: 4rpx solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 6rpx 18rpx rgba(30, 99, 214, 0.25);
+  transform: rotate(-6deg);
 
   &-text {
     font-size: 38rpx;
     font-weight: 800;
-    color: #fff;
+    color: $text-primary;
     letter-spacing: -0.02em;
   }
 }
@@ -636,23 +637,22 @@ function goBillDetail(id: number) { uni.navigateTo({ url: `/pages/bill/detail?id
   gap: 4rpx;
   flex-shrink: 0;
   padding: 12rpx 24rpx;
-  background: rgba(255, 255, 255, 0.15);
+  background: $accent-lemon;
   border-radius: $radius-full;
-  border: 1rpx solid rgba(255, 255, 255, 0.15);
 
   &:active {
-    background: rgba(255, 255, 255, 0.25);
+    opacity: 0.85;
   }
 
   .switch-text {
     font-size: $font-xs;
-    color: rgba(255, 255, 255, 0.85);
-    font-weight: 600;
+    color: $text-primary;
+    font-weight: 700;
   }
 
   .switch-arrow {
     font-size: $font-xs;
-    color: rgba(255, 255, 255, 0.85);
+    color: $text-primary;
     font-weight: 600;
   }
 }

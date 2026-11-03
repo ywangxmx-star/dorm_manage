@@ -39,15 +39,15 @@ const props = defineProps<{
 
 defineEmits(['click'])
 
-const statusInfo = computed(() => TaskStatusMap[props.task.status] || { text: '未知', color: '#94A3B8' })
+const statusInfo = computed(() => TaskStatusMap[props.task.status] || { text: '未知', color: '#9AA8BC' })
 const executorNames = computed(() => {
   const names = props.task.executors?.map(e => e.nickname).filter(Boolean) || []
   return names.length > 0 ? names.join('、') : '-'
 })
 
 const titleColor = computed(() => {
-  if (props.task.priority === 0) return '#1E293B'
-  return PRIORITY_OPTIONS.find(p => p.value === props.task.priority)?.color || '#1E293B'
+  if (props.task.priority === 0) return '#152238'
+  return PRIORITY_OPTIONS.find(p => p.value === props.task.priority)?.color || '#152238'
 })
 </script>
 

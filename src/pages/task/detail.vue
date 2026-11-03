@@ -65,7 +65,7 @@
           <view class="executor-list">
             <view v-for="ex in task.executors" :key="ex.user_id" class="executor-tag">
               <text class="executor-name">{{ ex.nickname }}</text>
-              <text class="executor-status" :style="{ color: ExecutorStatusMap[ex.status]?.color || '#94A3B8' }">
+              <text class="executor-status" :style="{ color: ExecutorStatusMap[ex.status]?.color || '#9AA8BC' }">
                 {{ ExecutorStatusMap[ex.status]?.text || '未知' }}
               </text>
             </view>
@@ -153,7 +153,7 @@ const roomStore = useRoomStore()
 const task = ref<Task | null>(null)
 let taskId = 0
 
-const statusInfo = computed(() => TaskStatusMap[task.value?.status || 0] || { text: '未知', color: '#94A3B8' })
+const statusInfo = computed(() => TaskStatusMap[task.value?.status || 0] || { text: '未知', color: '#9AA8BC' })
 const cycleText = computed(() => {
   const rule = task.value?.cycle_rule
   if (!rule) return '周期任务'
@@ -164,7 +164,7 @@ const cycleText = computed(() => {
   return text
 })
 const priorityText = computed(() => PRIORITY_OPTIONS.find(p => p.value === task.value?.priority)?.label || '普通')
-const priorityColor = computed(() => PRIORITY_OPTIONS.find(p => p.value === task.value?.priority)?.color || '#94A3B8')
+const priorityColor = computed(() => PRIORITY_OPTIONS.find(p => p.value === task.value?.priority)?.color || '#9AA8BC')
 const finishRemark = computed(() => task.value?.finish_remark?.trim() || '')
 const finishImageUrls = computed(() =>
   (task.value?.finish_images || [])

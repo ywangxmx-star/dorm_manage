@@ -242,7 +242,7 @@ function handleLogout() {
   position: relative;
   z-index: 2;
   overflow: hidden;
-  background: linear-gradient(160deg, #6366F1 0%, #818CF8 55%, #A5B4FC 100%);
+  background: $hero-gradient;
   padding: calc(var(--status-bar-height) + 48rpx) $space-5 $space-6;
   flex-shrink: 0;
 }

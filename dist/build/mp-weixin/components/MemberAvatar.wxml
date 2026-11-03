@@ -1,0 +1,1 @@
+<view class="{{['member-avatar', 'data-v-29c321e5', f && 'show-name']}}"><image wx:if="{{a}}" src="{{b}}" class="avatar-img data-v-29c321e5" mode="aspectFill"/><view wx:else class="avatar-placeholder data-v-29c321e5"><text class="data-v-29c321e5">{{c}}</text></view><text wx:if="{{d}}" class="member-name data-v-29c321e5">{{e}}</text></view>

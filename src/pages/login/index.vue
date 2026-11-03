@@ -133,7 +133,7 @@ function handleCancelLogin() {
 
 .login-page {
   height: 100vh;
-  background: linear-gradient(180deg, #F8F7FF 0%, #FFFFFF 40%);
+  background: linear-gradient(180deg, #F2F7FF 0%, #FFFFFF 40%);
   position: relative;
   overflow: hidden;
   display: flex;
@@ -193,7 +193,7 @@ function handleCancelLogin() {
   align-items: center;
   justify-content: center;
   margin: 0 auto $space-6;
-  box-shadow: 0 16rpx 48rpx rgba(99, 102, 241, 0.25);
+  box-shadow: 0 16rpx 48rpx rgba(47, 124, 246, 0.25);
 }
 
 .logo-img {
@@ -246,11 +246,11 @@ function handleCancelLogin() {
   }
 
   &--task {
-    background: linear-gradient(135deg, #EEF0FF, #E0E7FF);
+    background: linear-gradient(135deg, #EAF2FF, #DCEBFF);
   }
 
   &--bill {
-    background: linear-gradient(135deg, #ECFDF5, #D1FAE5);
+    background: linear-gradient(135deg, #E8FAF2, #CFF5E6);
   }
 
   &--vote {

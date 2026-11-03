@@ -47,7 +47,7 @@
           </view>
         </view>
         <view class="info-item">
-          <view class="info-icon-wrap" style="background: rgba(99, 102, 241, 0.12);">
+          <view class="info-icon-wrap" style="background: rgba(47, 124, 246, 0.12);">
             <text class="info-icon">🎯</text>
           </view>
           <view class="info-body">
@@ -155,8 +155,8 @@ const canVote = computed(() => {
 })
 
 const statusInfo = computed(() => {
-  if (!vote.value) return { text: '未知', color: '#94A3B8' }
-  return VOTE_STATUS_MAP[vote.value.status] || { text: '未知', color: '#94A3B8' }
+  if (!vote.value) return { text: '未知', color: '#9AA8BC' }
+  return VOTE_STATUS_MAP[vote.value.status] || { text: '未知', color: '#9AA8BC' }
 })
 
 const voteTypeText = computed(() => {
@@ -164,7 +164,7 @@ const voteTypeText = computed(() => {
   return VOTE_TYPE_MAP[vote.value.vote_type] || '未知'
 })
 
-const voteTypeColor = computed(() => vote.value?.vote_type === 1 ? '#10B981' : '#6366F1')
+const voteTypeColor = computed(() => vote.value?.vote_type === 1 ? '#14B88A' : '#2F7CF6')
 
 const selectTypeText = computed(() => {
   if (!vote.value) return ''
@@ -173,7 +173,7 @@ const selectTypeText = computed(() => {
   return `最多选${vote.value.select_count}项`
 })
 
-const barColors = ['#14B8A6', '#6366F1', '#F59E0B', '#F43F5E', '#0EA5E9', '#8B5CF6', '#10B981', '#EF4444']
+const barColors = ['#12B5A5', '#2F7CF6', '#FF9F2E', '#FF6B8B', '#22A6F2', '#FF7AB6', '#14B88A', '#FF5A5F']
 
 const optionLabels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N']
 
@@ -333,7 +333,7 @@ function formatDeadline(deadline: string) {
    ========================================== */
 .hero-banner {
   position: relative;
-  background: linear-gradient(135deg, #0D9488 0%, #14B8A6 50%, #2DD4BF 100%);
+  background: linear-gradient(155deg, #12B5A5 0%, #2FCFBE 55%, #7EE8DA 100%);
   padding: calc(var(--status-bar-height) + 24rpx) $space-4 $space-6;
   overflow: hidden;
 }
@@ -605,7 +605,7 @@ function formatDeadline(deadline: string) {
       width: 36rpx;
       height: 36rpx;
       border-radius: 50%;
-      border: 2rpx solid #D1D5DB;
+      border: 2rpx solid #D5DEEA;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -675,7 +675,7 @@ function formatDeadline(deadline: string) {
     .option-bar {
       flex: 1;
       height: 8rpx;
-      background-color: #F1F5F9;
+      background-color: #EDF3FC;
       border-radius: $radius-full;
       overflow: hidden;
 
