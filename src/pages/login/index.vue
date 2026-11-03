@@ -1,41 +1,37 @@
 <template>
   <view class="login-page">
-    <view class="login-decor login-decor--1"></view>
-    <view class="login-decor login-decor--2"></view>
-
     <view class="login-center">
       <view class="login-hero">
-        <view class="login-top">
-          <view class="logo-wrap">
-            <image class="logo-img" src="/static/icons/app.png" mode="aspectFit" />
-          </view>
-          <text class="app-title">舍小圈</text>
-          <text class="app-desc">一起经营小窝</text>
+        <view class="logo-wrap">
+          <image class="logo-img" src="/static/icons/app.png" mode="aspectFit" />
         </view>
+        <text class="app-title">舍小圈</text>
+        <text class="app-slogan">宿舍那点事，</text>
+        <text class="app-slogan app-slogan--hl">一个圈就够了</text>
+        <text class="app-desc">学生宿舍、员工公寓、合租小窝都适用</text>
 
-        <view class="login-features">
-          <view class="feature-item">
-            <view class="feature-icon feature-icon--task">
-              <image class="feature-icon-img" src="/static/icons/task.png" mode="aspectFit" />
-            </view>
-            <text class="feature-text">任务协作</text>
+        <view class="stickers">
+          <view class="sticker sticker--blue">
+            <image class="sticker-icon" src="/static/icons/task.png" mode="aspectFit" />
+            <text class="sticker-text">值日分工</text>
           </view>
-          <view class="feature-item">
-            <view class="feature-icon feature-icon--bill">
-              <image class="feature-icon-img" src="/static/icons/wallet-sm.png" mode="aspectFit" />
-            </view>
-            <text class="feature-text">账单分摊</text>
+          <view class="sticker sticker--lemon">
+            <image class="sticker-icon" src="/static/icons/wallet-sm.png" mode="aspectFit" />
+            <text class="sticker-text">AA 记账</text>
           </view>
-          <view class="feature-item">
-            <view class="feature-icon feature-icon--vote">
-              <image class="feature-icon-img" src="/static/icons/vote.png" mode="aspectFit" />
-            </view>
-            <text class="feature-text">民主投票</text>
+          <view class="sticker sticker--mint">
+            <image class="sticker-icon" src="/static/icons/vote.png" mode="aspectFit" />
+            <text class="sticker-text">一起投票</text>
           </view>
         </view>
       </view>
 
       <view class="login-body">
+        <view class="btn-wechat" :class="{ 'is-loading': isLoading }" @click="handleLogin">
+          <text v-if="!isLoading">微信一键登录</text>
+          <view v-else class="loading-spinner"></view>
+        </view>
+        <view class="btn-cancel" :class="{ 'is-disabled': isLoading }" @click="!isLoading && handleCancelLogin()">先逛逛</view>
         <view class="login-agreement" @tap="agreed = !agreed">
           <view class="agreement-check" :class="{ 'is-checked': agreed }">
             <text v-if="agreed" class="agreement-check-icon">✓</text>
@@ -47,14 +43,6 @@
             <text class="agreement-link" @tap.stop="openPrivacy">《隐私政策》</text>
           </view>
         </view>
-        <button class="btn-wechat" :class="{ 'is-loading': isLoading }" @click="handleLogin">
-          <text v-if="!isLoading">微信一键登录</text>
-          <view v-else class="loading-spinner"></view>
-        </button>
-        <button class="btn-cancel" :disabled="isLoading" @click="handleCancelLogin">取消登录</button>
-        <!-- <view class="dev-login" @click="handleDevLogin">
-          <text class="dev-login-text">开发登录</text>
-        </view> -->
       </view>
     </view>
   </view>
@@ -132,261 +120,183 @@ function handleCancelLogin() {
 @use '@/styles/variables.scss' as *;
 
 .login-page {
-  height: 100vh;
-  background: linear-gradient(180deg, #F2F7FF 0%, #FFFFFF 40%);
-  position: relative;
-  overflow: hidden;
+  min-height: 100vh;
+  background: $bg-page;
   display: flex;
   flex-direction: column;
-}
-
-.login-decor {
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-
-  &--1 {
-    top: -160rpx;
-    right: -100rpx;
-    width: 500rpx;
-    height: 500rpx;
-    background: radial-gradient(circle, rgba($primary, 0.08) 0%, transparent 70%);
-  }
-
-  &--2 {
-    bottom: 200rpx;
-    left: -200rpx;
-    width: 400rpx;
-    height: 400rpx;
-    background: radial-gradient(circle, rgba($success, 0.06) 0%, transparent 70%);
-  }
 }
 
 .login-center {
-  position: relative;
-  z-index: 1;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: calc(var(--status-bar-height) + 40rpx) $space-8 $space-10;
-  box-sizing: border-box;
-}
-
-.login-hero {
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  padding: calc(env(safe-area-inset-top) + 140rpx) $space-6 calc(env(safe-area-inset-bottom) + 60rpx);
 }
 
-.login-top {
-  text-align: center;
+.login-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .logo-wrap {
-  width: 140rpx;
-  height: 140rpx;
-  border-radius: $radius-xl;
-  background: $primary-gradient;
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 40rpx;
+  background: $bg-card;
+  box-shadow: $shadow-md;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto $space-6;
-  box-shadow: 0 16rpx 48rpx rgba(47, 124, 246, 0.25);
+  margin-bottom: $space-4;
 }
 
 .logo-img {
-  width: 80rpx;
-  height: 80rpx;
+  width: 88rpx;
+  height: 88rpx;
 }
 
 .app-title {
-  font-size: 52rpx;
+  font-size: $font-sm;
   font-weight: 800;
+  color: $primary;
+  letter-spacing: 0.1em;
+  margin-bottom: $space-2;
+}
+
+.app-slogan {
+  font-size: 64rpx;
+  font-weight: 900;
   color: $text-primary;
-  display: block;
-  letter-spacing: -0.03em;
   line-height: 1.2;
+  letter-spacing: -0.02em;
+
+  &--hl {
+    color: $primary;
+    background: linear-gradient(transparent 62%, $accent-lemon 62%);
+  }
 }
 
 .app-desc {
-  font-size: $font-base;
-  color: $text-hint;
-  margin-top: $space-2;
-  display: block;
+  margin-top: $space-3;
+  font-size: $font-sm;
+  color: $text-secondary;
 }
 
-.login-features {
+.stickers {
   display: flex;
-  justify-content: center;
-  gap: $space-8;
-  margin-top: $space-10;
-  padding: $space-6 0;
-}
-
-.feature-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-wrap: wrap;
   gap: $space-3;
+  margin-top: $space-6;
 }
 
-.feature-icon {
-  width: 88rpx;
-  height: 88rpx;
-  border-radius: $radius-lg;
+.sticker {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 10rpx;
+  padding: 16rpx 28rpx;
+  border-radius: $radius-full;
 
-  &-img {
-    width: 40rpx;
-    height: 40rpx;
+  &--blue { background: $primary-bg; transform: rotate(-3deg); }
+  &--lemon { background: $accent-lemon; transform: rotate(2deg); }
+  &--mint { background: $success-bg; transform: rotate(-1deg); }
+
+  &-icon {
+    width: 32rpx;
+    height: 32rpx;
   }
 
-  &--task {
-    background: linear-gradient(135deg, #EAF2FF, #DCEBFF);
+  &-text {
+    font-size: $font-sm;
+    font-weight: 800;
+    color: $text-primary;
   }
-
-  &--bill {
-    background: linear-gradient(135deg, #E8FAF2, #CFF5E6);
-  }
-
-  &--vote {
-    background: linear-gradient(135deg, #F0FDFA, #CCFBF1);
-  }
-}
-
-.feature-text {
-  font-size: $font-xs;
-  color: $text-hint;
-  font-weight: 500;
 }
 
 .login-body {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
 }
 
 .btn-wechat {
-  background: linear-gradient(135deg, #07C160, #06AD56);
+  height: 104rpx;
+  border-radius: $radius-full;
+  background: $primary;
   color: $text-white;
-  border-radius: $radius-xl;
-  padding: $space-5;
-  font-size: $font-base;
-  font-weight: 700;
-  border: none;
-  transition: $transition-base;
+  font-size: $font-md;
+  font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100rpx;
-  box-shadow: 0 8rpx 32rpx rgba(7, 193, 96, 0.3);
-  letter-spacing: 0.02em;
+  box-shadow: $shadow-primary;
 
   &:active {
-    opacity: 0.85;
+    transform: scale(0.98);
   }
 
   &.is-loading {
-    opacity: 0.7;
-    pointer-events: none;
+    opacity: 0.8;
   }
 }
 
 .btn-cancel {
-  margin-top: $space-4;
-  width: 100%;
-  height: 100rpx;
-  background: $bg-card;
-  color: $text-primary;
-  border: 2rpx solid $border-color;
-  border-radius: $radius-xl;
-  font-size: $font-base;
-  font-weight: 700;
+  height: 88rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: $transition-base;
+  font-size: $font-sm;
+  font-weight: 700;
+  color: $text-secondary;
 
-  &:active {
-    background: $bg-hover;
-  }
-
-  &[disabled] {
+  &.is-disabled {
     opacity: 0.5;
-    pointer-events: none;
   }
 }
 
 .login-agreement {
   display: flex;
-  align-items: flex-start;
-  gap: $space-3;
-  margin-bottom: $space-5;
-  text-align: left;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
 }
 
 .agreement-check {
-  flex-shrink: 0;
-  width: 36rpx;
-  height: 36rpx;
-  border: 2rpx solid $border-color;
-  border-radius: 8rpx;
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 50%;
+  border: 3rpx solid $border-color;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 4rpx;
-  background: $bg-card;
+  flex-shrink: 0;
 
   &.is-checked {
     background: $primary;
     border-color: $primary;
   }
-}
 
-.agreement-check-icon {
-  font-size: 22rpx;
-  color: $text-white;
-  line-height: 1;
+  &-icon {
+    font-size: 20rpx;
+    color: $text-white;
+    font-weight: 900;
+  }
 }
 
 .agreement-label {
-  flex: 1;
-  line-height: 1.6;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .agreement-text {
-  font-size: $font-xs;
+  font-size: 22rpx;
   color: $text-hint;
 }
 
 .agreement-link {
-  font-size: $font-xs;
+  font-size: 22rpx;
   color: $primary;
-  font-weight: 500;
-}
-
-// .dev-login {
-//   margin-top: $space-6;
-//   padding: $space-3 $space-5;
-//
-//   .dev-login-text {
-//     font-size: $font-xs;
-//     color: $border-color;
-//   }
-// }
-
-.loading-spinner {
-  width: 40rpx;
-  height: 40rpx;
-  border: 4rpx solid rgba(255, 255, 255, 0.3);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
+  font-weight: 700;
 }
 </style>

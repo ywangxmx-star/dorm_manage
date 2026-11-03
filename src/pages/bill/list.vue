@@ -1,42 +1,39 @@
 <template>
   <view class="bill-list-page">
-    <view class="sticky-header">
-      <view class="header-bg-decor"></view>
-      <view class="sticky-inner">
-        <view class="sticky-top">
-          <view class="sticky-title-row">
-            <view class="sticky-icon-wrap">
-              <image class="sticky-icon" src="/static/icons/receipt.png" mode="aspectFit" />
-            </view>
-            <view class="sticky-title-group">
-              <text class="sticky-title">账单</text>
-              <text class="sticky-subtitle">{{ bills.length }} 笔账单</text>
-            </view>
+    <view class="head">
+      <view class="ui-header">
+        <text class="ui-header__eyebrow">AA · 水电与公共开销</text>
+        <view class="ui-header__row">
+          <text class="ui-header__title">账本</text>
+          <view class="head-count">
+            <text class="head-count-num">{{ currentTab === 'deleted' ? deletedBills.length : bills.length }}</text>
+            <text class="head-count-lbl">笔</text>
           </view>
         </view>
-        <scroll-view scroll-x class="tab-bar" :show-scrollbar="false">
+      </view>
+      <scroll-view scroll-x class="seg-scroll" :show-scrollbar="false">
+        <view class="ui-seg">
           <view
             v-for="tab in normalTabs"
             :key="tab.value"
-            class="tab-item"
-            :class="{ active: currentTab === tab.value }"
+            class="ui-seg__item"
+            :class="{ 'is-active': currentTab === tab.value }"
             @click="switchTab(tab.value)"
           >
             <text>{{ tab.label }}</text>
           </view>
           <view
             v-if="isLeader"
-            class="tab-item tab-deleted"
-            :class="{ active: currentTab === 'deleted' }"
+            class="ui-seg__item seg-trash"
+            :class="{ 'is-active': currentTab === 'deleted' }"
             @click="switchTab('deleted')"
           >
-            <text>最近删除</text>
+            <text>回收站</text>
           </view>
-        </scroll-view>
-      </view>
+        </view>
+      </scroll-view>
     </view>
 
-    <!-- 账单列表 -->
     <scroll-view
       class="page-content"
       scroll-y
@@ -53,70 +50,62 @@
     >
       <PageLoading v-if="isInitialLoading" />
       <template v-else>
-      <view v-if="currentTab !== 'deleted'">
-        <view v-if="bills.length > 0" class="bill-list">
-          <BillCard
-            v-for="(bill, index) in bills"
-            :key="bill.id"
-            :bill="bill"
-            :class="{ 'slide-up': index > 0 }"
-            :style="index > 0 ? { animationDelay: index * 50 + 'ms' } : undefined"
-            @click="goDetail(bill.id)"
-          />
-        </view>
-        <EmptyState v-else-if="!loading" text="暂无账单" title="账单列表为空" />
-      </view>
-
-      <!-- 最近删除列表 -->
-      <view v-else>
-        <view v-if="deletedBills.length > 0" class="deleted-list-wrapper">
-          <view
-            v-for="(bill, index) in deletedBills"
-            :key="bill.id"
-            class="deleted-bill-card card slide-up"
-            :style="{ animationDelay: index * 50 + 'ms' }"
-          >
-            <view class="deleted-bill-info">
-              <text class="deleted-bill-title">{{ bill.title }}</text>
-              <view class="deleted-bill-meta">
-                <text class="meta-amount">{{ formatAmount(bill.amount) }}</text>
-                <text class="meta-dot">·</text>
-                <text class="meta-text">{{ formatDeletedTime(bill.deleted_at) }}</text>
-                <text class="meta-dot">·</text>
-                <text class="meta-text">剩余 {{ getRemainingDays(bill.deleted_at) }} 天</text>
-              </view>
-            </view>
-            <view class="deleted-bill-actions">
-              <button class="btn-restore" @click="handleRestore(bill.id)">恢复</button>
-            </view>
+        <view v-if="currentTab !== 'deleted'" class="list-wrap">
+          <view v-if="bills.length > 0" class="bill-list">
+            <BillCard
+              v-for="(bill, index) in bills"
+              :key="bill.id"
+              :bill="bill"
+              class="slide-up"
+              :style="{ animationDelay: index * 50 + 'ms' }"
+              @click="goDetail(bill.id)"
+            />
+          </view>
+          <view v-else-if="!loading" class="empty-box">
+            <EmptyState text="一起花的钱记在这，自动帮你算分摊" title="还没有账单" />
           </view>
         </view>
-        <EmptyState v-else-if="!loading" text="暂无删除的账单" title="回收站为空" />
-      </view>
 
-      <!-- 加载更多 -->
-      <view v-if="showLoadMore" class="load-more">
-        <view v-if="loading && !isInitialLoading" class="loading-wrap">
-          <view class="loading-spinner spinner-sm"></view>
-          <text class="loading-text">加载中...</text>
+        <view v-else class="list-wrap">
+          <view class="trash-tip">
+            <text class="trash-tip-text">删除的账单会保留 7 天，期间可随时恢复</text>
+          </view>
+          <view v-if="deletedBills.length > 0" class="bill-list">
+            <view
+              v-for="(bill, index) in deletedBills"
+              :key="bill.id"
+              class="trash-card slide-up"
+              :style="{ animationDelay: index * 50 + 'ms' }"
+            >
+              <view class="trash-info">
+                <text class="trash-title">{{ bill.title }}</text>
+                <text class="trash-meta">{{ formatAmount(bill.amount) }} · {{ formatDeletedTime(bill.deleted_at) }} 删除 · 剩余 {{ getRemainingDays(bill.deleted_at) }} 天</text>
+              </view>
+              <view class="trash-btn" @click="handleRestore(bill.id)">恢复</view>
+            </view>
+          </view>
+          <view v-else-if="!loading" class="empty-box">
+            <EmptyState text="暂无删除的账单" title="回收站为空" />
+          </view>
         </view>
-        <view v-else-if="hasMore" class="load-more-btn" @click="loadMore">
-          <text class="load-more-text">加载更多</text>
+
+        <view v-if="showLoadMore" class="load-more">
+          <view v-if="loading && !isInitialLoading" class="loading-wrap">
+            <view class="loading-spinner spinner-sm"></view>
+            <text class="load-more-text">加载中...</text>
+          </view>
+          <view v-else-if="hasMore" class="load-more-btn" @click="loadMore">
+            <text class="load-more-text">加载更多</text>
+          </view>
+          <text v-else class="load-more-text">— 到底啦 —</text>
         </view>
-        <view v-else class="no-more">
-          <text class="no-more-text">没有更多了</text>
-        </view>
-      </view>
+        <view class="bottom-gap"></view>
       </template>
     </scroll-view>
 
-    <view v-if="currentTab !== 'deleted'" class="create-bar">
-      <view class="create-bar-inner page-action-btn page-action-btn--primary" @click="goCreate">
-        <view class="page-action-btn__icon">
-          <text class="page-action-btn__icon-text">+</text>
-        </view>
-        <text class="page-action-btn__text">记一笔账</text>
-      </view>
+    <view v-if="currentTab !== 'deleted'" class="ui-fab" @click="goCreate">
+      <text class="ui-fab__plus">+</text>
+      <text class="ui-fab__text">记一笔</text>
     </view>
   </view>
 </template>
@@ -332,322 +321,151 @@ function goCreate() {
 @use '@/styles/variables.scss' as *;
 
 .bill-list-page {
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  min-height: 100vh;
-  padding: 0;
-  box-sizing: border-box;
+  background: $bg-page;
+}
+
+.head {
+  flex-shrink: 0;
+  padding-bottom: $space-3;
+}
+
+.head-count {
+  display: flex;
+  align-items: baseline;
+  gap: 4rpx;
+  padding: 10rpx 24rpx;
+  background: $accent-lemon;
+  border-radius: $radius-full;
+  transform: rotate(-4deg);
+
+  &-num {
+    font-size: $font-md;
+    font-weight: 900;
+    color: $text-primary;
+  }
+
+  &-lbl {
+    font-size: $font-xs;
+    font-weight: 700;
+    color: $text-primary;
+  }
+}
+
+.seg-scroll {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.seg-trash {
+  border-style: dashed;
 }
 
 .page-content {
   flex: 1;
   height: 0;
-  min-height: 0;
-  box-sizing: border-box;
 }
 
-.sticky-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  overflow: hidden;
-  background: $hero-gradient;
-  padding-bottom: $space-3;
-}
-
-.header-bg-decor {
-  position: absolute;
-  top: -100rpx;
-  right: -80rpx;
-  width: 360rpx;
-  height: 360rpx;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 50%, transparent 70%);
-  pointer-events: none;
-}
-
-.sticky-inner {
-  position: relative;
-  z-index: 1;
-  padding: calc(var(--status-bar-height) + 20rpx) $space-5 $space-1;
-  display: flex;
-  flex-direction: column;
-  gap: $space-3;
-}
-
-.sticky-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.sticky-title-row {
-  display: flex;
-  align-items: center;
-  gap: $space-3;
-  flex: 1;
-  min-width: 0;
-}
-
-.sticky-icon-wrap {
-  width: 64rpx;
-  height: 64rpx;
-  border-radius: $radius-lg;
-  background: rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(12rpx);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  border: 1rpx solid rgba(255, 255, 255, 0.2);
-}
-
-.sticky-icon {
-  width: 34rpx;
-  height: 34rpx;
-  filter: brightness(0) invert(1);
-}
-
-.sticky-title-group {
-  display: flex;
-  flex-direction: column;
-  gap: 2rpx;
-}
-
-.sticky-title {
-  font-size: 42rpx;
-  font-weight: 800;
-  color: $text-white;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-}
-
-.sticky-subtitle {
-  font-size: $font-xs;
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: 500;
-  line-height: 1.3;
-}
-
-/* ---------- Tab 标签栏 ---------- */
-.tab-bar {
-  display: flex;
-  gap: 0;
-  white-space: nowrap;
-  padding: 0 $space-1;
-  position: relative;
-
-  .tab-item {
-    display: inline-block;
-    padding: $space-2 $space-4;
-    margin-right: $space-2;
-    font-size: $font-sm;
-    color: rgba(255, 255, 255, 0.65);
-    font-weight: 500;
-    border-radius: $radius-full;
-    border: none;
-    background: none;
-    position: relative;
-    transition: $transition-fast;
-
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%) scaleX(0);
-      width: 24rpx;
-      height: 4rpx;
-      border-radius: 2rpx;
-      background-color: $text-white;
-      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-                  width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    &.active {
-      color: $text-white;
-      font-weight: 700;
-      background-color: rgba(255, 255, 255, 0.18);
-
-      &::after {
-        transform: translateX(-50%) scaleX(1);
-        width: 28rpx;
-      }
-    }
-
-    &.tab-deleted {
-      color: rgba(255, 255, 255, 0.65);
-      font-weight: 500;
-
-      &.active {
-        color: $text-white;
-        font-weight: 700;
-        background-color: rgba(255, 255, 255, 0.18);
-
-        &::after {
-          background-color: $text-white;
-        }
-      }
-
-      &::after {
-        background-color: $text-white;
-      }
-    }
-
-    &:active {
-      opacity: 0.7;
-    }
-  }
+.list-wrap {
+  padding: $space-2 $space-5 0;
 }
 
 .bill-list {
   display: flex;
   flex-direction: column;
   gap: $space-3;
-  padding: $space-4 $space-4 200rpx;
-  box-sizing: border-box;
 }
 
-.deleted-list-wrapper {
+.empty-box {
+  margin-top: $space-4;
+  background: $bg-card;
+  border-radius: $radius-lg;
+  border: 2rpx dashed $border-color;
+}
+
+.trash-tip {
+  margin-bottom: $space-3;
+  padding: $space-2 $space-3;
+  background: $accent-lemon-soft;
+  border-radius: $radius-md;
+
+  &-text {
+    font-size: $font-xs;
+    color: $accent-lemon-text;
+    font-weight: 600;
+  }
+}
+
+.trash-card {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-4;
+  background: $bg-card;
+  border-radius: $radius-lg;
+  border: 2rpx dashed $border-color;
+}
+
+.trash-info {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: $space-3;
-  padding: $space-4 $space-4 200rpx;
-  box-sizing: border-box;
+  gap: 6rpx;
 }
 
-.deleted-bill-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: $space-4 $space-5;
-  position: relative;
+.trash-title {
+  font-size: $font-base;
+  font-weight: 700;
+  color: $text-secondary;
+  text-decoration: line-through;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 6rpx;
-    background: $text-hint;
-    opacity: 0.3;
-    border-radius: 0 $radius-sm $radius-sm 0;
-  }
+.trash-meta {
+  font-size: $font-xs;
+  color: $text-hint;
+}
 
-  .deleted-bill-info {
-    flex: 1;
-
-    .deleted-bill-title {
-      font-size: $font-base;
-      font-weight: 600;
-      color: $text-primary;
-      display: block;
-      margin-bottom: $space-2;
-    }
-
-    .deleted-bill-meta {
-      display: flex;
-      align-items: center;
-      gap: $space-2;
-
-      .meta-amount {
-        font-size: $font-sm;
-        color: $text-primary;
-        font-weight: 600;
-      }
-
-      .meta-text {
-        font-size: $font-xs;
-        color: $text-hint;
-      }
-
-      .meta-dot {
-        font-size: $font-xs;
-        color: $text-hint;
-      }
-    }
-  }
-
-  .deleted-bill-actions {
-    margin-left: $space-4;
-
-    .btn-restore {
-      font-size: $font-sm;
-      color: $primary;
-      background-color: $primary-bg;
-      border: none;
-      padding: $space-2 $space-4;
-      border-radius: $radius-full;
-      font-weight: 500;
-
-      &:active {
-        opacity: 0.8;
-      }
-    }
-  }
+.trash-btn {
+  flex-shrink: 0;
+  padding: 14rpx 32rpx;
+  border-radius: $radius-full;
+  background: $primary;
+  color: $text-white;
+  font-size: $font-xs;
+  font-weight: 700;
 }
 
 .load-more {
-  padding: $space-6 0;
-
-  .loading-wrap {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: $space-3;
-
-    .loading-text {
-      font-size: $font-sm;
-      color: $text-hint;
-    }
-  }
-
-  .load-more-btn {
-    text-align: center;
-    padding: $space-3;
-    background-color: $bg-card;
-    border-radius: $radius-lg;
-    border: 1rpx solid $border-color;
-    box-shadow: $shadow-sm;
-
-    &:active {
-      background-color: $bg-hover;
-    }
-
-    .load-more-text {
-      font-size: $font-sm;
-      color: $primary;
-      font-weight: 500;
-    }
-  }
-
-  .no-more {
-    text-align: center;
-
-    .no-more-text {
-      font-size: $font-xs;
-      color: $text-hint;
-    }
-  }
+  display: flex;
+  justify-content: center;
+  padding: $space-5 0;
 }
 
-.create-bar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: $space-4 $space-5;
-  padding-bottom: calc($space-4 + constant(safe-area-inset-bottom));
-  padding-bottom: calc($space-4 + env(safe-area-inset-bottom));
-  background: linear-gradient(transparent, $bg-page 40%);
-  z-index: 50;
-  pointer-events: none;
+.loading-wrap {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
 }
 
-.create-bar-inner {
-  pointer-events: auto;
+.load-more-btn {
+  padding: 14rpx 40rpx;
+  border-radius: $radius-full;
+  background: $bg-card;
+  border: 2rpx solid $border-color;
+}
+
+.load-more-text {
+  font-size: $font-xs;
+  color: $text-hint;
+}
+
+.bottom-gap {
+  height: calc(env(safe-area-inset-bottom) + 200rpx);
 }
 </style>

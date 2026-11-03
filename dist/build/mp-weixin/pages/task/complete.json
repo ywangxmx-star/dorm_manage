@@ -1,6 +1,4 @@
 {
   "navigationBarTitleText": "完成任务",
-  "usingComponents": {
-    "form-section": "../../components/FormSection"
-  }
+  "usingComponents": {}
 }

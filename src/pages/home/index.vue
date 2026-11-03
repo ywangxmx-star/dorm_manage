@@ -1,56 +1,28 @@
 <template>
   <view class="home-page">
-    <!-- ==================== 加载中 ==================== -->
     <view v-if="loading" class="loading-page">
-      <view class="loading-content">
-        <view class="loading-spinner"></view>
-        <text class="loading-text">加载中...</text>
-      </view>
+      <view class="loading-spinner spinner-lg"></view>
+      <text class="loading-text">正在整理宿舍动态...</text>
     </view>
 
-    <!-- ==================== 有宿舍 - 内容区 ==================== -->
     <template v-else-if="currentRoom">
       <view class="home-body">
-        <view class="page-header">
-          <view class="header-bg-decor"></view>
-          <view class="header-inner">
-            <view class="header-room" @click="showRoomPicker = true">
-              <view class="header-room-left">
-                <view class="header-room-avatar">
-                  <text class="header-room-avatar-text">{{ currentRoom.room_name.charAt(0) }}</text>
-                </view>
-                <view class="header-room-info">
-                  <text class="header-room-name">{{ currentRoom.room_name }}</text>
-                  <text class="header-room-meta">{{ myRooms.length > 1 ? myRooms.length + '个宿舍' : '我的宿舍' }}</text>
-                </view>
-              </view>
-              <view v-if="myRooms.length > 1" class="header-room-switch">
-                <text class="switch-text">切换</text>
-                <text class="switch-arrow">›</text>
+        <view class="top">
+          <view class="top-room" @click="showRoomPicker = true">
+            <view class="top-room-avatar">
+              <text class="top-room-avatar-text">{{ currentRoom.room_name.charAt(0) }}</text>
+            </view>
+            <view class="top-room-info">
+              <text class="top-room-eyebrow">我的小窝</text>
+              <view class="top-room-name-row">
+                <text class="top-room-name">{{ currentRoom.room_name }}</text>
+                <text class="top-room-caret">▾</text>
               </view>
             </view>
-
-            <view class="header-kpi">
-              <view class="kpi-item" @click="goMembers">
-                <text class="kpi-num">{{ currentRoom.member_count }}</text>
-                <text class="kpi-lbl">成员</text>
-              </view>
-              <view class="kpi-divider"></view>
-              <view class="kpi-item" @click="goTaskList">
-                <text class="kpi-num">{{ todayTasks.length }}</text>
-                <text class="kpi-lbl">待办</text>
-              </view>
-              <view class="kpi-divider"></view>
-              <view class="kpi-item" @click="goBillList">
-                <text class="kpi-num">{{ unpaidBills.length }}</text>
-                <text class="kpi-lbl">待付</text>
-              </view>
-              <view class="kpi-divider"></view>
-              <view class="kpi-item" @click="goVoteList">
-                <text class="kpi-num">{{ activeVotes.length }}</text>
-                <text class="kpi-lbl">投票</text>
-              </view>
-            </view>
+          </view>
+          <view class="top-members" @click="goMembers">
+            <text class="top-members-num">{{ currentRoom.member_count }}</text>
+            <text class="top-members-lbl">室友</text>
           </view>
         </view>
 
@@ -68,162 +40,192 @@
           @refresherrestore="onRefresherRestore"
           @refresherrefresh="onRefresh"
         >
-          <view v-if="currentRoom.notice" class="content-notice">
-            <text class="content-notice-dot"></text>
-            <text class="content-notice-text">{{ currentRoom.notice }}</text>
-          </view>
+          <view class="content">
+            <view v-if="currentRoom.notice" class="notice">
+              <view class="notice-tape"></view>
+              <text class="notice-label">宿舍公告</text>
+              <text class="notice-text">{{ currentRoom.notice }}</text>
+            </view>
 
-          <view class="section" :class="{ 'section--first': !currentRoom.notice }">
-          <view class="section-hd">
-            <text class="section-hd-title">快捷操作</text>
-          </view>
-          <view class="actions-row">
-            <view v-if="isLeader" class="action-item" @click="goCreateTask">
-              <view class="action-icon action-icon--task">
-                <image class="action-icon-img" src="/static/icons/task.png" mode="aspectFit" />
+            <view class="bento">
+              <view class="tile tile--task" @click="goTaskList">
+                <view class="tile-top">
+                  <view class="tile-icon tile-icon--light">
+                    <image class="tile-icon-img" src="/static/icons/task.png" mode="aspectFit" />
+                  </view>
+                  <text class="tile-arrow tile-arrow--light">↗</text>
+                </view>
+                <view class="tile-bottom">
+                  <text class="tile-num tile-num--light">{{ todayTasks.length }}</text>
+                  <text class="tile-title tile-title--light">今日待办</text>
+                  <text class="tile-desc tile-desc--light">{{ todayTasks.length ? '加油，马上搞定' : '今天很轻松' }}</text>
+                </view>
               </view>
-              <text class="action-label">发布任务</text>
-            </view>
-            <view class="action-item" @click="goCreateBill">
-              <view class="action-icon action-icon--bill">
-                <image class="action-icon-img" src="/static/icons/wallet.png" mode="aspectFit" />
-              </view>
-              <text class="action-label">记一笔账</text>
-            </view>
-            <view class="action-item" @click="goBillList">
-              <view class="action-icon action-icon--receipt">
-                <image class="action-icon-img" src="/static/icons/receipt.png" mode="aspectFit" />
-              </view>
-              <text class="action-label">账单列表</text>
-            </view>
-            <view class="action-item" @click="goMembers">
-              <view class="action-icon action-icon--member">
-                <image class="action-icon-img" src="/static/icons/users.png" mode="aspectFit" />
-              </view>
-              <text class="action-label">成员管理</text>
-            </view>
-          </view>
-        </view>
 
-        <!-- ==================== 今日待办 ==================== -->
-        <view class="section">
-          <view class="section-hd">
-            <view class="section-hd-left">
-              <text class="section-hd-title">今日待办</text>
-              <text v-if="todayTasks.length" class="section-hd-badge">{{ todayTasks.length }}</text>
+              <view class="bento-col">
+                <view class="tile tile--bill" @click="goBillList">
+                  <view class="tile-row">
+                    <view class="tile-icon">
+                      <image class="tile-icon-img" src="/static/icons/wallet.png" mode="aspectFit" />
+                    </view>
+                    <text class="tile-num">{{ unpaidBills.length }}</text>
+                  </view>
+                  <text class="tile-title">待付账单</text>
+                </view>
+                <view class="tile tile--vote" @click="goVoteList">
+                  <view class="tile-row">
+                    <view class="tile-icon">
+                      <image class="tile-icon-img" src="/static/icons/receipt.png" mode="aspectFit" />
+                    </view>
+                    <text class="tile-num">{{ activeVotes.length }}</text>
+                  </view>
+                  <text class="tile-title">进行中投票</text>
+                </view>
+              </view>
             </view>
-            <text class="section-hd-more" @click="goTaskList">查看全部</text>
-          </view>
-          <view class="data-card" v-if="todayTasks.length">
-            <view class="data-card-body">
-              <TaskCard
-                v-for="task in visibleTasks"
-                :key="task.id"
-                :task="task"
-                @click="goTaskDetail(task.id)"
-              />
-            </view>
-            <view v-if="todayTasks.length > maxVisibleItems" class="data-card-expand" @click="toggleTasks">
-              <text class="data-card-expand-text">{{ showAllTasks ? '收起' : '展开全部' }}</text>
-              <image
-                class="data-card-expand-icon"
-                :class="{ 'is-open': showAllTasks }"
-                src="/static/icons/chevron-right.png"
-                mode="aspectFit"
-              />
-            </view>
-          </view>
-          <EmptyState v-else icon="/static/icons/task.png" title="一切顺利" text="暂无待办任务" />
-        </view>
 
-        <!-- ==================== 待付账单 ==================== -->
-        <view class="section section--last">
-          <view class="section-hd">
-            <view class="section-hd-left">
-              <text class="section-hd-title">待付账单</text>
-              <text v-if="unpaidBills.length" class="section-hd-badge">{{ unpaidBills.length }}</text>
+            <view class="quick">
+              <view v-if="isLeader" class="quick-item" @click="goCreateTask">
+                <view class="quick-dot quick-dot--blue">
+                  <image class="quick-dot-img" src="/static/icons/task.png" mode="aspectFit" />
+                </view>
+                <text class="quick-text">发布任务</text>
+              </view>
+              <view class="quick-item" @click="goCreateBill">
+                <view class="quick-dot quick-dot--lemon">
+                  <image class="quick-dot-img" src="/static/icons/wallet.png" mode="aspectFit" />
+                </view>
+                <text class="quick-text">记一笔</text>
+              </view>
+              <view class="quick-item" @click="goBillList">
+                <view class="quick-dot quick-dot--mint">
+                  <image class="quick-dot-img" src="/static/icons/receipt.png" mode="aspectFit" />
+                </view>
+                <text class="quick-text">账单</text>
+              </view>
+              <view class="quick-item" @click="goMembers">
+                <view class="quick-dot quick-dot--pink">
+                  <image class="quick-dot-img" src="/static/icons/users.png" mode="aspectFit" />
+                </view>
+                <text class="quick-text">室友</text>
+              </view>
             </view>
-            <text class="section-hd-more" @click="goBillList">查看全部</text>
-          </view>
-          <view class="data-card" v-if="unpaidBills.length">
-            <view class="data-card-body">
-              <BillCard
-                v-for="bill in visibleBills"
-                :key="bill.id"
-                :bill="bill"
-                @click="goBillDetail(bill.id)"
-              />
-            </view>
-            <view v-if="unpaidBills.length > maxVisibleItems" class="data-card-expand" @click="toggleBills">
-              <text class="data-card-expand-text">{{ showAllBills ? '收起' : '展开全部' }}</text>
-              <image
-                class="data-card-expand-icon"
-                :class="{ 'is-open': showAllBills }"
-                src="/static/icons/chevron-right.png"
-                mode="aspectFit"
-              />
-            </view>
-          </view>
-          <EmptyState v-else icon="/static/icons/wallet.png" title="账单已清" text="暂无待付账单" />
-        </view>
 
-        <view class="safe-bottom"></view>
+            <view class="block">
+              <view class="block-hd">
+                <view class="block-hd-left">
+                  <text class="block-title">今日待办</text>
+                  <text v-if="todayTasks.length" class="block-count">{{ todayTasks.length }}</text>
+                </view>
+                <text class="block-more" @click="goTaskList">全部 ›</text>
+              </view>
+              <view v-if="todayTasks.length" class="block-list">
+                <TaskCard
+                  v-for="task in visibleTasks"
+                  :key="task.id"
+                  :task="task"
+                  @click="goTaskDetail(task.id)"
+                />
+                <view v-if="todayTasks.length > maxVisibleItems" class="block-expand" @click="toggleTasks">
+                  <text class="block-expand-text">{{ showAllTasks ? '收起' : `再看 ${todayTasks.length - maxVisibleItems} 条` }}</text>
+                </view>
+              </view>
+              <view v-else class="block-empty">
+                <EmptyState icon="/static/icons/task.png" title="一切顺利" text="暂无待办任务" />
+              </view>
+            </view>
+
+            <view class="block">
+              <view class="block-hd">
+                <view class="block-hd-left">
+                  <text class="block-title">待付账单</text>
+                  <text v-if="unpaidBills.length" class="block-count block-count--lemon">{{ unpaidBills.length }}</text>
+                </view>
+                <text class="block-more" @click="goBillList">全部 ›</text>
+              </view>
+              <view v-if="unpaidBills.length" class="block-list">
+                <BillCard
+                  v-for="bill in visibleBills"
+                  :key="bill.id"
+                  :bill="bill"
+                  @click="goBillDetail(bill.id)"
+                />
+                <view v-if="unpaidBills.length > maxVisibleItems" class="block-expand" @click="toggleBills">
+                  <text class="block-expand-text">{{ showAllBills ? '收起' : `再看 ${unpaidBills.length - maxVisibleItems} 条` }}</text>
+                </view>
+              </view>
+              <view v-else class="block-empty">
+                <EmptyState icon="/static/icons/wallet.png" title="账单已清" text="暂无待付账单" />
+              </view>
+            </view>
+
+            <view class="safe-bottom"></view>
+          </view>
         </scroll-view>
       </view>
     </template>
 
-    <!-- ==================== 无宿舍 - 空状态 ==================== -->
     <template v-else>
-      <view class="empty-state">
-        <view class="empty-card">
-          <view class="empty-icon-wrap">
-            <image class="empty-icon-img" src="/static/icons/app.png" mode="aspectFill" />
+      <view class="welcome">
+        <view class="welcome-art">
+          <view class="welcome-sticker welcome-sticker--blue">
+            <image class="welcome-sticker-img" src="/static/icons/app.png" mode="aspectFill" />
           </view>
-          <text class="empty-title">欢迎来到舍小圈</text>
-          <text class="empty-desc">创建或加入一个宿舍，开始管理宿舍生活</text>
-          <view class="empty-actions">
-            <view class="empty-btn empty-btn--outline" @click="goJoinRoom">加入宿舍</view>
-            <view class="empty-btn empty-btn--primary" @click="goCreateRoom">创建宿舍</view>
+          <view class="welcome-sticker welcome-sticker--lemon">
+            <text class="welcome-sticker-text">记账</text>
           </view>
+          <view class="welcome-sticker welcome-sticker--pink">
+            <text class="welcome-sticker-text">值日</text>
+          </view>
+          <view class="welcome-sticker welcome-sticker--mint">
+            <text class="welcome-sticker-text">投票</text>
+          </view>
+        </view>
+        <view class="welcome-copy">
+          <text class="welcome-title">和室友一起，{{ '\n' }}把日子过明白</text>
+          <text class="welcome-desc">无论是校园宿舍还是合租公寓，值日、分账、投票都能在这里轻松搞定。</text>
+        </view>
+        <view class="welcome-actions">
+          <view class="ui-btn ui-btn--primary" @click="goCreateRoom">创建宿舍</view>
+          <view class="ui-btn ui-btn--ghost" @click="goJoinRoom">我有邀请码</view>
         </view>
       </view>
     </template>
 
-    <!-- ==================== 宿舍选择弹窗 ==================== -->
-    <view class="modal-mask" v-if="showRoomPicker" @click="showRoomPicker = false">
-      <view class="modal" @click.stop>
-        <view class="modal-handle"></view>
-        <view class="modal-head">
-          <text class="modal-head-title">切换宿舍</text>
-          <view class="modal-head-close" @click="showRoomPicker = false">
-            <image class="modal-head-close-icon" src="/static/icons/x.png" mode="aspectFit" />
+    <view v-if="showRoomPicker" class="ui-sheet-mask" @click="showRoomPicker = false">
+      <view class="ui-sheet" @click.stop>
+        <view class="ui-sheet__handle"></view>
+        <view class="sheet-head">
+          <text class="ui-sheet__title">切换宿舍</text>
+          <view class="sheet-close" @click="showRoomPicker = false">
+            <image class="sheet-close-icon" src="/static/icons/x.png" mode="aspectFit" />
           </view>
         </view>
-        <scroll-view scroll-y class="modal-list">
-          <view class="modal-list-inner">
-          <view
-            v-for="room in myRooms"
-            :key="room.id"
-            class="modal-item"
-            :class="{ 'is-active': room.id === currentRoom?.id }"
-            @click="switchRoom(room)"
-          >
-            <view class="modal-item-avatar">
-              <text class="modal-item-avatar-text">{{ room.room_name.charAt(0) }}</text>
+        <scroll-view scroll-y class="sheet-list">
+          <view class="sheet-list-inner">
+            <view
+              v-for="room in myRooms"
+              :key="room.id"
+              class="sheet-item"
+              :class="{ 'is-active': room.id === currentRoom?.id }"
+              @click="switchRoom(room)"
+            >
+              <view class="sheet-item-avatar">
+                <text class="sheet-item-avatar-text">{{ room.room_name.charAt(0) }}</text>
+              </view>
+              <view class="sheet-item-info">
+                <text class="sheet-item-name">{{ room.room_name }}</text>
+                <text class="sheet-item-meta">{{ room.member_count }} 位室友</text>
+              </view>
+              <view v-if="room.id === currentRoom?.id" class="sheet-item-check">
+                <text class="sheet-item-check-icon">✓</text>
+              </view>
             </view>
-            <view class="modal-item-info">
-              <text class="modal-item-name">{{ room.room_name }}</text>
-              <text class="modal-item-meta">{{ room.member_count }} 位成员</text>
-            </view>
-            <view v-if="room.id === currentRoom?.id" class="modal-item-check">
-              <text class="modal-item-check-icon">✓</text>
-            </view>
-          </view>
           </view>
         </scroll-view>
-        <view class="modal-actions">
-          <view class="modal-btn" @click="showRoomPicker = false; goCreateRoom()">创建宿舍</view>
-          <view class="modal-btn modal-btn--primary" @click="showRoomPicker = false; goJoinRoom()">加入宿舍</view>
+        <view class="sheet-actions">
+          <view class="ui-btn ui-btn--ghost" @click="showRoomPicker = false; goCreateRoom()">创建宿舍</view>
+          <view class="ui-btn ui-btn--primary" @click="showRoomPicker = false; goJoinRoom()">加入宿舍</view>
         </view>
       </view>
     </view>
@@ -467,9 +469,6 @@ function goBillDetail(id: number) { uni.navigateTo({ url: `/pages/bill/detail?id
 <style lang="scss" scoped>
 @use '@/styles/variables.scss' as *;
 
-/* ============================================================
-   全局布局
-   ============================================================ */
 .home-page {
   min-height: 100vh;
   background-color: $bg-page;
@@ -480,34 +479,15 @@ function goBillDetail(id: number) { uni.navigateTo({ url: `/pages/bill/detail?id
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
-  box-sizing: border-box;
 }
 
-/* ============================================================
-   加载中
-   ============================================================ */
 .loading-page {
   min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: $bg-page;
-}
-
-.loading-content {
-  display: flex;
   flex-direction: column;
   align-items: center;
-  gap: $space-4;
-}
-
-.loading-spinner {
-  width: 80rpx;
-  height: 80rpx;
-  border: 6rpx solid $border-color;
-  border-top-color: $primary;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  justify-content: center;
+  gap: $space-3;
 }
 
 .loading-text {
@@ -515,734 +495,600 @@ function goBillDetail(id: number) { uni.navigateTo({ url: `/pages/bill/detail?id
   color: $text-hint;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
 .page-content {
   flex: 1;
   height: 0;
-  min-height: 0;
-  box-sizing: border-box;
+}
+
+.content {
+  padding: 0 $space-5;
+  display: flex;
+  flex-direction: column;
+  gap: $space-5;
 }
 
 .safe-bottom {
-  height: calc(env(safe-area-inset-bottom) + 16rpx);
+  height: calc(env(safe-area-inset-bottom) + 24rpx);
 }
 
-/* ============================================================
-   页面头部
-   ============================================================ */
-.page-header {
-  position: relative;
+/* -------- 顶部宿舍栏 -------- */
+.top {
   flex-shrink: 0;
-  overflow: hidden;
-  background: $hero-gradient;
-  padding: calc(var(--status-bar-height) + 48rpx) $space-5 $space-5;
-
-  .header-bg-decor {
-    position: absolute;
-    top: -120rpx;
-    right: -80rpx;
-    width: 400rpx;
-    height: 400rpx;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .header-inner {
-    position: relative;
-    z-index: 1;
-  }
-}
-
-/* -- 宿舍信息 -- */
-.header-room {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: $space-5;
-  padding: $space-4;
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(24rpx);
-  border-radius: $radius-xl;
-  border: 1rpx solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.06);
-  transition: $transition-fast;
-
-  &:active {
-    background: rgba(255, 255, 255, 0.18);
-    transform: scale(0.98);
-  }
+  gap: $space-3;
+  padding: calc(var(--status-bar-height) + 32rpx) $space-5 $space-4;
 }
 
-.header-room-left {
+.top-room {
   display: flex;
   align-items: center;
   gap: $space-3;
   flex: 1;
   min-width: 0;
+
+  &:active {
+    opacity: 0.8;
+  }
 }
 
-.header-room-avatar {
-  width: 88rpx;
-  height: 88rpx;
-  border-radius: $radius-lg;
+.top-room-avatar {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 32rpx;
   background: $accent-lemon;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border: 4rpx solid rgba(255, 255, 255, 0.85);
-  box-shadow: 0 6rpx 18rpx rgba(30, 99, 214, 0.25);
   transform: rotate(-6deg);
+  box-shadow: 0 8rpx 0 rgba(21, 34, 56, 0.08);
 
   &-text {
-    font-size: 38rpx;
-    font-weight: 800;
+    font-size: 44rpx;
+    font-weight: 900;
     color: $text-primary;
-    letter-spacing: -0.02em;
   }
 }
 
-.header-room-info {
-  flex: 1;
-  min-width: 0;
+.top-room-info {
   display: flex;
   flex-direction: column;
-  gap: 6rpx;
+  min-width: 0;
 }
 
-.header-room-name {
-  font-size: $font-md;
-  font-weight: 700;
-  color: #fff;
-  line-height: 1.2;
+.top-room-eyebrow {
+  font-size: $font-xs;
+  color: $text-hint;
+  font-weight: 600;
+}
+
+.top-room-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  min-width: 0;
+}
+
+.top-room-name {
+  font-size: 44rpx;
+  font-weight: 800;
+  color: $text-primary;
+  letter-spacing: -0.02em;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
 }
 
-.header-room-meta {
-  font-size: $font-xs;
-  color: rgba(255, 255, 255, 0.65);
-  font-weight: 500;
+.top-room-caret {
+  font-size: $font-sm;
+  color: $primary;
 }
 
-.header-room-switch {
-  display: flex;
-  align-items: center;
-  gap: 4rpx;
+.top-members {
   flex-shrink: 0;
-  padding: 12rpx 24rpx;
-  background: $accent-lemon;
-  border-radius: $radius-full;
-
-  &:active {
-    opacity: 0.85;
-  }
-
-  .switch-text {
-    font-size: $font-xs;
-    color: $text-primary;
-    font-weight: 700;
-  }
-
-  .switch-arrow {
-    font-size: $font-xs;
-    color: $text-primary;
-    font-weight: 600;
-  }
-}
-
-/* -- KPI -- */
-.header-kpi {
   display: flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(12rpx);
-  border-radius: $radius-xl;
-  padding: $space-3 0;
-  border: 1rpx solid rgba(255, 255, 255, 0.2);
+  align-items: baseline;
+  gap: 6rpx;
+  padding: 14rpx 26rpx;
+  background: $bg-card;
+  border-radius: $radius-full;
+  border: 2rpx solid $border-color;
+
+  &-num {
+    font-size: $font-base;
+    font-weight: 800;
+    color: $primary;
+  }
+
+  &-lbl {
+    font-size: $font-xs;
+    color: $text-secondary;
+  }
 }
 
-.kpi-item {
-  flex: 1;
+/* -------- 公告便利贴 -------- */
+.notice {
+  position: relative;
+  margin-top: $space-2;
+  padding: $space-5 $space-4 $space-4;
+  background: $accent-lemon-soft;
+  border-radius: $radius-md;
+  transform: rotate(-1deg);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 4rpx;
-  padding: $space-2 0;
-  transition: $transition-fast;
+  gap: 8rpx;
 
-  &:active {
-    opacity: 0.6;
+  &-tape {
+    position: absolute;
+    top: -14rpx;
+    left: 50%;
+    width: 140rpx;
+    height: 32rpx;
+    margin-left: -70rpx;
+    background: rgba(47, 124, 246, 0.25);
+    border-radius: 6rpx;
+    transform: rotate(3deg);
   }
-}
 
-.kpi-num {
-  font-size: 44rpx;
-  font-weight: 800;
-  color: #fff;
-  line-height: 1.1;
-}
-
-.kpi-lbl {
-  font-size: 22rpx;
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: 500;
-}
-
-.kpi-divider {
-  width: 1rpx;
-  height: 48rpx;
-  background: rgba(255, 255, 255, 0.2);
-  flex-shrink: 0;
-}
-
-/* -- 公告（滚动区） -- */
-.content-notice {
-  display: flex;
-  align-items: center;
-  gap: $space-2;
-  margin: $space-4 $space-4 0;
-  padding: $space-3 $space-4;
-  background: $bg-card;
-  border-radius: $radius-lg;
-  border: 1rpx solid $border-color;
-  box-shadow: $shadow-sm;
-
-  &-dot {
-    width: 10rpx;
-    height: 10rpx;
-    border-radius: 50%;
-    background: $warning;
-    flex-shrink: 0;
+  &-label {
+    font-size: $font-xs;
+    font-weight: 800;
+    color: $accent-lemon-text;
   }
 
   &-text {
-    font-size: 24rpx;
-    color: $text-secondary;
-    line-height: 1.4;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-}
-
-/* ============================================================
-   区块通用样式
-   ============================================================ */
-.section {
-  padding: 0 $space-4;
-  margin-top: $space-5;
-
-  &--first {
-    margin-top: $space-4;
-  }
-
-  &--last {
-    margin-bottom: $space-4;
-  }
-}
-
-.section-hd {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: $space-4;
-
-  &-left {
-    display: flex;
-    align-items: center;
-    gap: $space-2;
-  }
-
-  &-title {
-    font-size: $font-md;
-    font-weight: 700;
+    font-size: $font-sm;
     color: $text-primary;
-    letter-spacing: -0.01em;
-  }
-
-  &-badge {
-    font-size: 20rpx;
-    font-weight: 600;
-    color: $danger;
-    background: $danger-bg;
-    min-width: 32rpx;
-    height: 32rpx;
-    line-height: 32rpx;
-    text-align: center;
-    border-radius: $radius-full;
-    padding: 0 $space-2;
-  }
-
-  &-more {
-    font-size: 24rpx;
-    color: $text-hint;
-    font-weight: 500;
-    padding: $space-1 $space-3;
-    border-radius: $radius-full;
-    background: $bg-hover;
-    transition: $transition-fast;
-
-    &:active {
-      background: $border-light;
-      color: $primary;
-    }
+    line-height: 1.6;
   }
 }
 
-/* ============================================================
-   快捷操作
-   ============================================================ */
-.actions-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+/* -------- 便当盒宫格 -------- */
+.bento {
+  display: flex;
   gap: $space-3;
 }
 
-.action-item {
+.bento-col {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: $space-2;
-  padding: $space-4 $space-2;
-  background: $bg-card;
-  border-radius: $radius-xl;
-  box-shadow: $shadow-sm;
-  transition: $transition-base;
-  border: 1rpx solid $border-color;
-
-  &:active {
-    transform: scale(0.95);
-    box-shadow: $shadow-sm;
-  }
-}
-
-.action-icon {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: $radius-lg;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 6rpx;
-    background: currentColor;
-    opacity: 0.4;
-    border-radius: 0 $radius-sm $radius-sm 0;
-  }
-
-  &-img {
-    width: 40rpx;
-    height: 40rpx;
-  }
-
-  &--task {
-    background: linear-gradient(135deg, rgba($primary, 0.12), rgba($primary-light, 0.06));
-    color: $primary;
-  }
-  &--bill {
-    background: linear-gradient(135deg, rgba($success, 0.12), rgba($success-light, 0.06));
-    color: $success;
-  }
-  &--receipt {
-    background: linear-gradient(135deg, rgba($warning, 0.12), rgba($warning-light, 0.06));
-    color: $warning;
-  }
-  &--member {
-    background: linear-gradient(135deg, rgba($accent-violet, 0.12), rgba($accent-violet, 0.06));
-    color: $accent-violet;
-  }
-}
-
-.action-label {
-  font-size: 24rpx;
-  font-weight: 600;
-  color: $text-secondary;
-}
-
-/* ============================================================
-   数据卡片（待办 / 待付）
-   ============================================================ */
-.data-card {
-  background: transparent;
-  border-radius: $radius-xl;
-  padding: 0;
-
-  &-body {
-    display: flex;
-    flex-direction: column;
-  }
-
-  &-expand {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: $space-1;
-    padding: $space-3 0;
-    transition: $transition-fast;
-
-    &:active {
-      opacity: 0.5;
-    }
-
-    &-text {
-      font-size: 24rpx;
-      color: $text-hint;
-      font-weight: 500;
-    }
-
-    &-icon {
-      width: 24rpx;
-      height: 24rpx;
-      opacity: 0.3;
-      transition: transform 0.25s ease;
-
-      &.is-open {
-        transform: rotate(90deg);
-      }
-    }
-  }
-}
-
-/* ============================================================
-   空状态（无宿舍）
-   ============================================================ */
-.empty-state {
-  padding: $space-16 $space-5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 60vh;
-}
-
-.empty-card {
-  background: $bg-card;
-  border-radius: $radius-xl;
-  padding: $space-12 $space-6;
-  text-align: center;
-  box-shadow: $shadow-md;
-  border: 1rpx solid $border-color;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 6rpx;
-    background: $primary;
-    opacity: 0.4;
-    border-radius: 0 $radius-sm $radius-sm 0;
-  }
-}
-
-.empty-icon-wrap {
-  width: 200rpx;
-  height: 200rpx;
-  margin: 0 auto $space-6;
-  border-radius: 50%;
-  position: relative;
-  overflow: hidden;
-}
-
-.empty-icon-img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.empty-title {
-  font-size: $font-lg;
-  font-weight: 700;
-  color: $text-primary;
-  display: block;
-  margin-bottom: $space-3;
-}
-
-.empty-desc {
-  font-size: $font-sm;
-  color: $text-secondary;
-  display: block;
-  margin-bottom: $space-8;
-  line-height: 1.6;
-}
-
-.empty-actions {
-  display: flex;
   gap: $space-3;
 }
 
-.empty-btn {
-  flex: 1;
-  height: 88rpx;
+.tile {
   border-radius: $radius-lg;
-  font-size: $font-base;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: $space-4;
+  box-sizing: border-box;
   transition: $transition-fast;
 
   &:active {
     transform: scale(0.97);
   }
 
-  &--primary {
-    background: $primary-gradient;
-    color: $text-white;
-    border: none;
-    box-shadow: 0 8rpx 24rpx rgba($primary, 0.3);
+  &--task {
+    flex: 1;
+    min-height: 360rpx;
+    background: $primary;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: $shadow-primary;
   }
 
-  &--outline {
-    background: transparent;
-    color: $primary;
-    border: 2rpx solid rgba($primary, 0.3);
+  &--bill {
+    flex: 1;
+    background: $accent-lemon;
+  }
+
+  &--vote {
+    flex: 1;
+    background: $bg-card;
+    border: 2rpx solid $border-color;
   }
 }
 
-/* ============================================================
-   宿舍选择弹窗（底部 Sheet）
-   ============================================================ */
-.modal-mask {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
+.tile-top,
+.tile-row {
   display: flex;
-  align-items: flex-end;
-  backdrop-filter: blur(4rpx);
+  align-items: center;
+  justify-content: space-between;
 }
 
-.modal {
-  width: 100%;
-  background: $bg-card;
-  border-radius: $radius-xl $radius-xl 0 0;
-  max-height: 80vh;
+.tile-icon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 20rpx;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &--light {
+    background: rgba(255, 255, 255, 0.22);
+  }
+
+  &-img {
+    width: 36rpx;
+    height: 36rpx;
+  }
+}
+
+.tile--vote .tile-icon {
+  background: $accent-violet-bg;
+}
+
+.tile-arrow {
+  font-size: $font-md;
+  font-weight: 700;
+
+  &--light {
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+.tile-bottom {
   display: flex;
   flex-direction: column;
-  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  gap: 4rpx;
+}
 
-  &-handle {
-    width: 48rpx;
-    height: 6rpx;
-    border-radius: 3rpx;
-    background: $border-color;
-    margin: $space-3 auto 0;
-    flex-shrink: 0;
+.tile-num {
+  font-size: 64rpx;
+  font-weight: 900;
+  line-height: 1;
+  color: $text-primary;
+  letter-spacing: -0.03em;
+
+  &--light {
+    font-size: 112rpx;
+    color: $text-white;
   }
+}
 
-  &-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: $space-4 $space-5 $space-3;
-    flex-shrink: 0;
+.tile-title {
+  display: block;
+  margin-top: $space-2;
+  font-size: $font-sm;
+  font-weight: 700;
+  color: $text-primary;
 
-    &-title {
-      font-size: $font-md;
-      font-weight: 700;
-      color: $text-primary;
-    }
-
-    &-close {
-      width: 56rpx;
-      height: 56rpx;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      background: $bg-hover;
-      transition: $transition-fast;
-
-      &:active {
-        background: $border-color;
-      }
-
-      &-icon {
-        width: 24rpx;
-        height: 24rpx;
-      }
-    }
+  &--light {
+    margin-top: $space-1;
+    font-size: $font-base;
+    color: $text-white;
   }
+}
 
-  &-list {
-    flex: 1;
-    max-height: 55vh;
-    width: 100%;
-    box-sizing: border-box;
+.tile-desc--light {
+  font-size: $font-xs;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* -------- 快捷入口 -------- */
+.quick {
+  display: flex;
+  justify-content: space-between;
+  padding: $space-4 $space-3;
+  background: $bg-card;
+  border-radius: $radius-lg;
+  border: 2rpx solid $border-light;
+}
+
+.quick-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+
+  &:active {
+    opacity: 0.7;
   }
+}
 
-  &-list-inner {
-    padding: 0 $space-5;
-    box-sizing: border-box;
+.quick-dot {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &--blue { background: $primary-bg; }
+  &--lemon { background: $accent-lemon-soft; }
+  &--mint { background: $success-bg; }
+  &--pink { background: $accent-violet-bg; }
+
+  &-img {
+    width: 44rpx;
+    height: 44rpx;
   }
+}
 
-  &-item {
-    display: flex;
-    align-items: center;
-    gap: $space-3;
-    padding: $space-4;
-    border-radius: $radius-lg;
-    transition: $transition-fast;
-    margin-bottom: $space-3;
-    border: 1rpx solid $border-light;
-    background: $bg-card;
-    position: relative;
+.quick-text {
+  font-size: $font-xs;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+/* -------- 列表区块 -------- */
+.block-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $space-3;
+}
+
+.block-hd-left {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.block-title {
+  font-size: $font-md;
+  font-weight: 800;
+  color: $text-primary;
+}
+
+.block-count {
+  min-width: 40rpx;
+  height: 40rpx;
+  padding: 0 12rpx;
+  border-radius: $radius-full;
+  background: $primary;
+  color: $text-white;
+  font-size: 22rpx;
+  font-weight: 800;
+  line-height: 40rpx;
+  text-align: center;
+  box-sizing: border-box;
+
+  &--lemon {
+    background: $accent-lemon;
+    color: $text-primary;
+  }
+}
+
+.block-more {
+  font-size: $font-xs;
+  font-weight: 600;
+  color: $text-secondary;
+  padding: 8rpx 20rpx;
+  background: $bg-card;
+  border-radius: $radius-full;
+}
+
+.block-list {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+}
+
+.block-expand {
+  display: flex;
+  justify-content: center;
+  padding: $space-2 0;
+
+  &-text {
+    font-size: $font-xs;
+    font-weight: 600;
+    color: $primary;
+  }
+}
+
+.block-empty {
+  background: $bg-card;
+  border-radius: $radius-lg;
+  border: 2rpx dashed $border-color;
+}
+
+/* -------- 无宿舍欢迎页 -------- */
+.welcome {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: calc(var(--status-bar-height) + 120rpx) $space-6 calc(env(safe-area-inset-bottom) + 60rpx);
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+}
+
+.welcome-art {
+  position: relative;
+  height: 420rpx;
+}
+
+.welcome-sticker {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 40rpx;
+  box-shadow: 0 10rpx 0 rgba(21, 34, 56, 0.06);
+
+  &--blue {
+    left: 50%;
+    top: 60rpx;
+    width: 240rpx;
+    height: 240rpx;
+    margin-left: -120rpx;
+    background: $primary;
+    transform: rotate(-4deg);
     overflow: hidden;
-    box-sizing: border-box;
+  }
+
+  &--lemon {
+    left: 20rpx;
+    top: 20rpx;
+    padding: 18rpx 32rpx;
+    background: $accent-lemon;
+    transform: rotate(-10deg);
+  }
+
+  &--pink {
+    right: 10rpx;
+    top: 80rpx;
+    padding: 18rpx 32rpx;
+    background: $accent-violet;
+    transform: rotate(8deg);
+  }
+
+  &--mint {
+    left: 60rpx;
+    bottom: 20rpx;
+    padding: 18rpx 32rpx;
+    background: $success;
+    transform: rotate(6deg);
+  }
+
+  &-img {
     width: 100%;
-
-    &::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 6rpx;
-      background: $primary;
-      opacity: 0.4;
-      border-radius: 0 $radius-sm $radius-sm 0;
-    }
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    &:active {
-      transform: scale(0.98);
-      border-color: $primary;
-    }
-
-    &.is-active {
-      border-color: $primary;
-      background: $bg-card;
-
-      .modal-item-name {
-        color: $primary;
-      }
-
-      &::before {
-        background: $primary;
-        opacity: 0.6;
-      }
-    }
-
-    &-avatar {
-      width: 64rpx;
-      height: 64rpx;
-      border-radius: $radius-lg;
-      background: $primary-gradient;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-
-      &-text {
-        font-size: 28rpx;
-        font-weight: 700;
-        color: #fff;
-      }
-    }
-
-    &-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    &-name {
-      font-size: $font-base;
-      font-weight: 600;
-      color: $text-primary;
-      display: block;
-      margin-bottom: 4rpx;
-    }
-
-    &-meta {
-      font-size: 22rpx;
-      color: $text-hint;
-    }
-
-    &-check {
-      width: 40rpx;
-      height: 40rpx;
-      border-radius: 50%;
-      background: $primary-bg;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    &-check-icon {
-      font-size: 22rpx;
-      color: $primary;
-      font-weight: 700;
-      line-height: 1;
-    }
+    height: 100%;
   }
 
-  &-actions {
-    display: flex;
-    gap: $space-3;
-    padding: $space-4 $space-5 calc($space-6 + env(safe-area-inset-bottom));
-    flex-shrink: 0;
+  &-text {
+    font-size: $font-sm;
+    font-weight: 800;
+    color: $text-primary;
+  }
+}
+
+.welcome-sticker--pink .welcome-sticker-text,
+.welcome-sticker--mint .welcome-sticker-text {
+  color: $text-white;
+}
+
+.welcome-copy {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+}
+
+.welcome-title {
+  font-size: 60rpx;
+  font-weight: 900;
+  color: $text-primary;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  white-space: pre-line;
+}
+
+.welcome-desc {
+  font-size: $font-sm;
+  color: $text-secondary;
+  line-height: 1.7;
+}
+
+.welcome-actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+}
+
+/* -------- 切换宿舍抽屉 -------- */
+.sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sheet-close {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: $bg-card;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: $space-3;
+
+  &-icon {
+    width: 28rpx;
+    height: 28rpx;
+  }
+}
+
+.sheet-list {
+  max-height: 50vh;
+}
+
+.sheet-list-inner {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.sheet-item {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-3;
+  background: $bg-card;
+  border-radius: $radius-md;
+  border: 3rpx solid transparent;
+
+  &.is-active {
+    border-color: $primary;
   }
 
-  &-btn {
-    flex: 1;
-    height: 88rpx;
+  &-avatar {
+    width: 80rpx;
+    height: 80rpx;
+    border-radius: 26rpx;
+    background: $accent-lemon-soft;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: $radius-lg;
-    font-size: $font-base;
-    font-weight: 600;
-    border: 2rpx solid $border-color;
-    color: $text-primary;
-    transition: $transition-fast;
 
-    &:active {
-      transform: scale(0.97);
+    &-text {
+      font-size: $font-md;
+      font-weight: 800;
+      color: $accent-lemon-text;
     }
+  }
 
-    &--primary {
-      background: $primary-gradient;
-      border-color: transparent;
-      color: #fff;
-      box-shadow: 0 8rpx 24rpx rgba($primary, 0.3);
+  &-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &-name {
+    font-size: $font-base;
+    font-weight: 700;
+    color: $text-primary;
+  }
+
+  &-meta {
+    font-size: $font-xs;
+    color: $text-hint;
+  }
+
+  &-check {
+    width: 44rpx;
+    height: 44rpx;
+    border-radius: 50%;
+    background: $primary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &-icon {
+      font-size: 24rpx;
+      color: $text-white;
+      font-weight: 800;
     }
   }
 }
 
-/* ============================================================
-   弹窗入场动画
-   ============================================================ */
-@keyframes slideUp {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
+.sheet-actions {
+  display: flex;
+  gap: $space-3;
+  margin-top: $space-4;
 }
 </style>

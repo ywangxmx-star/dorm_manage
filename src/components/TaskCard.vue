@@ -1,26 +1,27 @@
 <template>
   <view class="task-card" @click="$emit('click')">
-    <view class="card-top">
-      <view class="card-top-left">
-        <text class="card-title" :style="{ color: titleColor }">{{ task.title }}</text>
-        <text class="card-time">{{ formatDate(task.create_time, 'MM-DD HH:mm') }}</text>
+    <view class="tc-top">
+      <view class="tc-status" :style="{ backgroundColor: statusInfo.color + '1A', color: statusInfo.color }">
+        <view class="tc-status-dot" :style="{ backgroundColor: statusInfo.color }"></view>
+        <text>{{ statusInfo.text }}</text>
       </view>
-      <view class="card-top-right">
-        <view v-if="task.is_urged" class="urge-tag">催办</view>
-        <view class="status-tag" :style="{ backgroundColor: statusInfo.color + '14', color: statusInfo.color }">
-          {{ statusInfo.text }}
-        </view>
-      </view>
+      <view v-if="task.is_urged" class="tc-urge">被催啦</view>
+      <text class="tc-time">{{ formatDate(task.create_time, 'MM-DD HH:mm') }}</text>
     </view>
-    <view class="card-bottom">
-      <view class="user-item">
-        <text class="user-label">发起</text>
-        <text class="user-name">{{ task.assign_user_name || '-' }}</text>
+    <text class="tc-title" :style="{ color: titleColor }">{{ task.title }}</text>
+    <view class="tc-people">
+      <view class="tc-person">
+        <view class="tc-avatar tc-avatar--from">
+          <text class="tc-avatar-text">{{ (task.assign_user_name || '-').charAt(0) }}</text>
+        </view>
+        <text class="tc-name">{{ task.assign_user_name || '-' }}</text>
       </view>
-      <view class="user-divider"></view>
-      <view class="user-item">
-        <text class="user-label">执行</text>
-        <text class="user-name">{{ executorNames }}</text>
+      <text class="tc-arrow">→</text>
+      <view class="tc-person tc-person--grow">
+        <view class="tc-avatar tc-avatar--to">
+          <text class="tc-avatar-text">{{ executorNames.charAt(0) }}</text>
+        </view>
+        <text class="tc-name">{{ executorNames }}</text>
       </view>
     </view>
   </view>
@@ -55,132 +56,122 @@ const titleColor = computed(() => {
 @use '@/styles/variables.scss' as *;
 
 .task-card {
-  background-color: $bg-card;
+  background: $bg-card;
   border-radius: $radius-lg;
   padding: $space-4;
-  margin-bottom: $space-2;
-  box-shadow: $shadow-card;
-  transition: $transition-base;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 6rpx;
-    background: $primary;
-    opacity: 0.4;
-    border-radius: 0 $radius-sm $radius-sm 0;
-  }
+  border: 2rpx solid $border-light;
+  box-shadow: $shadow-sm;
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  transition: $transition-fast;
 
   &:active {
     transform: scale(0.98);
   }
 }
 
-.card-top {
+.tc-top {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: $space-3;
+  align-items: center;
+  gap: 12rpx;
 }
 
-.card-top-left {
+.tc-status {
   display: flex;
-  flex-direction: column;
-  gap: 6rpx;
-  flex: 1;
-  min-width: 0;
-  margin-right: $space-3;
+  align-items: center;
+  gap: 8rpx;
+  padding: 6rpx 18rpx;
+  border-radius: $radius-full;
+  font-size: 22rpx;
+  font-weight: 700;
+
+  &-dot {
+    width: 12rpx;
+    height: 12rpx;
+    border-radius: 50%;
+  }
 }
 
-.card-title {
-  font-size: $font-base;
-  font-weight: 600;
-  line-height: 1.3;
+.tc-urge {
+  padding: 6rpx 16rpx;
+  border-radius: $radius-full;
+  background: $accent-lemon;
   color: $text-primary;
+  font-size: 22rpx;
+  font-weight: 800;
+  transform: rotate(-3deg);
+}
+
+.tc-time {
+  margin-left: auto;
+  font-size: 22rpx;
+  color: $text-hint;
+}
+
+.tc-title {
+  font-size: $font-base;
+  font-weight: 800;
+  line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.card-time {
-  font-size: $font-xs;
-  color: $text-hint;
-  font-weight: 400;
-}
-
-.card-top-right {
+.tc-people {
   display: flex;
   align-items: center;
-  gap: $space-2;
-  flex-shrink: 0;
+  gap: 12rpx;
+  padding: 14rpx 18rpx;
+  background: $bg-page;
+  border-radius: $radius-md;
 }
 
-.urge-tag {
-  font-size: 20rpx;
-  padding: 4rpx $space-2;
-  border-radius: $radius-full;
-  background-color: rgba($warning, 0.1);
-  color: $warning;
-  font-weight: 600;
-  flex-shrink: 0;
-  white-space: nowrap;
-  line-height: 1.4;
-}
-
-.status-tag {
-  font-size: 20rpx;
-  padding: 4rpx $space-2;
-  border-radius: $radius-full;
-  font-weight: 500;
-  flex-shrink: 0;
-  white-space: nowrap;
-  line-height: 1.4;
-}
-
-.card-bottom {
+.tc-person {
   display: flex;
   align-items: center;
-  padding-top: $space-3;
-  border-top: 1rpx solid $border-light;
-}
-
-.user-item {
-  display: flex;
-  align-items: center;
-  gap: $space-2;
-  flex: 1;
+  gap: 10rpx;
   min-width: 0;
+
+  &--grow {
+    flex: 1;
+  }
 }
 
-.user-label {
-  font-size: 20rpx;
-  color: $text-hint;
-  background-color: $bg-hover;
-  padding: 4rpx $space-2;
-  border-radius: $radius-sm;
+.tc-avatar {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  line-height: 1.4;
+
+  &--from { background: $accent-lemon; }
+  &--to { background: $primary; }
+
+  &-text {
+    font-size: 20rpx;
+    font-weight: 800;
+    color: $text-primary;
+  }
 }
 
-.user-name {
+.tc-avatar--to .tc-avatar-text {
+  color: $text-white;
+}
+
+.tc-name {
   font-size: $font-xs;
   color: $text-secondary;
-  font-weight: 500;
+  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.user-divider {
-  width: 2rpx;
-  height: 24rpx;
-  background-color: $border-light;
-  flex-shrink: 0;
-  margin: 0 $space-3;
+.tc-arrow {
+  font-size: $font-xs;
+  color: $text-hint;
 }
 </style>

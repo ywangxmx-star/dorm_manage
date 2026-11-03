@@ -617,3 +617,313 @@ button.btn-restore {
 .gap-lg {
   gap: $space-6;
 }
+
+// ============================================
+// Layout Primitives v2 - 「贴纸便当盒」布局语言
+// 大标题页眉 + 便当盒宫格 + 胶囊分段 + 底部悬浮操作栏
+// ============================================
+
+// 自定义导航页的大标题页眉（浅底，不压抑）
+.ui-header {
+  padding: calc(var(--status-bar-height) + 40rpx) $space-5 $space-4;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+
+  &__eyebrow {
+    font-size: $font-xs;
+    font-weight: 700;
+    color: $primary;
+    letter-spacing: 0.08em;
+  }
+
+  &__row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: $space-3;
+  }
+
+  &__title {
+    font-size: 56rpx;
+    font-weight: 800;
+    color: $text-primary;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  &__sub {
+    font-size: $font-sm;
+    color: $text-secondary;
+    line-height: 1.5;
+  }
+}
+
+// 胶囊分段切换
+.ui-seg {
+  display: flex;
+  gap: $space-2;
+  padding: 0 $space-5;
+  overflow-x: auto;
+  white-space: nowrap;
+
+  &__item {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8rpx;
+    padding: 14rpx 30rpx;
+    border-radius: $radius-full;
+    background: $bg-card;
+    border: 2rpx solid $border-color;
+    font-size: $font-sm;
+    font-weight: 600;
+    color: $text-secondary;
+    transition: $transition-fast;
+
+    &.is-active {
+      background: $text-primary;
+      border-color: $text-primary;
+      color: $text-white;
+    }
+  }
+
+  &__count {
+    min-width: 32rpx;
+    height: 32rpx;
+    padding: 0 8rpx;
+    border-radius: $radius-full;
+    background: $accent-lemon;
+    color: $text-primary;
+    font-size: 20rpx;
+    font-weight: 800;
+    line-height: 32rpx;
+    text-align: center;
+    box-sizing: border-box;
+  }
+}
+
+// 通用白色面板
+.ui-panel {
+  background: $bg-card;
+  border-radius: $radius-lg;
+  padding: $space-4;
+  box-shadow: $shadow-sm;
+  border: 2rpx solid $border-light;
+
+  &__hd {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $space-3;
+  }
+
+  &__title {
+    font-size: $font-base;
+    font-weight: 800;
+    color: $text-primary;
+  }
+
+  &__more {
+    font-size: $font-xs;
+    font-weight: 600;
+    color: $primary;
+  }
+}
+
+// 键值行（详情页）
+.ui-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-3;
+  padding: 26rpx 0;
+  border-bottom: 2rpx dashed $border-color;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &__label {
+    font-size: $font-sm;
+    color: $text-secondary;
+    flex-shrink: 0;
+  }
+
+  &__value {
+    font-size: $font-sm;
+    font-weight: 600;
+    color: $text-primary;
+    text-align: right;
+    word-break: break-all;
+  }
+}
+
+// 底部悬浮操作栏
+.ui-bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  display: flex;
+  gap: $space-3;
+  padding: $space-3 $space-5 calc(env(safe-area-inset-bottom) + #{$space-3});
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 2rpx solid $border-light;
+  box-shadow: 0 -8rpx 30rpx rgba(47, 124, 246, 0.06);
+}
+
+.ui-bottom-spacer {
+  height: calc(env(safe-area-inset-bottom) + 180rpx);
+}
+
+// 圆角大按钮
+.ui-btn {
+  flex: 1;
+  height: 96rpx;
+  border-radius: $radius-full;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-1;
+  font-size: $font-base;
+  font-weight: 700;
+  transition: $transition-fast;
+
+  &:active {
+    transform: scale(0.97);
+    opacity: 0.9;
+  }
+
+  &--primary {
+    background: $primary;
+    color: $text-white;
+    box-shadow: $shadow-primary;
+  }
+
+  &--lemon {
+    background: $accent-lemon;
+    color: $text-primary;
+  }
+
+  &--ghost {
+    background: $bg-hover;
+    color: $primary;
+  }
+
+  &--danger {
+    background: $danger-bg;
+    color: $danger;
+  }
+
+  &.is-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+// 悬浮新建按钮
+.ui-fab {
+  position: fixed;
+  right: $space-5;
+  bottom: calc(env(safe-area-inset-bottom) + 48rpx);
+  z-index: 40;
+  height: 104rpx;
+  padding: 0 40rpx;
+  border-radius: $radius-full;
+  background: $text-primary;
+  color: $text-white;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  box-shadow: 0 16rpx 40rpx rgba(21, 34, 56, 0.25);
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &__plus {
+    width: 48rpx;
+    height: 48rpx;
+    border-radius: 50%;
+    background: $accent-lemon;
+    color: $text-primary;
+    font-size: 40rpx;
+    font-weight: 800;
+    line-height: 46rpx;
+    text-align: center;
+  }
+
+  &__text {
+    font-size: $font-sm;
+    font-weight: 700;
+  }
+}
+
+// 表单分组（创建页）
+.ui-form-group {
+  background: $bg-card;
+  border-radius: $radius-lg;
+  padding: $space-2 $space-4;
+  margin: 0 $space-5 $space-4;
+  border: 2rpx solid $border-light;
+  box-shadow: $shadow-sm;
+}
+
+.ui-form-label {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: $space-3 $space-5 $space-2;
+  font-size: $font-xs;
+  font-weight: 800;
+  color: $text-secondary;
+  letter-spacing: 0.06em;
+
+  &::before {
+    content: '';
+    width: 12rpx;
+    height: 12rpx;
+    border-radius: 4rpx;
+    background: $accent-lemon;
+    transform: rotate(45deg);
+  }
+}
+
+// 底部抽屉
+.ui-sheet-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(21, 34, 56, 0.4);
+  display: flex;
+  align-items: flex-end;
+}
+
+.ui-sheet {
+  width: 100%;
+  max-height: 80vh;
+  background: $bg-page;
+  border-radius: $radius-xl $radius-xl 0 0;
+  padding: $space-2 $space-5 calc(env(safe-area-inset-bottom) + #{$space-4});
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.25s ease-out;
+
+  &__handle {
+    width: 80rpx;
+    height: 10rpx;
+    border-radius: $radius-full;
+    background: $border-color;
+    margin: 0 auto $space-3;
+  }
+
+  &__title {
+    font-size: $font-md;
+    font-weight: 800;
+    color: $text-primary;
+    margin-bottom: $space-3;
+  }
+}

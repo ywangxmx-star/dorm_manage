@@ -1,82 +1,73 @@
 <template>
   <view class="task-detail-page" v-if="task">
-    <!-- 头部卡片 -->
-    <view class="hero-card section-card section-card-task">
-      <view class="hero-header">
-        <text class="title">{{ task.title }}</text>
-        <view class="status-tag" :style="{ backgroundColor: statusInfo.color + '14', color: statusInfo.color }">
-          {{ statusInfo.text }}
+    <view class="ticket">
+      <view class="ticket-top">
+        <view class="ticket-status" :style="{ color: statusInfo.color }">
+          <view class="ticket-status-dot" :style="{ backgroundColor: statusInfo.color }"></view>
+          <text>{{ statusInfo.text }}</text>
+        </view>
+        <view class="ticket-priority" :style="{ backgroundColor: priorityColor + '1A', color: priorityColor }">{{ priorityText }}</view>
+      </view>
+      <text class="ticket-title">{{ task.title }}</text>
+      <text v-if="task.description" class="ticket-desc">{{ task.description }}</text>
+      <view class="ticket-cut">
+        <view class="ticket-hole ticket-hole--l"></view>
+        <view class="ticket-dash"></view>
+        <view class="ticket-hole ticket-hole--r"></view>
+      </view>
+      <view class="ticket-stats">
+        <view class="ticket-stat">
+          <text class="ticket-stat-lbl">截止时间</text>
+          <text class="ticket-stat-val">{{ formatDate(task.deadline) }}</text>
+        </view>
+        <view class="ticket-stat">
+          <text class="ticket-stat-lbl">创建时间</text>
+          <text class="ticket-stat-val">{{ formatDate(task.create_time) }}</text>
         </view>
       </view>
-      <text class="description" v-if="task.description">{{ task.description }}</text>
     </view>
 
-    <!-- 催办提示 -->
-    <view v-if="task.is_urged && isExecutor" class="urge-banner">
+    <view v-if="task.is_urged && isExecutor" class="urge">
       <image class="urge-icon" src="/static/icons/bell.png" mode="aspectFit" />
-      <text class="urge-text">宿舍长已催办，请尽快处理</text>
+      <text class="urge-text">宿舍长在催你啦，请尽快处理</text>
     </view>
 
-    <!-- 信息网格 -->
-    <view class="info-card card">
-      <view class="info-row">
-        <view class="info-icon-wrap">
-          <image class="info-icon-img" src="/static/icons/clock.png" mode="aspectFit" />
+    <view v-if="task.is_cycle && !task.parent_cycle_id" class="ui-panel block">
+      <view class="cycle">
+        <view class="cycle-icon">
+          <image class="cycle-icon-img" src="/static/icons/refresh.png" mode="aspectFit" />
         </view>
-        <view class="info-content">
-          <text class="info-label">截止时间</text>
-          <text class="info-value">{{ formatDate(task.deadline) }}</text>
-        </view>
-      </view>
-      <view class="info-row">
-        <view class="info-icon-wrap">
-          <view class="priority-dot" :style="{ backgroundColor: priorityColor }"></view>
-        </view>
-        <view class="info-content">
-          <text class="info-label">优先级</text>
-          <text class="info-value" :style="{ color: priorityColor }">{{ priorityText }}</text>
+        <view class="cycle-info">
+          <text class="cycle-title">周期任务 · {{ cycleText }}</text>
+          <text v-if="task.cycle_end_date" class="cycle-hint">结束于 {{ formatDate(task.cycle_end_date) }}</text>
         </view>
       </view>
-      <view class="info-row">
-        <view class="info-icon-wrap">
-          <image class="info-icon-img" src="/static/icons/calendar.png" mode="aspectFit" />
-        </view>
-        <view class="info-content">
-          <text class="info-label">创建时间</text>
-          <text class="info-value">{{ formatDate(task.create_time) }}</text>
-        </view>
+    </view>
+
+    <view class="ui-panel block">
+      <view class="ui-panel__hd">
+        <text class="ui-panel__title">执行人</text>
+        <text class="panel-count">{{ task.executors?.length || 0 }} 人</text>
       </view>
-      <view v-if="task.is_cycle && !task.parent_cycle_id" class="info-row">
-        <view class="info-icon-wrap">
-          <image class="info-icon-img" src="/static/icons/refresh.png" mode="aspectFit" />
-        </view>
-        <view class="info-content">
-          <text class="info-label">周期任务</text>
-          <text class="info-value">{{ cycleText }}</text>
-          <text v-if="task.cycle_end_date" class="info-hint">结束时间：{{ formatDate(task.cycle_end_date) }}</text>
-        </view>
-      </view>
-      <view class="info-row">
-        <view class="info-icon-wrap">
-          <image class="info-icon-img" src="/static/icons/users-sm.png" mode="aspectFit" />
-        </view>
-        <view class="info-content">
-          <text class="info-label">执行人</text>
-          <view class="executor-list">
-            <view v-for="ex in task.executors" :key="ex.user_id" class="executor-tag">
-              <text class="executor-name">{{ ex.nickname }}</text>
-              <text class="executor-status" :style="{ color: ExecutorStatusMap[ex.status]?.color || '#9AA8BC' }">
-                {{ ExecutorStatusMap[ex.status]?.text || '未知' }}
-              </text>
-            </view>
-            <text v-if="!task.executors?.length" class="info-value">-</text>
+      <view v-if="task.executors?.length" class="people">
+        <view v-for="ex in task.executors" :key="ex.user_id" class="person">
+          <view class="person-avatar">
+            <text class="person-avatar-text">{{ (ex.nickname || '-').charAt(0) }}</text>
           </view>
+          <text class="person-name">{{ ex.nickname }}</text>
+          <text
+            class="person-status"
+            :style="{ color: ExecutorStatusMap[ex.status]?.color || '#9AA8BC', backgroundColor: (ExecutorStatusMap[ex.status]?.color || '#9AA8BC') + '1A' }"
+          >{{ ExecutorStatusMap[ex.status]?.text || '未知' }}</text>
         </view>
       </view>
+      <text v-else class="panel-empty">暂未指定执行人</text>
     </view>
 
-    <view v-if="finishRemark || finishImageUrls.length" class="finish-card card">
-      <text class="finish-title">完成记录</text>
+    <view v-if="finishRemark || finishImageUrls.length" class="ui-panel block">
+      <view class="ui-panel__hd">
+        <text class="ui-panel__title">完成记录</text>
+      </view>
       <text v-if="finishRemark" class="finish-remark">{{ finishRemark }}</text>
       <view v-if="finishImageUrls.length" class="finish-images">
         <image
@@ -90,48 +81,36 @@
       </view>
     </view>
 
-    <!-- 状态提示 -->
-      <view v-if="statusHint" class="status-hint">
-        <text class="hint-icon">💡</text>
-        <text class="hint-text">{{ statusHint }}</text>
-      </view>
+    <view v-if="statusHint" class="hint">
+      <text class="hint-tag">提示</text>
+      <text class="hint-text">{{ statusHint }}</text>
+    </view>
 
-      <!-- 操作按钮 -->
-    <view class="action-section">
-      <!-- 执行人：待接受 -->
-      <view class="action-pair" v-if="isPendingExecutor">
-        <button class="btn btn-primary" @click="handleAccept">接受任务</button>
-        <button class="btn btn-outline" @click="handleReject">拒绝</button>
+    <view v-if="isLeader && !canAudit && (canUrge || canStopCycle || canCancel || canDelete)" class="ui-panel block">
+      <view class="ui-panel__hd">
+        <text class="ui-panel__title">管理操作</text>
       </view>
+      <view class="tools">
+        <view v-if="canUrge" class="tool" @click="handleUrge">催一下</view>
+        <view v-if="canStopCycle" class="tool" @click="handleStopCycle">结束周期</view>
+        <view v-if="canCancel" class="tool" @click="handleCancel">取消任务</view>
+        <view v-if="canDelete" class="tool tool--danger" @click="handleDelete">删除任务</view>
+      </view>
+    </view>
 
-      <!-- 宿舍长：待审核 -->
-      <view class="action-pair" v-else-if="canAudit">
-        <button class="btn btn-primary" @click="handleAudit(true)">通过</button>
-        <button class="btn btn-danger" @click="handleAudit(false)">驳回</button>
-      </view>
+    <view class="ui-bottom-spacer"></view>
 
-      <!-- 执行人/宿舍长：去完成 -->
-      <view class="action-single" v-else-if="canComplete">
-        <button class="btn btn-primary btn-block" @click="goComplete">去完成</button>
-      </view>
-
-      <!-- 宿舍长：重新发布 -->
-      <view class="action-single" v-else-if="canRepublish">
-        <button class="btn btn-primary btn-block" @click="goEdit">重新发布</button>
-      </view>
-
-      <!-- 操作工具（按钮形式，无图标） -->
-      <view class="tools-section" v-if="isLeader && !canAudit">
-        <view class="tools-divider"></view>
-        <view class="tools-row" v-if="canUrge || canStopCycle">
-          <button v-if="canUrge" class="tools-btn" @click="handleUrge">催办</button>
-          <button v-if="canStopCycle" class="tools-btn" @click="handleStopCycle">结束周期</button>
-        </view>
-        <view class="tools-row">
-          <button v-if="canCancel" class="tools-btn" @click="handleCancel">取消任务</button>
-          <button v-if="canDelete" class="tools-btn tools-btn-danger" @click="handleDelete">删除任务</button>
-        </view>
-      </view>
+    <view v-if="isPendingExecutor || canAudit || canComplete || canRepublish" class="ui-bottom-bar">
+      <template v-if="isPendingExecutor">
+        <view class="ui-btn ui-btn--ghost" @click="handleReject">拒绝</view>
+        <view class="ui-btn ui-btn--primary bar-main" @click="handleAccept">接受任务</view>
+      </template>
+      <template v-else-if="canAudit">
+        <view class="ui-btn ui-btn--danger" @click="handleAudit(false)">驳回</view>
+        <view class="ui-btn ui-btn--primary bar-main" @click="handleAudit(true)">审核通过</view>
+      </template>
+      <view v-else-if="canComplete" class="ui-btn ui-btn--primary" @click="goComplete">去完成</view>
+      <view v-else-if="canRepublish" class="ui-btn ui-btn--primary" @click="goEdit">重新发布</view>
     </view>
   </view>
 </template>
@@ -355,341 +334,311 @@ function goComplete() { uni.navigateTo({ url: `/pages/task/complete?id=${taskId}
 @use '@/styles/variables.scss' as *;
 
 .task-detail-page {
-  padding: $space-3;
   min-height: 100vh;
   background: $bg-page;
+  padding: $space-4 $space-5 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
 }
 
-.urge-banner {
+/* -------- 票据头卡 -------- */
+.ticket {
+  background: $primary;
+  border-radius: $radius-xl;
+  padding: $space-5 $space-5 $space-4;
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  box-shadow: $shadow-primary;
+}
+
+.ticket-top {
   display: flex;
   align-items: center;
-  gap: $space-2;
-  background-color: rgba($warning, 0.1);
-  border: 1rpx solid rgba($warning, 0.3);
-  border-radius: $radius-lg;
-  padding: $space-2 $space-3;
-  margin-bottom: $space-3;
+  justify-content: space-between;
+}
 
-  .urge-icon {
-    width: 28rpx;
-    height: 28rpx;
-    flex-shrink: 0;
-  }
+.ticket-status {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 8rpx 20rpx;
+  background: $bg-card;
+  border-radius: $radius-full;
+  font-size: $font-xs;
+  font-weight: 800;
 
-  .urge-text {
-    font-size: $font-xs;
-    color: $warning;
-    font-weight: 600;
+  &-dot {
+    width: 14rpx;
+    height: 14rpx;
+    border-radius: 50%;
   }
 }
 
-.hero-card {
-  background: $bg-card;
-  border: 1rpx solid $border-color;
-  border-radius: $radius-xl;
-  padding: $space-4;
-  box-shadow: $shadow-sm;
+.ticket-priority {
+  padding: 8rpx 20rpx;
+  border-radius: $radius-full;
+  background: $bg-card !important;
+  font-size: $font-xs;
+  font-weight: 800;
+}
+
+.ticket-title {
+  margin-top: $space-2;
+  font-size: 48rpx;
+  font-weight: 900;
+  color: $text-white;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+.ticket-desc {
+  font-size: $font-sm;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
+}
+
+.ticket-cut {
   position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 6rpx;
-    background: $primary;
-    opacity: 0.4;
-    border-radius: 0 $radius-sm $radius-sm 0;
-  }
-
-  .hero-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: $space-2;
-
-    .title {
-      font-size: $font-md;
-      font-weight: 700;
-      color: $text-primary;
-      flex: 1;
-      margin-right: $space-3;
-      line-height: 1.3;
-    }
-
-    .status-tag {
-      font-size: $font-xs;
-      padding: $space-1 $space-3;
-      border-radius: $radius-full;
-      white-space: nowrap;
-      font-weight: 500;
-    }
-  }
-
-  .description {
-    font-size: $font-sm;
-    color: $text-secondary;
-    line-height: 1.5;
-    display: block;
-  }
-}
-
-.info-card {
-  background: $bg-card;
-  border: 1rpx solid $border-color;
-  border-radius: $radius-xl;
-  padding: $space-4;
-  box-shadow: $shadow-sm;
-
-  .info-row {
-    display: flex;
-    align-items: center;
-    gap: $space-3;
-    padding: $space-3 0;
-
-    &:not(:last-child) {
-      border-bottom: 1rpx solid $border-light;
-    }
-
-    .info-icon-wrap {
-      width: 40rpx;
-      height: 40rpx;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      .info-icon-img {
-        width: 28rpx;
-        height: 28rpx;
-      }
-
-      .priority-dot {
-        width: 16rpx;
-        height: 16rpx;
-        border-radius: 50%;
-      }
-    }
-
-    .info-content {
-      flex: 1;
-
-      .info-label {
-        font-size: $font-xs;
-        color: $text-hint;
-        display: block;
-        margin-bottom: 2rpx;
-      }
-
-      .info-value {
-        font-size: $font-sm;
-        color: $text-primary;
-        font-weight: 500;
-        display: block;
-      }
-
-      .info-hint {
-        font-size: $font-xs;
-        color: $text-hint;
-        display: block;
-        margin-top: 2rpx;
-      }
-
-      .executor-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: $space-2;
-
-        .executor-tag {
-          display: inline-flex;
-          align-items: center;
-          gap: $space-2;
-          background-color: $bg-hover;
-          padding: $space-1 $space-3;
-          border-radius: $radius-full;
-
-          .executor-name {
-            font-size: $font-xs;
-            color: $text-primary;
-            font-weight: 500;
-          }
-
-          .executor-status {
-            font-size: 20rpx;
-          }
-        }
-      }
-    }
-  }
-}
-
-.finish-card {
-  margin-top: $space-3;
-  padding: $space-4;
-
-  .finish-title {
-    display: block;
-    font-size: $font-sm;
-    font-weight: 600;
-    color: $text-primary;
-    margin-bottom: $space-3;
-  }
-
-  .finish-remark {
-    display: block;
-    font-size: $font-sm;
-    color: $text-secondary;
-    line-height: 1.6;
-    margin-bottom: $space-3;
-  }
-
-  .finish-images {
-    display: flex;
-    flex-wrap: wrap;
-    gap: $space-3;
-  }
-
-  .finish-img {
-    width: 180rpx;
-    height: 180rpx;
-    border-radius: $radius-lg;
-  }
-}
-
-.action-section {
-  margin-top: $space-4;
-}
-
-.status-hint {
   display: flex;
   align-items: center;
-  gap: $space-2;
-  padding: $space-2 $space-3;
-  background-color: rgba($primary, 0.06);
-  border: 1rpx solid rgba($primary, 0.12);
-  border-radius: $radius-lg;
-  margin-bottom: $space-3;
-
-  .hint-icon {
-    font-size: $font-xs;
-  }
-
-  .hint-text {
-    font-size: $font-xs;
-    color: $primary;
-    font-weight: 500;
-  }
+  margin: $space-3 (-$space-5) $space-2;
 }
 
-.action-pair {
+.ticket-hole {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  background: $bg-page;
+  flex-shrink: 0;
+
+  &--l { margin-left: -18rpx; }
+  &--r { margin-right: -18rpx; }
+}
+
+.ticket-dash {
+  flex: 1;
+  border-top: 3rpx dashed rgba(255, 255, 255, 0.4);
+  margin: 0 $space-2;
+}
+
+.ticket-stats {
   display: flex;
   gap: $space-3;
+}
 
-  .btn {
-    flex: 1;
-    height: 88rpx;
-    border-radius: $radius-lg;
+.ticket-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+
+  &-lbl {
+    font-size: 22rpx;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  &-val {
     font-size: $font-sm;
-    font-weight: 600;
-    border: none;
+    font-weight: 700;
+    color: $text-white;
+  }
+}
+
+/* -------- 催办 -------- */
+.urge {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-3 $space-4;
+  background: $accent-lemon;
+  border-radius: $radius-md;
+  transform: rotate(-0.8deg);
+
+  &-icon {
+    width: 36rpx;
+    height: 36rpx;
+  }
+
+  &-text {
+    font-size: $font-sm;
+    font-weight: 700;
+    color: $text-primary;
+  }
+}
+
+/* -------- 周期 -------- */
+.cycle {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+
+  &-icon {
+    width: 72rpx;
+    height: 72rpx;
+    border-radius: 24rpx;
+    background: $success-bg;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: $transition-fast;
 
-    &::after { display: none; }
-
-    &:active { opacity: 0.85; }
-  }
-}
-
-.action-single {
-  .btn {
-    width: 100%;
-    height: 88rpx;
-    border-radius: $radius-lg;
-    font-size: $font-sm;
-    font-weight: 600;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: $transition-fast;
-
-    &::after { display: none; }
-
-    &:active { opacity: 0.85; }
-  }
-}
-
-.btn-primary {
-  background: $primary-gradient;
-  color: #fff;
-  box-shadow: 0 4rpx 12rpx rgba($primary, 0.25);
-}
-
-.btn-outline {
-  background: $bg-card;
-  color: $text-primary;
-  border: 2rpx solid $border-color !important;
-  box-shadow: $shadow-sm;
-}
-
-.btn-danger {
-  background: $bg-card;
-  color: $danger;
-  border: 2rpx solid rgba($danger, 0.3) !important;
-  box-shadow: $shadow-sm;
-}
-
-.tools-section {
-  margin-top: $space-3;
-
-  .tools-divider {
-    height: 1rpx;
-    background: $border-light;
-    margin-bottom: $space-3;
-  }
-
-  .tools-row {
-    display: flex;
-    gap: $space-3;
-    margin-bottom: $space-3;
-
-    &:last-child {
-      margin-bottom: 0;
+    &-img {
+      width: 36rpx;
+      height: 36rpx;
     }
+  }
 
-    .tools-btn {
-      flex: 1;
-      height: 88rpx;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 1;
+  &-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4rpx;
+  }
+
+  &-title {
+    font-size: $font-sm;
+    font-weight: 800;
+    color: $text-primary;
+  }
+
+  &-hint {
+    font-size: $font-xs;
+    color: $text-hint;
+  }
+}
+
+/* -------- 执行人 -------- */
+.panel-count {
+  font-size: $font-xs;
+  color: $text-hint;
+}
+
+.panel-empty {
+  font-size: $font-sm;
+  color: $text-hint;
+}
+
+.people {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-2 $space-3;
+  background: $bg-page;
+  border-radius: $radius-md;
+
+  &-avatar {
+    width: 64rpx;
+    height: 64rpx;
+    border-radius: 50%;
+    background: $accent-lemon;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &-text {
       font-size: $font-sm;
-      font-weight: 600;
+      font-weight: 800;
       color: $text-primary;
-      background-color: $bg-card;
-      border: 1rpx solid $border-color;
-      border-radius: $radius-lg;
-      transition: $transition-fast;
-      box-shadow: $shadow-sm;
-
-      &:active {
-        background-color: $bg-hover;
-      }
-
-      &.tools-btn-danger {
-        color: $danger;
-        border-color: rgba($danger, 0.2);
-
-        &:active {
-          background-color: rgba($danger, 0.04);
-        }
-      }
     }
   }
+
+  &-name {
+    flex: 1;
+    font-size: $font-sm;
+    font-weight: 700;
+    color: $text-primary;
+  }
+
+  &-status {
+    padding: 6rpx 18rpx;
+    border-radius: $radius-full;
+    font-size: 22rpx;
+    font-weight: 700;
+  }
+}
+
+/* -------- 完成记录 -------- */
+.finish-remark {
+  display: block;
+  font-size: $font-sm;
+  color: $text-primary;
+  line-height: 1.7;
+  margin-bottom: $space-3;
+}
+
+.finish-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+}
+
+.finish-img {
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: $radius-md;
+}
+
+/* -------- 提示 -------- */
+.hint {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-2;
+  padding: $space-3 $space-4;
+  background: $primary-bg;
+  border-radius: $radius-md;
+
+  &-tag {
+    flex-shrink: 0;
+    padding: 2rpx 14rpx;
+    border-radius: 8rpx;
+    background: $primary;
+    color: $text-white;
+    font-size: 22rpx;
+    font-weight: 800;
+  }
+
+  &-text {
+    font-size: $font-xs;
+    color: $text-secondary;
+    line-height: 1.6;
+  }
+}
+
+/* -------- 管理工具 -------- */
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+}
+
+.tool {
+  padding: 16rpx 32rpx;
+  border-radius: $radius-full;
+  background: $bg-page;
+  border: 2rpx solid $border-color;
+  font-size: $font-xs;
+  font-weight: 700;
+  color: $text-primary;
+
+  &:active {
+    opacity: 0.7;
+  }
+
+  &--danger {
+    color: $danger;
+    background: $danger-bg;
+    border-color: transparent;
+  }
+}
+
+.bar-main {
+  flex: 2;
 }
 </style>

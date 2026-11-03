@@ -1,24 +1,21 @@
 <template>
   <view class="bill-card" @click="$emit('click')">
-    <view class="bill-body">
-      <view class="bill-left">
-        <text class="bill-title">{{ bill.title }}</text>
-        <view class="bill-meta">
-          <text class="meta-text">{{ billTypeText }}</text>
-          <text class="meta-dot">-</text>
-          <text class="meta-text">{{ formatDate(bill.create_time, 'MM-DD HH:mm') }}</text>
-        </view>
-        <view v-if="myPayInfo" class="my-pay-info">
-          <text class="my-pay-label">我的分摊</text>
-          <text class="my-pay-amount" :class="{ 'is-paid': myPayInfo.isPaid }">{{ formatAmount(myPayInfo.amount) }}</text>
-        </view>
+    <view class="bc-main">
+      <view class="bc-badge" :class="{ 'is-settled': bill.is_settled }">
+        <text class="bc-badge-text">{{ billTypeText.charAt(0) }}</text>
       </view>
-      <view class="bill-right">
-        <view class="settle-tag" :class="{ settled: bill.is_settled }">
-          {{ bill.is_settled ? '已结清' : '未结清' }}
-        </view>
-        <text class="bill-amount">{{ formatAmount(bill.amount) }}</text>
+      <view class="bc-info">
+        <text class="bc-title">{{ bill.title }}</text>
+        <text class="bc-meta">{{ billTypeText }} · {{ formatDate(bill.create_time, 'MM-DD HH:mm') }}</text>
       </view>
+      <view class="bc-amount-wrap">
+        <text class="bc-amount">{{ formatAmount(bill.amount) }}</text>
+        <text class="bc-settle" :class="{ 'is-settled': bill.is_settled }">{{ bill.is_settled ? '已结清' : '未结清' }}</text>
+      </view>
+    </view>
+    <view v-if="myPayInfo" class="bc-mine" :class="{ 'is-paid': myPayInfo.isPaid }">
+      <text class="bc-mine-label">{{ myPayInfo.isPaid ? '我已付清' : '我需分摊' }}</text>
+      <text class="bc-mine-amount">{{ formatAmount(myPayInfo.amount) }}</text>
     </view>
   </view>
 </template>
@@ -53,122 +50,122 @@ const myPayInfo = computed(() => {
 @use '@/styles/variables.scss' as *;
 
 .bill-card {
-  background-color: $bg-card;
+  background: $bg-card;
   border-radius: $radius-lg;
   padding: $space-4;
-  margin-bottom: $space-2;
-  box-shadow: $shadow-card;
-  transition: $transition-base;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 6rpx;
-    background: $success;
-    opacity: 0.4;
-    border-radius: 0 $radius-sm $radius-sm 0;
-  }
+  border: 2rpx solid $border-light;
+  box-shadow: $shadow-sm;
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  transition: $transition-fast;
 
   &:active {
     transform: scale(0.98);
-    box-shadow: $shadow-sm;
+  }
+}
+
+.bc-main {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+}
+
+.bc-badge {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 26rpx;
+  background: $accent-lemon;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transform: rotate(-4deg);
+
+  &.is-settled {
+    background: $success-bg;
   }
 
-  .bill-body {
-    display: flex;
-    justify-content: space-between;
-
-    .bill-left {
-      flex: 1;
-      margin-right: $space-4;
-      display: flex;
-      flex-direction: column;
-      gap: $space-2;
-
-      .bill-title {
-        font-size: $font-base;
-        font-weight: 600;
-        color: $text-primary;
-        line-height: 1.3;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        min-width: 0;
-      }
-
-      .bill-meta {
-        display: flex;
-        align-items: center;
-        gap: $space-2;
-
-        .meta-text {
-          font-size: $font-xs;
-          color: $text-secondary;
-        }
-
-        .meta-dot {
-          font-size: $font-xs;
-          color: $border-color;
-        }
-      }
-
-      .my-pay-info {
-        display: flex;
-        align-items: center;
-        gap: $space-2;
-        padding-top: $space-2;
-        border-top: 1rpx solid $border-light;
-
-        .my-pay-label {
-          font-size: $font-xs;
-          color: $text-hint;
-        }
-
-        .my-pay-amount {
-          font-size: $font-sm;
-          font-weight: 600;
-          color: $warning;
-
-          &.is-paid {
-            color: $success;
-          }
-        }
-      }
-    }
-
-    .bill-right {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: $space-2;
-
-      .settle-tag {
-        font-size: 20rpx;
-        padding: 4rpx $space-3;
-        border-radius: $radius-full;
-        background-color: $warning-bg;
-        color: $warning;
-        font-weight: 500;
-        flex-shrink: 0;
-
-        &.settled {
-          background-color: $success-bg;
-          color: $success;
-        }
-      }
-
-      .bill-amount {
-        font-size: $font-lg;
-        font-weight: 700;
-        color: $text-primary;
-        line-height: 1;
-      }
-    }
+  &-text {
+    font-size: $font-md;
+    font-weight: 900;
+    color: $text-primary;
   }
+}
+
+.bc-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.bc-title {
+  font-size: $font-base;
+  font-weight: 800;
+  color: $text-primary;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bc-meta {
+  font-size: $font-xs;
+  color: $text-hint;
+}
+
+.bc-amount-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4rpx;
+  flex-shrink: 0;
+}
+
+.bc-amount {
+  font-size: $font-md;
+  font-weight: 900;
+  color: $text-primary;
+  letter-spacing: -0.02em;
+}
+
+.bc-settle {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: $warning;
+
+  &.is-settled {
+    color: $success;
+  }
+}
+
+.bc-mine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14rpx 20rpx;
+  border-radius: $radius-md;
+  background: $primary-bg;
+
+  &.is-paid {
+    background: $success-bg;
+  }
+
+  &-label {
+    font-size: $font-xs;
+    font-weight: 600;
+    color: $text-secondary;
+  }
+
+  &-amount {
+    font-size: $font-sm;
+    font-weight: 800;
+    color: $primary;
+  }
+}
+
+.bc-mine.is-paid .bc-mine-amount {
+  color: $success;
 }
 </style>

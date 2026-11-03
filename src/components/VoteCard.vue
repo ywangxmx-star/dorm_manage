@@ -1,35 +1,21 @@
 <template>
   <view class="vote-card" @click="$emit('click')">
-    <view class="vote-header">
-      <text class="vote-title">{{ vote.title }}</text>
-      <view class="header-tags">
-        <view class="type-tag" :style="{ backgroundColor: voteTypeColor + '14', color: voteTypeColor }">
-          {{ voteTypeText }}
-        </view>
-        <view v-if="vote.has_voted" class="voted-tag-inline">
-          ✓ 已投票
-        </view>
-        <view v-else class="status-tag" :style="{ backgroundColor: statusInfo.color + '14', color: statusInfo.color }">
-          {{ statusInfo.text }}
-        </view>
+    <view class="vc-top">
+      <view class="vc-type" :style="{ backgroundColor: voteTypeColor + '1A', color: voteTypeColor }">{{ voteTypeText }}</view>
+      <view v-if="vote.has_voted" class="vc-voted">已投票</view>
+      <view v-else class="vc-status" :style="{ color: statusInfo.color }">
+        <view class="vc-status-dot" :style="{ backgroundColor: statusInfo.color }"></view>
+        <text>{{ statusInfo.text }}</text>
       </view>
     </view>
-    <view class="vote-desc" v-if="vote.description">
-      <text class="desc-text">{{ vote.description }}</text>
-    </view>
-    <view class="vote-meta">
-      <view class="meta-item">
-        <text class="meta-icon-text">👤</text>
-        <text>{{ vote.creator_name || '匿名' }}</text>
+    <text class="vc-title">{{ vote.title }}</text>
+    <text v-if="vote.description" class="vc-desc">{{ vote.description }}</text>
+    <view class="vc-foot">
+      <view class="vc-count">
+        <text class="vc-count-num">{{ vote.total_voters }}</text>
+        <text class="vc-count-lbl">人已投</text>
       </view>
-      <view class="meta-item">
-        <text class="meta-icon-text">📊</text>
-        <text>{{ vote.total_voters }}人已投</text>
-      </view>
-      <view class="meta-item">
-        <text class="meta-icon-text">⏰</text>
-        <text>{{ formatDeadline(vote.deadline) }}</text>
-      </view>
+      <text class="vc-meta">{{ vote.creator_name || '匿名' }} · 截止 {{ formatDeadline(vote.deadline) }}</text>
     </view>
   </view>
 </template>
@@ -64,109 +50,106 @@ function formatDeadline(deadline: string) {
 @use '@/styles/variables.scss' as *;
 
 .vote-card {
-  background-color: $bg-card;
-  border-radius: $radius-xl;
+  background: $bg-card;
+  border-radius: $radius-lg;
   padding: $space-4;
-  margin-bottom: $space-2;
+  border: 2rpx solid $border-light;
   box-shadow: $shadow-sm;
-  border: 1rpx solid $border-color;
-  transition: $transition-base;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 6rpx;
-    background: $accent-teal;
-    opacity: 0.4;
-    border-radius: 0 $radius-sm $radius-sm 0;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  transition: $transition-fast;
 
   &:active {
     transform: scale(0.98);
   }
+}
 
-  .vote-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: $space-2;
+.vc-top {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
 
-    .vote-title {
-      font-size: $font-md;
-      font-weight: 600;
-      color: $text-primary;
-      flex: 1;
-      margin-right: $space-3;
-      line-height: 1.4;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      min-width: 0;
-    }
+.vc-type {
+  padding: 6rpx 18rpx;
+  border-radius: $radius-full;
+  font-size: 22rpx;
+  font-weight: 700;
+}
 
-    .header-tags {
-      display: flex;
-      align-items: center;
-      gap: $space-2;
-      flex-shrink: 0;
-    }
+.vc-voted {
+  padding: 6rpx 18rpx;
+  border-radius: $radius-full;
+  background: $accent-lemon;
+  color: $text-primary;
+  font-size: 22rpx;
+  font-weight: 800;
+}
 
-    .type-tag,
-    .status-tag {
-      font-size: $font-xs;
-      padding: $space-1 $space-3;
-      border-radius: $radius-full;
-      white-space: nowrap;
-      font-weight: 500;
-      line-height: 1.2;
-    }
+.vc-status {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 22rpx;
+  font-weight: 700;
 
-    .voted-tag-inline {
-      font-size: $font-xs;
-      padding: $space-1 $space-3;
-      border-radius: $radius-full;
-      background-color: $success-bg;
-      color: $success;
-      font-weight: 600;
-      white-space: nowrap;
-      line-height: 1.2;
-    }
+  &-dot {
+    width: 12rpx;
+    height: 12rpx;
+    border-radius: 50%;
+  }
+}
+
+.vc-title {
+  font-size: $font-base;
+  font-weight: 800;
+  color: $text-primary;
+  line-height: 1.4;
+}
+
+.vc-desc {
+  font-size: $font-xs;
+  color: $text-secondary;
+  line-height: 1.6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.vc-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-2;
+  padding-top: $space-2;
+  border-top: 2rpx dashed $border-color;
+}
+
+.vc-count {
+  display: flex;
+  align-items: baseline;
+  gap: 6rpx;
+
+  &-num {
+    font-size: $font-md;
+    font-weight: 900;
+    color: $primary;
   }
 
-  .vote-desc {
-    margin-bottom: $space-2;
-
-    .desc-text {
-      font-size: $font-sm;
-      color: $text-secondary;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2;
-      overflow: hidden;
-    }
-  }
-
-  .vote-meta {
-    display: flex;
-    align-items: center;
-    gap: $space-3;
-    font-size: $font-sm;
+  &-lbl {
+    font-size: $font-xs;
     color: $text-secondary;
-
-    .meta-item {
-      display: flex;
-      align-items: center;
-      gap: $space-1;
-
-      .meta-icon-text {
-        font-size: $font-sm;
-      }
-    }
   }
+}
+
+.vc-meta {
+  font-size: 22rpx;
+  color: $text-hint;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

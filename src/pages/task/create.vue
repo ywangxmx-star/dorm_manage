@@ -1,67 +1,62 @@
 <template>
   <view class="page">
-    <view class="form-body">
-      <view class="task-input-area">
-        <view class="field-title">
-          <view class="title-row">
-            <text class="title-label">任务标题</text>
-            <text class="title-count">{{ form.title.length }}/12</text>
-          </view>
-          <input v-model="form.title" class="input-title" placeholder="" maxlength="12" />
+    <view class="intro">
+      <text class="intro-title">{{ isEdit ? '改一改这个任务' : '新任务来啦' }}</text>
+      <text class="intro-sub">分配给室友，到点自动提醒</text>
+    </view>
+
+    <text class="ui-form-label">做什么</text>
+    <view class="ui-form-group">
+      <view class="title-row">
+        <input v-model="form.title" class="input-title" placeholder="比如：倒垃圾、拖地" maxlength="12" />
+        <text class="count">{{ form.title.length }}/12</text>
+      </view>
+      <view class="desc-wrap">
+        <textarea v-model="form.description" class="input-desc" placeholder="补充一下具体要求（选填）" maxlength="500" />
+        <text class="count count--desc">{{ form.description.length }}/500</text>
+      </view>
+    </view>
+
+    <view class="label-row">
+      <text class="ui-form-label">谁来做</text>
+      <text class="label-extra">已选 {{ selectedExecutorIds.length }} 人</text>
+    </view>
+    <view v-if="members.length > 0" class="member-grid">
+      <view
+        v-for="m in members"
+        :key="m.user_id"
+        class="member-chip"
+        :class="{ 'is-active': selectedExecutorIds.includes(m.user_id) }"
+        @click="toggleExecutor(m.user_id)"
+      >
+        <view class="member-avatar" :style="{ background: getAvatarColor(m.nickname) }">
+          <text class="member-avatar-text">{{ m.nickname.charAt(0) }}</text>
+          <view v-if="selectedExecutorIds.includes(m.user_id)" class="member-check">✓</view>
         </view>
-
-        <view class="field-desc">
-          <textarea v-model="form.description" class="input-desc" placeholder="描述一下任务的具体要求..." maxlength="500" />
-          <text class="desc-count">{{ form.description.length }}/500</text>
-        </view>
+        <text class="member-name">{{ m.nickname }}</text>
       </view>
+    </view>
+    <view v-else class="ui-form-group empty-text">暂无成员</view>
 
-      <view class="section-line">
-        <text class="section-label">执行人</text>
-        <text class="section-count">{{ selectedExecutorIds.length }}人</text>
+    <text class="ui-form-label">有多急</text>
+    <view class="priority-row">
+      <view
+        v-for="opt in priorityOptions"
+        :key="opt.value"
+        class="priority-pill"
+        :class="{ 'is-active': form.priority === opt.value }"
+        :style="form.priority === opt.value ? { backgroundColor: opt.color, borderColor: opt.color } : {}"
+        @click="form.priority = opt.value"
+      >
+        <view class="priority-dot" :style="{ backgroundColor: form.priority === opt.value ? '#FFFFFF' : opt.color }"></view>
+        <text>{{ opt.label }}</text>
       </view>
+    </view>
 
-      <view v-if="members.length > 0" class="member-list">
-        <view
-          v-for="m in members"
-          :key="m.user_id"
-          class="member-row"
-          :class="{ active: selectedExecutorIds.includes(m.user_id) }"
-          @click="toggleExecutor(m.user_id)"
-        >
-          <view class="member-avatar" :style="{ background: getAvatarColor(m.nickname) }">
-            <text class="avatar-letter">{{ m.nickname.charAt(0) }}</text>
-          </view>
-          <view class="member-info">
-            <text class="member-name">{{ m.nickname }}</text>
-          </view>
-          <view class="member-check" :class="{ checked: selectedExecutorIds.includes(m.user_id) }">
-            <text v-if="selectedExecutorIds.includes(m.user_id)" class="check-icon">✓</text>
-          </view>
-        </view>
-      </view>
-      <view v-else class="empty-text">暂无成员</view>
-
-      <view class="section-line">
-        <text class="section-label">优先级</text>
-      </view>
-
-      <view class="priority-row">
-        <view
-          v-for="opt in priorityOptions"
-          :key="opt.value"
-          class="priority-tag"
-          :class="{ active: form.priority === opt.value }"
-          :style="form.priority === opt.value ? { borderColor: opt.color, color: opt.color } : {}"
-          @click="form.priority = opt.value"
-        >
-          <view class="priority-dot" :style="{ backgroundColor: opt.color }"></view>
-          <text>{{ opt.label }}</text>
-        </view>
-      </view>
-
+    <text class="ui-form-label">什么时候</text>
+    <view class="ui-form-group">
       <picker mode="multiSelector" :range="dateTimeRange" :value="dateTimeValue" @change="onDeadlineChange">
-        <view class="row-line">
+        <view class="row">
           <text class="row-label">截止时间</text>
           <view class="row-value">
             <text>{{ deadlineText }}</text>
@@ -69,16 +64,17 @@
           </view>
         </view>
       </picker>
-
-      <view class="row-line">
-        <text class="row-label">周期任务</text>
+      <view class="row">
+        <view class="row-label-group">
+          <text class="row-label">周期任务</text>
+          <text class="row-hint">适合值日、轮流打扫</text>
+        </view>
         <switch :checked="form.is_cycle" @change="form.is_cycle = $event.detail.value" color="#2F7CF6" />
       </view>
-
       <template v-if="form.is_cycle">
         <picker :range="cycleTypes" :range-key="'label'" :value="cycleIndex" @change="onCycleChange">
-          <view class="row-line row-line-sub">
-            <text class="row-label-sub">重复频率</text>
+          <view class="row row--sub">
+            <text class="row-label">重复频率</text>
             <view class="row-value">
               <text>{{ cycleTypes[cycleIndex].label }}</text>
               <text class="row-arrow">›</text>
@@ -86,21 +82,21 @@
           </view>
         </picker>
         <picker v-if="cycleTypes[cycleIndex].value === 'monthly'" :range="dayOfMonthRange" :value="dayOfMonthIndex" @change="onDayOfMonthChange">
-          <view class="row-line row-line-sub">
-            <text class="row-label-sub">每月几号</text>
+          <view class="row row--sub">
+            <text class="row-label">每月几号</text>
             <view class="row-value">
               <text>{{ dayOfMonthRange[dayOfMonthIndex] }} 号</text>
               <text class="row-arrow">›</text>
             </view>
           </view>
         </picker>
-        <view class="row-line row-line-sub">
-          <text class="row-label-sub">结束时间</text>
+        <view class="row row--sub">
+          <text class="row-label">设置结束时间</text>
           <switch :checked="hasCycleEnd" @change="hasCycleEnd = $event.detail.value" color="#2F7CF6" />
         </view>
         <picker v-if="hasCycleEnd" mode="date" :value="cycleEndDate" @change="onCycleEndDateChange">
-          <view class="row-line row-line-sub">
-            <text class="row-label-sub">结束日期</text>
+          <view class="row row--sub">
+            <text class="row-label">结束日期</text>
             <view class="row-value">
               <text>{{ cycleEndDate || '请选择' }}</text>
               <text class="row-arrow">›</text>
@@ -110,11 +106,17 @@
       </template>
     </view>
 
-    <view class="footer">
-      <button class="btn-submit" :class="{ loading: submitting }" :disabled="!canSubmit" @click="handleSubmit">
-        {{ submitting ? '发布中...' : (isEdit ? '更新任务' : '创建任务') }}
-      </button>
-      <text class="footer-hint">创建后将通知所有执行人</text>
+    <view class="ui-bottom-spacer"></view>
+
+    <view class="ui-bottom-bar bar">
+      <text class="bar-hint">发布后将通知所有执行人</text>
+      <view
+        class="ui-btn ui-btn--primary bar-btn"
+        :class="{ 'is-disabled': !canSubmit || submitting }"
+        @click="handleSubmit"
+      >
+        {{ submitting ? '发布中...' : (isEdit ? '更新任务' : '发布任务') }}
+      </view>
     </view>
   </view>
 </template>
@@ -304,275 +306,178 @@ async function handleSubmit() {
 .page {
   min-height: 100vh;
   background: $bg-page;
+  padding-top: $space-4;
 }
 
-.form-body {
-  padding: $space-4 $space-4 0;
-}
+.intro {
+  padding: 0 $space-5 $space-2;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
 
-/* ---------- 标题 ---------- */
-.task-input-area {
-  background: linear-gradient(135deg, #F2F7FF 0%, #E8F1FF 100%);
-  border-radius: $radius-xl;
-  padding: $space-4;
-  margin-bottom: $space-4;
-  border: 1rpx solid rgba($primary, 0.08);
-  position: relative;
+  &-title {
+    font-size: 48rpx;
+    font-weight: 900;
+    color: $text-primary;
+    letter-spacing: -0.02em;
+  }
 
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 6rpx;
-    background: $primary;
-    opacity: 0.4;
-    border-radius: 0 $radius-sm $radius-sm 0;
+  &-sub {
+    font-size: $font-sm;
+    color: $text-secondary;
   }
 }
 
-.field-title {
-  margin-bottom: $space-3;
+.label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: $space-5;
+}
+
+.label-extra {
+  font-size: $font-xs;
+  font-weight: 700;
+  color: $primary;
 }
 
 .title-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: $space-1;
-}
-
-.title-label {
-  font-size: $font-xs;
-  color: $primary;
-  font-weight: 600;
-}
-
-.title-count {
-  font-size: 20rpx;
-  color: $text-hint;
+  gap: $space-2;
+  padding: $space-2 0;
+  border-bottom: 2rpx dashed $border-color;
 }
 
 .input-title {
-  width: 100%;
-  height: 80rpx;
-  font-size: $font-base;
-  font-weight: 600;
+  flex: 1;
+  height: 88rpx;
+  font-size: 40rpx;
+  font-weight: 800;
   color: $text-primary;
-  border: 2rpx solid $border-color;
-  border-radius: $radius-lg;
-  background: rgba(255, 255, 255, 0.8);
-  padding: 0 $space-4;
-  margin: 0;
-  box-sizing: border-box;
-  transition: $transition-fast;
+}
 
-  &:focus {
-    border-color: $primary;
-    box-shadow: 0 0 0 4rpx $primary-bg;
+.count {
+  font-size: 22rpx;
+  color: $text-hint;
+
+  &--desc {
+    display: block;
+    text-align: right;
+    padding-bottom: $space-2;
   }
 }
 
-/* ---------- 描述 ---------- */
-.field-desc {
-  position: relative;
-  border: 2rpx solid $border-color;
-  border-radius: $radius-lg;
-  background: rgba(255, 255, 255, 0.8);
-  transition: $transition-fast;
-
-  &:focus-within {
-    border-color: $primary;
-    box-shadow: 0 0 0 4rpx $primary-bg;
-  }
+.desc-wrap {
+  padding-top: $space-2;
 }
 
 .input-desc {
   width: 100%;
-  min-height: 100rpx;
+  height: 160rpx;
   font-size: $font-sm;
   color: $text-primary;
-  border: none;
-  background: transparent;
   line-height: 1.6;
-  resize: none;
-  padding: $space-3;
-
-  &::placeholder {
-    color: rgba($text-hint, 0.35);
-  }
 }
 
-.desc-count {
-  position: absolute;
-  bottom: $space-2;
-  right: $space-3;
-  font-size: 20rpx;
-  color: $text-hint;
-}
-
-/* ---------- 分段标题 ---------- */
-.section-line {
+/* 执行人宫格 */
+.member-grid {
   display: flex;
+  flex-wrap: wrap;
+  gap: $space-3;
+  padding: 0 $space-5 $space-4;
+}
+
+.member-chip {
+  width: 140rpx;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  gap: 10rpx;
   padding: $space-3 0;
-}
-
-.section-label {
-  font-size: $font-xs;
-  color: $text-hint;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-}
-
-.section-count {
-  font-size: $font-xs;
-  color: $primary;
-  font-weight: 600;
-}
-
-/* ---------- 成员列表 ---------- */
-.member-list {
   background: $bg-card;
   border-radius: $radius-lg;
-  overflow: hidden;
-  margin-bottom: $space-3;
-  box-shadow: $shadow-sm;
-  border: 1rpx solid $border-color;
-  position: relative;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 6rpx;
-    background: $primary;
-    opacity: 0.4;
-    border-radius: 0 $radius-sm $radius-sm 0;
-  }
-}
-
-.member-row {
-  display: flex;
-  align-items: center;
-  gap: $space-3;
-  padding: $space-3 $space-4;
-  border-bottom: 1rpx solid $border-light;
+  border: 3rpx solid $border-light;
   transition: $transition-fast;
 
-  &:last-child {
-    border-bottom: none;
-  }
-
-  &:active {
-    background: $bg-hover;
+  &.is-active {
+    border-color: $primary;
+    background: $primary-bg;
   }
 }
 
 .member-avatar {
-  width: 48rpx;
-  height: 48rpx;
+  position: relative;
+  width: 80rpx;
+  height: 80rpx;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-}
 
-.avatar-letter {
-  font-size: 20rpx;
-  font-weight: 700;
-  color: $text-white;
-}
-
-.member-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.member-name {
-  font-size: $font-sm;
-  font-weight: 500;
-  color: $text-primary;
+  &-text {
+    font-size: $font-md;
+    font-weight: 800;
+    color: $text-white;
+  }
 }
 
 .member-check {
+  position: absolute;
+  right: -8rpx;
+  bottom: -8rpx;
   width: 36rpx;
   height: 36rpx;
   border-radius: 50%;
-  border: 2rpx solid $border-color;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: $transition-fast;
-
-  &.checked {
-    border-color: $primary;
-    background: $primary;
-  }
-}
-
-.check-icon {
+  background: $accent-lemon;
+  border: 4rpx solid $bg-card;
+  color: $text-primary;
   font-size: 20rpx;
-  color: $text-white;
-  font-weight: 700;
-}
-
-.empty-text {
-  font-size: $font-sm;
-  color: $text-hint;
-  padding: $space-4 0;
+  font-weight: 900;
+  line-height: 36rpx;
   text-align: center;
 }
 
-/* ---------- 优先级 ---------- */
+.member-name {
+  max-width: 120rpx;
+  font-size: $font-xs;
+  font-weight: 600;
+  color: $text-primary;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty-text {
+  padding: $space-4;
+  font-size: $font-sm;
+  color: $text-hint;
+  text-align: center;
+}
+
+/* 优先级 */
 .priority-row {
   display: flex;
   gap: $space-2;
-  padding: $space-2 0 $space-4;
+  padding: 0 $space-5 $space-4;
 }
 
-.priority-tag {
+.priority-pill {
   flex: 1;
+  height: 80rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: $space-2;
-  height: 72rpx;
-  border: 2rpx solid $border-color;
-  border-radius: $radius-lg;
-  font-size: $font-xs;
-  color: $text-secondary;
-  transition: $transition-fast;
+  gap: 10rpx;
+  border-radius: $radius-full;
   background: $bg-card;
-  position: relative;
-  overflow: hidden;
+  border: 3rpx solid $border-color;
+  font-size: $font-sm;
+  font-weight: 700;
+  color: $text-primary;
 
-  &:active {
-    transform: scale(0.97);
-  }
-
-  &.active {
-    background: $bg-card;
-    font-weight: 600;
-    box-shadow: $shadow-sm;
-
-    &::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 6rpx;
-      background: currentColor;
-      opacity: 0.4;
-      border-radius: 0 $radius-sm $radius-sm 0;
-    }
+  &.is-active {
+    color: $text-white;
   }
 }
 
@@ -580,88 +485,74 @@ async function handleSubmit() {
   width: 14rpx;
   height: 14rpx;
   border-radius: 50%;
-  flex-shrink: 0;
 }
 
-/* ---------- 行项 ---------- */
-.row-line {
+/* 设置行 */
+.row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: $space-3 0;
-  border-bottom: 1rpx solid $border-light;
+  gap: $space-3;
+  min-height: 104rpx;
+  border-bottom: 2rpx dashed $border-color;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &--sub {
+    padding-left: $space-3;
+  }
 }
 
-.row-line-sub {
-  padding-left: $space-4;
+picker:last-child .row {
+  border-bottom: none;
+}
+
+.row-label-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2rpx;
 }
 
 .row-label {
   font-size: $font-sm;
+  font-weight: 700;
   color: $text-primary;
-  font-weight: 500;
 }
 
-.row-label-sub {
-  font-size: $font-xs;
-  color: $text-secondary;
+.row-hint {
+  font-size: 22rpx;
+  color: $text-hint;
 }
 
 .row-value {
   display: flex;
   align-items: center;
-  gap: $space-2;
+  gap: 8rpx;
   font-size: $font-sm;
-  color: $text-primary;
+  color: $text-secondary;
 }
 
 .row-arrow {
-  font-size: 32rpx;
+  font-size: $font-md;
   color: $text-hint;
 }
 
-/* ---------- 底部 ---------- */
-.footer {
-  padding: $space-6 $space-4 $space-8;
+/* 底栏 */
+.bar {
+  flex-direction: column;
+  align-items: stretch;
+  gap: $space-2;
 }
 
-.btn-submit {
-  width: 100%;
-  height: 96rpx;
-  background: $primary-gradient;
-  border: none;
-  border-radius: $radius-xl;
-  font-size: $font-base;
-  font-weight: 700;
-  color: $text-white;
-  letter-spacing: 0.02em;
-  box-shadow: 0 8rpx 32rpx rgba($primary, 0.3);
-  transition: $transition-base;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-
-  &.loading {
-    opacity: 0.7;
-  }
-
-  &:disabled {
-    opacity: 0.4;
-    box-shadow: none;
-  }
-
-  &:active:not(:disabled) {
-    transform: scale(0.97);
-    box-shadow: 0 4rpx 16rpx rgba($primary, 0.2);
-  }
-}
-
-.footer-hint {
-  display: block;
-  text-align: center;
+.bar-hint {
   font-size: 22rpx;
   color: $text-hint;
-  margin-top: $space-3;
+  text-align: center;
+}
+
+.bar-btn {
+  flex: none;
 }
 </style>
