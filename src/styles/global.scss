@@ -1,0 +1,613 @@
+@use './variables.scss' as *;
+
+// ============================================
+// Global Styles - 舍管Pro
+// ============================================
+
+page {
+  background-color: $bg-page;
+  font-size: $font-base;
+  color: $text-primary;
+  font-family: $font-family;
+  line-height: 1.6;
+}
+
+.container {
+  padding: $space-4;
+}
+
+// -- Card --
+.card {
+  background-color: $bg-card;
+  border-radius: $radius-xl;
+  padding: $space-5;
+  margin-bottom: $space-6;
+  box-shadow: $shadow-sm;
+  border: 1rpx solid $border-light;
+  transition: $transition-base;
+
+  &:active {
+    transform: scale(0.99);
+    box-shadow: $shadow-card;
+  }
+}
+
+// -- Section Card (带背景色的区块) --
+.section-card {
+  border-radius: $radius-xl;
+  padding: $space-5;
+  margin-bottom: $space-4;
+  position: relative;
+  overflow: hidden;
+}
+
+.section-card-task {
+  background: linear-gradient(135deg, #F8F7FF, #EEF2FF);
+}
+
+.section-card-bill {
+  background: linear-gradient(135deg, #F0FDF9, #ECFDF5);
+}
+
+.section-card-room {
+  background: linear-gradient(135deg, #FDF8F0, #FFFBEB);
+}
+
+.section-card-quick {
+  background: linear-gradient(135deg, #EFF6FF, #F0F9FF);
+}
+
+// -- Section Header --
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $space-4;
+
+  .section-header-left {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+  }
+
+  .section-header-icon {
+    width: 36rpx;
+    height: 36rpx;
+  }
+
+  .section-link {
+    font-size: $font-sm;
+    color: $primary;
+    font-weight: 500;
+  }
+}
+
+// -- Decorative background dot --
+.section-card::before {
+  content: '';
+  position: absolute;
+  top: -40rpx;
+  right: -40rpx;
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+.section-card-task::before {
+  background: $primary;
+}
+
+.section-card-bill::before {
+  background: $success;
+}
+
+.section-card-room::before {
+  background: $warning;
+}
+
+.section-card-quick::before {
+  background: $accent-sky;
+}
+
+// -- Buttons --
+button {
+  &::after {
+    border: none;
+  }
+}
+
+.btn-primary,
+.btn-outline,
+.btn-danger,
+.btn-ghost,
+.btn-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  line-height: 1;
+  text-align: center;
+}
+
+.btn-primary {
+  background-color: $primary;
+  color: $text-white;
+  border-radius: $radius-md;
+  padding: $space-2 $space-4;
+  font-size: $font-sm;
+  font-weight: 600;
+  border: none;
+  transition: $transition-base;
+  box-shadow: 0 2rpx 8rpx rgba(99, 102, 241, 0.2);
+  min-height: 60rpx;
+
+  &:active {
+    transform: scale(0.97);
+    opacity: 0.9;
+    box-shadow: 0 1rpx 4rpx rgba(99, 102, 241, 0.2);
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  &.is-loading,
+  &.loading {
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .loading-spinner {
+    border-color: rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+    flex-shrink: 0;
+  }
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: $primary;
+  border: 2rpx solid $primary;
+  border-radius: $radius-md;
+  padding: $space-2 $space-4;
+  font-size: $font-sm;
+  font-weight: 600;
+  transition: $transition-base;
+  min-height: 60rpx;
+
+  &:active {
+    transform: scale(0.97);
+    background-color: $primary-bg;
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: $text-secondary;
+  border: none;
+  border-radius: $radius-md;
+  padding: $space-2 $space-4;
+  font-size: $font-sm;
+  transition: $transition-base;
+  min-height: 60rpx;
+
+  &:active {
+    background-color: $bg-hover;
+  }
+}
+
+.btn-danger {
+  background-color: $danger;
+  color: $text-white;
+  border-radius: $radius-md;
+  padding: $space-2 $space-4;
+  font-size: $font-sm;
+  font-weight: 600;
+  border: none;
+  transition: $transition-base;
+  box-shadow: 0 2rpx 8rpx rgba(239, 68, 68, 0.2);
+  min-height: 60rpx;
+
+  &:active {
+    transform: scale(0.97);
+    opacity: 0.9;
+  }
+}
+
+button.submit-btn,
+button.save-btn {
+  width: 100%;
+  min-height: 96rpx;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+button.btn-restore {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.btn-submit {
+  &.loading,
+  &.is-loading {
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .loading-spinner {
+    border-color: rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+    flex-shrink: 0;
+  }
+}
+
+// -- Page Action Button (底部主操作 / 页面级按钮) --
+.page-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-2;
+  width: 100%;
+  height: 96rpx;
+  padding: 0 $space-6;
+  border-radius: $radius-full;
+  box-sizing: border-box;
+  font-size: $font-base;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  transition: $transition-base;
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40rpx;
+    height: 40rpx;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    flex-shrink: 0;
+  }
+
+  &__icon-text {
+    font-size: $font-base;
+    font-weight: 600;
+    line-height: 1;
+    color: inherit;
+  }
+
+  &__text {
+    line-height: 1;
+    color: inherit;
+  }
+
+  &--primary {
+    background: $primary-gradient;
+    color: $text-white;
+    border: none;
+    box-shadow: 0 8rpx 32rpx rgba($primary, 0.3);
+
+    &:active {
+      opacity: 0.85;
+    }
+  }
+
+  &--danger-outline {
+    background: transparent;
+    color: $danger;
+    border: 2rpx solid $danger;
+
+    &:active {
+      opacity: 0.6;
+    }
+  }
+
+  &--outline {
+    background: $bg-card;
+    color: $primary;
+    border: 2rpx solid rgba($primary, 0.35);
+    box-shadow: $shadow-sm;
+
+    &:active {
+      opacity: 0.85;
+      background: $primary-bg;
+    }
+  }
+}
+
+// -- Section Title --
+.section-title {
+  font-size: $font-md;
+  font-weight: 700;
+  color: $text-primary;
+  margin-bottom: $space-5;
+  letter-spacing: -0.02em;
+}
+
+// -- Tag --
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: $space-1 $space-3;
+  border-radius: $radius-full;
+  font-size: $font-xs;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.tag-primary {
+  background-color: $primary-bg;
+  color: $primary;
+}
+
+.tag-success {
+  background-color: $success-bg;
+  color: $success;
+}
+
+.tag-warning {
+  background-color: $warning-bg;
+  color: $warning;
+}
+
+.tag-danger {
+  background-color: $danger-bg;
+  color: $danger;
+}
+
+// -- Form --
+.form-group {
+  margin-bottom: $space-7;
+
+  .form-label {
+    font-size: $font-sm;
+    color: $text-secondary;
+    margin-bottom: $space-3;
+    font-weight: 600;
+
+    .required {
+      color: $danger;
+      margin-left: $space-2;
+    }
+  }
+
+  .form-desc {
+    font-size: $font-xs;
+    color: $text-secondary;
+    margin-top: $space-2;
+    line-height: 1.6;
+  }
+}
+
+.input-field {
+  width: 100%;
+  height: 96rpx;
+  padding: 0 $space-5;
+  font-size: $font-base;
+  color: $text-primary;
+  background-color: $bg-card;
+  border: 2rpx solid $border-color;
+  border-radius: $radius-md;
+  transition: $transition-base;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+
+  &:focus {
+    border-color: $primary;
+    box-shadow: 0 0 0 4rpx $primary-bg;
+  }
+
+  &::placeholder {
+    color: $text-secondary;
+  }
+}
+
+.textarea-field {
+  width: 100%;
+  padding: $space-5;
+  font-size: $font-base;
+  color: $text-primary;
+  background-color: $bg-card;
+  border: 2rpx solid $border-color;
+  border-radius: $radius-md;
+  transition: $transition-base;
+  box-sizing: border-box;
+  min-height: 200rpx;
+  line-height: 1.6;
+
+  &:focus {
+    border-color: $primary;
+    box-shadow: 0 0 0 4rpx $primary-bg;
+  }
+
+  &::placeholder {
+    color: $text-secondary;
+  }
+}
+
+// -- Empty State --
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $space-16 $space-10;
+  color: $text-hint;
+
+  .empty-icon {
+    font-size: $font-xxl;
+    margin-bottom: $space-6;
+    opacity: 0.5;
+  }
+
+  .empty-title {
+    font-size: $font-md;
+    color: $text-secondary;
+    margin-bottom: $space-3;
+    font-weight: 600;
+  }
+
+  .empty-text {
+    font-size: $font-sm;
+    color: $text-hint;
+    text-align: center;
+  }
+
+  .empty-action {
+    margin-top: $space-7;
+  }
+}
+
+// -- Loading Spinner --
+.loading-spinner {
+  display: inline-block;
+  width: 40rpx;
+  height: 40rpx;
+  border: 4rpx solid $border-color;
+  border-top-color: $primary;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+
+  &.spinner-sm {
+    width: 28rpx;
+    height: 28rpx;
+    border-width: 3rpx;
+  }
+
+  &.spinner-lg {
+    width: 60rpx;
+    height: 60rpx;
+    border-width: 5rpx;
+  }
+}
+
+// -- Skeleton Loading --
+.skeleton {
+  background: linear-gradient(90deg, $border-light 25%, $bg-hover 50%, $border-light 75%);
+  background-size: 400% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: $radius-sm;
+}
+
+// -- Animations --
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.slide-up {
+  animation: slideUp 0.4s ease-out forwards;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(60rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// -- Utility --
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.font-bold {
+  font-weight: 600;
+}
+
+.text-primary {
+  color: $text-primary;
+}
+
+.text-secondary {
+  color: $text-secondary;
+}
+
+.text-hint {
+  color: $text-hint;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.gap-sm {
+  gap: $space-2;
+}
+
+.gap-md {
+  gap: $space-4;
+}
+
+.gap-lg {
+  gap: $space-6;
+}

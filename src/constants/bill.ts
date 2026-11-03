@@ -1,0 +1,13 @@
+export const BILL_TYPE_OPTIONS = [
+  { value: 0, label: '水电' },
+  { value: 1, label: '采购' },
+  { value: 2, label: '聚餐' },
+  { value: 3, label: '网费' },
+  { value: 4, label: '其他' },
+]
+
+export const SPLIT_TYPE_OPTIONS = [
+  { value: 0, label: 'AA均分' },
+  { value: 1, label: '自定义金额' },
+  { value: 2, label: '按百分比' },
+]

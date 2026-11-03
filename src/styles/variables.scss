@@ -1,0 +1,116 @@
+// ============================================
+// Design Tokens - 舍管Pro
+// ============================================
+
+// -- Color Palette --
+$primary: #6366F1;
+$primary-light: #818CF8;
+$primary-dark: #4F46E5;
+$primary-bg: rgba(99, 102, 241, 0.08);
+$primary-gradient: linear-gradient(135deg, #6366F1, #818CF8);
+
+$success: #10B981;
+$success-light: #34D399;
+$success-bg: rgba(16, 185, 129, 0.08);
+$success-gradient: linear-gradient(135deg, #10B981, #34D399);
+
+$warning: #F59E0B;
+$warning-light: #FBBF24;
+$warning-bg: rgba(245, 158, 11, 0.08);
+$warning-gradient: linear-gradient(135deg, #F59E0B, #FBBF24);
+
+$danger: #EF4444;
+$danger-light: #F87171;
+$danger-bg: rgba(239, 68, 68, 0.08);
+$danger-gradient: linear-gradient(135deg, #EF4444, #F87171);
+
+// -- Warm Accent Colors --
+$accent-rose: #F43F5E;
+$accent-rose-bg: rgba(244, 63, 94, 0.08);
+$accent-amber: #F59E0B;
+$accent-amber-bg: rgba(245, 158, 11, 0.08);
+$accent-teal: #14B8A6;
+$accent-teal-bg: rgba(20, 184, 166, 0.08);
+$accent-sky: #0EA5E9;
+$accent-sky-bg: rgba(14, 165, 233, 0.08);
+$accent-violet: #8B5CF6;
+$accent-violet-bg: rgba(139, 92, 246, 0.08);
+
+// -- Text Colors --
+$text-primary: #0F172A;
+$text-secondary: #64748B;
+$text-hint: #94A3B8;
+$text-white: #FFFFFF;
+
+// -- Background --
+$bg-page: #F8FAFC;
+$bg-card: #FFFFFF;
+$bg-hover: #F1F5F9;
+$bg-section-task: #F8F7FF;
+$bg-section-bill: #F0FDF9;
+$bg-section-room: #FDF8F0;
+$bg-section-quick: #EFF6FF;
+
+// -- Border --
+$border-color: #E2E8F0;
+$border-light: #F1F5F9;
+
+// -- Spacing Scale (遵循ui.md推荐的generous spacing) --
+$space-1: 8rpx;
+$space-2: 16rpx;
+$space-3: 24rpx;
+$space-4: 32rpx;
+$space-5: 40rpx;
+$space-6: 48rpx;
+$space-7: 56rpx;
+$space-8: 64rpx;
+$space-9: 72rpx;
+$space-10: 80rpx;
+$space-12: 96rpx;
+$space-14: 112rpx;
+$space-16: 128rpx;
+
+// -- Border Radius --
+$radius-xs: 8rpx;
+$radius-sm: 16rpx;
+$radius-md: 28rpx;
+$radius-lg: 32rpx;
+$radius-xl: 40rpx;
+$radius-full: 9999rpx;
+
+// -- Shadows --
+$shadow-sm: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+$shadow-md: 0 8rpx 30rpx rgba(0, 0, 0, 0.08);
+$shadow-lg: 0 16rpx 60rpx rgba(0, 0, 0, 0.12);
+$shadow-card: 0 8rpx 30rpx rgba(0, 0, 0, 0.08);
+$shadow-primary: 0 4rpx 16rpx rgba(99, 102, 241, 0.15);
+
+// -- Typography --
+$font-xs: 24rpx;
+$font-sm: 28rpx;
+$font-base: 32rpx;
+$font-md: 36rpx;
+$font-lg: 48rpx;
+$font-xl: 64rpx;
+$font-xxl: 80rpx;
+
+// -- Font Family --
+$font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+
+// -- Transitions --
+$transition-fast: all 0.15s ease;
+$transition-base: all 0.2s ease;
+$transition-slow: all 0.3s ease;
+
+// ============================================
+// Backward-compatible aliases
+// ============================================
+$primary-color: $primary;
+$text-white: #FFFFFF;
+$bg-color: $bg-page;
+$bg-white: $bg-card;
+$spacing-xs: $space-1;
+$spacing-sm: $space-2;
+$spacing-md: $space-4;
+$spacing-lg: $space-6;
+$spacing-xl: $space-12;

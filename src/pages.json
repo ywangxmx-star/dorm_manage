@@ -1,0 +1,185 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/home/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/task/list",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/mine/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/login/index",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": ""
+      }
+    },
+    {
+      "path": "pages/login/agreement",
+      "style": {
+        "navigationBarTitleText": "用户协议"
+      }
+    },
+    {
+      "path": "pages/login/privacy",
+      "style": {
+        "navigationBarTitleText": "隐私政策"
+      }
+    },
+    {
+      "path": "pages/room/create",
+      "style": {
+        "navigationBarTitleText": "创建宿舍"
+      }
+    },
+    {
+      "path": "pages/room/detail",
+      "style": {
+        "navigationBarTitleText": "宿舍详情"
+      }
+    },
+    {
+      "path": "pages/room/join",
+      "style": {
+        "navigationBarTitleText": "加入宿舍"
+      }
+    },
+    {
+      "path": "pages/room/members",
+      "style": {
+        "navigationBarTitleText": "成员管理"
+      }
+    },
+    {
+      "path": "pages/room/list",
+      "style": {
+        "navigationBarTitleText": "我的宿舍"
+      }
+    },
+    {
+      "path": "pages/task/create",
+      "style": {
+        "navigationBarTitleText": "创建任务"
+      }
+    },
+    {
+      "path": "pages/task/detail",
+      "style": {
+        "navigationBarTitleText": "任务详情"
+      }
+    },
+    {
+      "path": "pages/task/complete",
+      "style": {
+        "navigationBarTitleText": "完成任务"
+      }
+    },
+    {
+      "path": "pages/bill/list",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/bill/create",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/bill/detail",
+      "style": {
+        "navigationBarTitleText": "账单详情"
+      }
+    },
+    {
+      "path": "pages/mine/feedback",
+      "style": {
+        "navigationBarTitleText": "意见反馈"
+      }
+    },
+    {
+      "path": "pages/mine/profile",
+      "style": {
+        "navigationBarTitleText": "编辑资料"
+      }
+    },
+    {
+      "path": "pages/vote/list",
+      "style": {
+        "navigationBarTitleText": "",
+        "navigationBarBackgroundColor": "#F0FDFA"
+      }
+    },
+    {
+      "path": "pages/vote/create",
+      "style": {
+        "navigationBarTitleText": "创建投票"
+      }
+    },
+    {
+      "path": "pages/vote/detail",
+      "style": {
+        "navigationBarTitleText": "投票详情"
+      }
+    }
+  ],
+  "tabBar": {
+    "color": "#94A3B8",
+    "selectedColor": "#6366F1",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页",
+        "iconPath": "static/tab/home.png",
+        "selectedIconPath": "static/tab/home-active.png"
+      },
+      {
+        "pagePath": "pages/task/list",
+        "text": "任务",
+        "iconPath": "static/tab/task.png",
+        "selectedIconPath": "static/tab/task-active.png"
+      },
+      {
+        "pagePath": "pages/bill/list",
+        "text": "账单",
+        "iconPath": "static/tab/bill.png",
+        "selectedIconPath": "static/tab/bill-active.png"
+      },
+      {
+        "pagePath": "pages/mine/index",
+        "text": "我的",
+        "iconPath": "static/tab/mine.png",
+        "selectedIconPath": "static/tab/mine-active.png"
+      }
+    ]
+  },
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "舍小圈",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#F8FAFC",
+    "mp-weixin": {
+      "enableShareAppMessage": true,
+      "enableShareTimeline": true
+    }
+  }
+}
