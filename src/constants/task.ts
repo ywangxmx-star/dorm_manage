@@ -1,7 +1,7 @@
 export const PRIORITY_OPTIONS = [
-  { value: 0, label: '普通', color: '#9AA8BC' },
-  { value: 1, label: '重要', color: '#FF9F2E' },
-  { value: 2, label: '紧急', color: '#FF5A5F' },
+  { value: 0, label: '普通', color: '#94A3B8' },
+  { value: 1, label: '重要', color: '#D97706' },
+  { value: 2, label: '紧急', color: '#E5484D' },
 ]
 
 export const TASK_STATUS_OPTIONS = [

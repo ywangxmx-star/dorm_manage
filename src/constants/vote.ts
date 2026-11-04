@@ -16,8 +16,8 @@ export const VOTE_STATUS_OPTIONS = [
 ]
 
 export const VOTE_STATUS_MAP: Record<number, { text: string; color: string }> = {
-  0: { text: '进行中', color: '#2F7CF6' },
-  1: { text: '已结束', color: '#9AA8BC' },
+  0: { text: '进行中', color: '#2563EB' },
+  1: { text: '已结束', color: '#94A3B8' },
 }
 
 export const VOTE_TYPE_MAP: Record<number, string> = {

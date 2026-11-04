@@ -38,7 +38,7 @@
       class="page-content"
       scroll-y
       refresher-enabled
-      refresher-background="#F3F7FD"
+      refresher-background="#F4F5F7"
       :refresher-triggered="refreshing"
       @refresherrefresh="onRefresh"
     >

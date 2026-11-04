@@ -2,7 +2,7 @@
   <view class="task-list-page">
     <view class="head">
       <view class="ui-header">
-        <text class="ui-header__eyebrow">TO DO · 值日与分工</text>
+        <text class="ui-header__eyebrow">值日与分工</text>
         <view class="ui-header__row">
           <text class="ui-header__title">任务板</text>
           <view class="head-count">
@@ -40,7 +40,7 @@
       :refresher-enabled="refresherEnabled"
       :refresher-threshold="REFRESHER_THRESHOLD"
       refresher-default-style="black"
-      refresher-background="#F3F7FD"
+      refresher-background="#F4F5F7"
       :upper-threshold="30"
       :refresher-triggered="refreshing"
       @scroll="onContentScroll"
@@ -97,7 +97,7 @@
           <view v-else-if="hasMore" class="load-more-btn" @click="loadMore">
             <text class="load-more-text">加载更多</text>
           </view>
-          <text v-else class="load-more-text">— 到底啦 —</text>
+          <text v-else class="load-more-text">没有更多了</text>
         </view>
         <view class="bottom-gap"></view>
       </template>
@@ -330,21 +330,20 @@ function goCreate() {
   display: flex;
   align-items: baseline;
   gap: 4rpx;
-  padding: 10rpx 24rpx;
-  background: $accent-lemon;
+  padding: 6rpx 20rpx;
+  background: $bg-hover;
   border-radius: $radius-full;
-  transform: rotate(-4deg);
 
   &-num {
-    font-size: $font-md;
-    font-weight: 900;
+    font-size: $font-sm;
+    font-weight: 600;
     color: $text-primary;
+    font-variant-numeric: tabular-nums;
   }
 
   &-lbl {
     font-size: $font-xs;
-    font-weight: 700;
-    color: $text-primary;
+    color: $text-secondary;
   }
 }
 
@@ -363,32 +362,31 @@ function goCreate() {
 }
 
 .list-wrap {
-  padding: $space-2 $space-5 0;
+  padding: $space-2 $page-gutter 0;
 }
 
 .task-list {
   display: flex;
   flex-direction: column;
-  gap: $space-3;
+  gap: $space-2;
 }
 
 .empty-box {
   margin-top: $space-4;
   background: $bg-card;
   border-radius: $radius-lg;
-  border: 2rpx dashed $border-color;
+  border: 1rpx dashed $border-color;
 }
 
 .trash-tip {
   margin-bottom: $space-3;
   padding: $space-2 $space-3;
-  background: $accent-lemon-soft;
+  background: $bg-hover;
   border-radius: $radius-md;
 
   &-text {
     font-size: $font-xs;
-    color: $accent-lemon-text;
-    font-weight: 600;
+    color: $text-secondary;
   }
 }
 
@@ -399,7 +397,7 @@ function goCreate() {
   padding: $space-4;
   background: $bg-card;
   border-radius: $radius-lg;
-  border: 2rpx dashed $border-color;
+  border: 1rpx solid $border-light;
 }
 
 .trash-info {
@@ -412,9 +410,8 @@ function goCreate() {
 
 .trash-title {
   font-size: $font-base;
-  font-weight: 700;
+  font-weight: 600;
   color: $text-secondary;
-  text-decoration: line-through;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -427,12 +424,14 @@ function goCreate() {
 
 .trash-btn {
   flex-shrink: 0;
-  padding: 14rpx 32rpx;
-  border-radius: $radius-full;
-  background: $primary;
-  color: $text-white;
+  height: 56rpx;
+  line-height: 56rpx;
+  padding: 0 28rpx;
+  border-radius: $radius-sm;
+  background: $primary-bg;
+  color: $primary;
   font-size: $font-xs;
-  font-weight: 700;
+  font-weight: 600;
 
   &:active {
     opacity: 0.85;
@@ -455,7 +454,7 @@ function goCreate() {
   padding: 14rpx 40rpx;
   border-radius: $radius-full;
   background: $bg-card;
-  border: 2rpx solid $border-color;
+  border: 1rpx solid $border-color;
 }
 
 .load-more-text {

@@ -1,7 +1,8 @@
 @use './variables.scss' as *;
 
 // ============================================
-// Global Styles - 舍管Pro
+// Global Styles - 舍小圈
+// 原则：中性底、细边框、轻阴影、统一 8rpx 网格与 32rpx 页边距
 // ============================================
 
 page {
@@ -9,52 +10,45 @@ page {
   font-size: $font-base;
   color: $text-primary;
   font-family: $font-family;
-  line-height: 1.6;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
 .container {
-  padding: $space-4;
+  padding: $page-gutter;
 }
 
 // -- Card --
 .card {
   background-color: $bg-card;
-  border-radius: $radius-xl;
-  padding: $space-5;
-  margin-bottom: $space-6;
-  box-shadow: $shadow-sm;
+  border-radius: $radius-lg;
+  padding: $space-4;
+  margin-bottom: $space-3;
   border: 1rpx solid $border-light;
-  transition: $transition-base;
+  box-shadow: $shadow-sm;
+  transition: $transition-fast;
 
   &:active {
-    transform: scale(0.99);
-    box-shadow: $shadow-card;
+    background-color: $bg-subtle;
   }
 }
 
-// -- Section Card (带背景色的区块) --
+// -- Section Card --
 .section-card {
-  border-radius: $radius-xl;
-  padding: $space-5;
-  margin-bottom: $space-4;
+  border-radius: $radius-lg;
+  padding: $space-4;
+  margin-bottom: $space-3;
   position: relative;
   overflow: hidden;
+  background: $bg-card;
+  border: 1rpx solid $border-light;
 }
 
-.section-card-task {
-  background: $bg-section-task;
-}
-
-.section-card-bill {
-  background: $bg-section-bill;
-}
-
-.section-card-room {
-  background: $bg-section-room;
-}
-
+.section-card-task,
+.section-card-bill,
+.section-card-room,
 .section-card-quick {
-  background: $bg-section-quick;
+  background: $bg-card;
 }
 
 // -- Section Header --
@@ -62,7 +56,7 @@ page {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: $space-4;
+  margin-bottom: $space-3;
 
   .section-header-left {
     display: flex;
@@ -71,44 +65,15 @@ page {
   }
 
   .section-header-icon {
-    width: 36rpx;
-    height: 36rpx;
+    width: 32rpx;
+    height: 32rpx;
   }
 
   .section-link {
-    font-size: $font-sm;
-    color: $primary;
+    font-size: $font-xs;
+    color: $text-secondary;
     font-weight: 500;
   }
-}
-
-// -- Decorative background dot --
-.section-card::before {
-  content: '';
-  position: absolute;
-  top: -40rpx;
-  right: -40rpx;
-  width: 160rpx;
-  height: 160rpx;
-  border-radius: 50%;
-  opacity: 0.08;
-  pointer-events: none;
-}
-
-.section-card-task::before {
-  background: $primary;
-}
-
-.section-card-bill::before {
-  background: $success;
-}
-
-.section-card-room::before {
-  background: $warning;
-}
-
-.section-card-quick::before {
-  background: $accent-sky;
 }
 
 // -- Buttons --
@@ -134,23 +99,20 @@ button {
 .btn-primary {
   background-color: $primary;
   color: $text-white;
-  border-radius: $radius-md;
+  border-radius: $radius-sm;
   padding: $space-2 $space-4;
   font-size: $font-sm;
   font-weight: 600;
   border: none;
-  transition: $transition-base;
-  box-shadow: $shadow-primary;
-  min-height: 60rpx;
+  transition: $transition-fast;
+  min-height: 64rpx;
 
   &:active {
-    transform: scale(0.97);
-    opacity: 0.9;
-    box-shadow: 0 2rpx 8rpx rgba(47, 124, 246, 0.2);
+    background-color: $primary-dark;
   }
 
   &[disabled] {
-    opacity: 0.5;
+    opacity: 0.45;
     pointer-events: none;
   }
 
@@ -162,29 +124,28 @@ button {
 
   .loading-spinner {
     border-color: rgba(255, 255, 255, 0.35);
-    border-top-color: #fff;
+    border-top-color: $text-white;
     flex-shrink: 0;
   }
 }
 
 .btn-outline {
-  background-color: transparent;
-  color: $primary;
-  border: 2rpx solid $primary;
-  border-radius: $radius-md;
+  background-color: $bg-card;
+  color: $text-primary;
+  border: 1rpx solid $border-color;
+  border-radius: $radius-sm;
   padding: $space-2 $space-4;
   font-size: $font-sm;
   font-weight: 600;
-  transition: $transition-base;
-  min-height: 60rpx;
+  transition: $transition-fast;
+  min-height: 64rpx;
 
   &:active {
-    transform: scale(0.97);
-    background-color: $primary-bg;
+    background-color: $bg-hover;
   }
 
   &[disabled] {
-    opacity: 0.5;
+    opacity: 0.45;
     pointer-events: none;
   }
 }
@@ -193,11 +154,11 @@ button {
   background-color: transparent;
   color: $text-secondary;
   border: none;
-  border-radius: $radius-md;
+  border-radius: $radius-sm;
   padding: $space-2 $space-4;
   font-size: $font-sm;
-  transition: $transition-base;
-  min-height: 60rpx;
+  transition: $transition-fast;
+  min-height: 64rpx;
 
   &:active {
     background-color: $bg-hover;
@@ -207,25 +168,23 @@ button {
 .btn-danger {
   background-color: $danger;
   color: $text-white;
-  border-radius: $radius-md;
+  border-radius: $radius-sm;
   padding: $space-2 $space-4;
   font-size: $font-sm;
   font-weight: 600;
   border: none;
-  transition: $transition-base;
-  box-shadow: 0 6rpx 18rpx rgba(255, 90, 95, 0.25);
-  min-height: 60rpx;
+  transition: $transition-fast;
+  min-height: 64rpx;
 
   &:active {
-    transform: scale(0.97);
-    opacity: 0.9;
+    opacity: 0.88;
   }
 }
 
 button.submit-btn,
 button.save-btn {
   width: 100%;
-  min-height: 96rpx;
+  min-height: 92rpx;
   padding-top: 0;
   padding-bottom: 0;
 }
@@ -246,40 +205,33 @@ button.btn-restore {
 
   .loading-spinner {
     border-color: rgba(255, 255, 255, 0.35);
-    border-top-color: #fff;
+    border-top-color: $text-white;
     flex-shrink: 0;
   }
 }
 
-// -- Page Action Button (底部主操作 / 页面级按钮) --
+// -- Page Action Button --
 .page-action-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: $space-2;
   width: 100%;
-  height: 96rpx;
+  height: 92rpx;
   padding: 0 $space-6;
-  border-radius: $radius-full;
+  border-radius: $radius-md;
   box-sizing: border-box;
   font-size: $font-base;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1;
-  letter-spacing: 0.02em;
-  transition: $transition-base;
-
-  &:active {
-    transform: scale(0.97);
-  }
+  transition: $transition-fast;
 
   &__icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40rpx;
-    height: 40rpx;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.25);
+    width: 36rpx;
+    height: 36rpx;
     flex-shrink: 0;
   }
 
@@ -296,35 +248,32 @@ button.btn-restore {
   }
 
   &--primary {
-    background: $primary-gradient;
+    background: $primary;
     color: $text-white;
     border: none;
-    box-shadow: 0 8rpx 32rpx rgba($primary, 0.3);
 
     &:active {
-      opacity: 0.85;
+      background: $primary-dark;
     }
   }
 
   &--danger-outline {
-    background: transparent;
+    background: $bg-card;
     color: $danger;
-    border: 2rpx solid $danger;
+    border: 1rpx solid $border-color;
 
     &:active {
-      opacity: 0.6;
+      background: $danger-bg;
     }
   }
 
   &--outline {
     background: $bg-card;
-    color: $primary;
-    border: 2rpx solid rgba($primary, 0.35);
-    box-shadow: $shadow-sm;
+    color: $text-primary;
+    border: 1rpx solid $border-color;
 
     &:active {
-      opacity: 0.85;
-      background: $primary-bg;
+      background: $bg-hover;
     }
   }
 }
@@ -332,21 +281,20 @@ button.btn-restore {
 // -- Section Title --
 .section-title {
   font-size: $font-md;
-  font-weight: 700;
+  font-weight: 600;
   color: $text-primary;
-  margin-bottom: $space-5;
-  letter-spacing: -0.02em;
+  margin-bottom: $space-3;
 }
 
-// -- Tag --
+// -- Tag（方角小标签，更专业）--
 .tag {
   display: inline-flex;
   align-items: center;
-  padding: $space-1 $space-3;
-  border-radius: $radius-full;
-  font-size: $font-xs;
-  font-weight: 500;
-  line-height: 1;
+  padding: 6rpx 14rpx;
+  border-radius: $radius-xs;
+  font-size: 22rpx;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 .tag-primary {
@@ -376,38 +324,38 @@ button.btn-restore {
 
 // -- Form --
 .form-group {
-  margin-bottom: $space-7;
+  margin-bottom: $space-5;
 
   .form-label {
     font-size: $font-sm;
-    color: $text-secondary;
-    margin-bottom: $space-3;
+    color: $text-primary;
+    margin-bottom: $space-2;
     font-weight: 600;
 
     .required {
       color: $danger;
-      margin-left: $space-2;
+      margin-left: $space-1;
     }
   }
 
   .form-desc {
     font-size: $font-xs;
-    color: $text-secondary;
-    margin-top: $space-2;
-    line-height: 1.6;
+    color: $text-hint;
+    margin-top: $space-1;
+    line-height: 1.5;
   }
 }
 
 .input-field {
   width: 100%;
-  height: 96rpx;
-  padding: 0 $space-5;
+  height: 88rpx;
+  padding: 0 $space-3;
   font-size: $font-base;
   color: $text-primary;
   background-color: $bg-card;
-  border: 2rpx solid $border-color;
-  border-radius: $radius-md;
-  transition: $transition-base;
+  border: 1rpx solid $border-color;
+  border-radius: $radius-sm;
+  transition: $transition-fast;
   box-sizing: border-box;
   caret-color: $primary;
   display: flex;
@@ -415,34 +363,32 @@ button.btn-restore {
 
   &:focus {
     border-color: $primary;
-    box-shadow: 0 0 0 4rpx $primary-bg;
   }
 
   &::placeholder {
-    color: $text-secondary;
+    color: $text-hint;
   }
 }
 
 .textarea-field {
   width: 100%;
-  padding: $space-5;
+  padding: $space-3;
   font-size: $font-base;
   color: $text-primary;
   background-color: $bg-card;
-  border: 2rpx solid $border-color;
-  border-radius: $radius-md;
-  transition: $transition-base;
+  border: 1rpx solid $border-color;
+  border-radius: $radius-sm;
+  transition: $transition-fast;
   box-sizing: border-box;
   min-height: 200rpx;
   line-height: 1.6;
 
   &:focus {
     border-color: $primary;
-    box-shadow: 0 0 0 4rpx $primary-bg;
   }
 
   &::placeholder {
-    color: $text-secondary;
+    color: $text-hint;
   }
 }
 
@@ -452,19 +398,19 @@ button.btn-restore {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: $space-16 $space-10;
+  padding: $space-12 $space-8;
   color: $text-hint;
 
   .empty-icon {
-    font-size: $font-xxl;
-    margin-bottom: $space-6;
+    font-size: $font-xl;
+    margin-bottom: $space-4;
     opacity: 0.5;
   }
 
   .empty-title {
-    font-size: $font-md;
-    color: $text-secondary;
-    margin-bottom: $space-3;
+    font-size: $font-base;
+    color: $text-primary;
+    margin-bottom: $space-1;
     font-weight: 600;
   }
 
@@ -475,7 +421,7 @@ button.btn-restore {
   }
 
   .empty-action {
-    margin-top: $space-7;
+    margin-top: $space-5;
   }
 }
 
@@ -487,7 +433,7 @@ button.btn-restore {
   border: 4rpx solid $border-color;
   border-top-color: $primary;
   border-radius: 50%;
-  animation: spin 0.6s linear infinite;
+  animation: spin 0.7s linear infinite;
 
   &.spinner-sm {
     width: 28rpx;
@@ -496,13 +442,13 @@ button.btn-restore {
   }
 
   &.spinner-lg {
-    width: 60rpx;
-    height: 60rpx;
-    border-width: 5rpx;
+    width: 56rpx;
+    height: 56rpx;
+    border-width: 4rpx;
   }
 }
 
-// -- Skeleton Loading --
+// -- Skeleton --
 .skeleton {
   background: linear-gradient(90deg, $border-light 25%, $bg-hover 50%, $border-light 75%);
   background-size: 400% 100%;
@@ -512,11 +458,11 @@ button.btn-restore {
 
 // -- Animations --
 .fade-in {
-  animation: fadeIn 0.3s ease-out;
+  animation: fadeIn 0.25s ease-out;
 }
 
 .slide-up {
-  animation: slideUp 0.4s ease-out forwards;
+  animation: slideUp 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 @keyframes spin {
@@ -546,7 +492,7 @@ button.btn-restore {
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(60rpx);
+    transform: translateY(16rpx);
   }
   to {
     opacity: 1;
@@ -577,6 +523,11 @@ button.btn-restore {
 
 .text-hint {
   color: $text-hint;
+}
+
+.num {
+  font-family: $font-num;
+  font-variant-numeric: tabular-nums;
 }
 
 .flex-row {
@@ -619,37 +570,41 @@ button.btn-restore {
 }
 
 // ============================================
-// Layout Primitives v2 - 「贴纸便当盒」布局语言
-// 大标题页眉 + 便当盒宫格 + 胶囊分段 + 底部悬浮操作栏
+// Layout Primitives
+// 页眉 · 分段 · 面板 · 键值行 · 底部操作栏 · 表单分组 · 抽屉
 // ============================================
 
-// 自定义导航页的大标题页眉（浅底，不压抑）
+// 大标题页眉。子页面使用系统导航栏（带返回），
+// Tab 根页面使用 --root 修饰，自行让出状态栏高度。
 .ui-header {
-  padding: calc(var(--status-bar-height) + 40rpx) $space-5 $space-4;
+  padding: $space-3 $page-gutter $space-4;
   display: flex;
   flex-direction: column;
-  gap: 6rpx;
+  gap: 4rpx;
+
+  &--root {
+    padding-top: calc(var(--status-bar-height) + 32rpx);
+  }
 
   &__eyebrow {
-    font-size: $font-xs;
-    font-weight: 700;
-    color: $primary;
-    letter-spacing: 0.08em;
+    font-size: 22rpx;
+    font-weight: 600;
+    color: $text-hint;
+    letter-spacing: 0.04em;
   }
 
   &__row {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: space-between;
     gap: $space-3;
   }
 
   &__title {
-    font-size: 56rpx;
-    font-weight: 800;
+    font-size: $font-lg;
+    font-weight: 700;
     color: $text-primary;
-    line-height: 1.2;
-    letter-spacing: -0.02em;
+    line-height: 1.25;
   }
 
   &__sub {
@@ -659,11 +614,11 @@ button.btn-restore {
   }
 }
 
-// 胶囊分段切换
+// 分段筛选（可横向滚动）
 .ui-seg {
   display: flex;
-  gap: $space-2;
-  padding: 0 $space-5;
+  gap: $space-1;
+  padding: 0 $page-gutter;
   overflow-x: auto;
   white-space: nowrap;
 
@@ -672,19 +627,27 @@ button.btn-restore {
     display: flex;
     align-items: center;
     gap: 8rpx;
-    padding: 14rpx 30rpx;
-    border-radius: $radius-full;
-    background: $bg-card;
-    border: 2rpx solid $border-color;
+    height: 60rpx;
+    padding: 0 24rpx;
+    border-radius: $radius-sm;
+    background: transparent;
+    border: 1rpx solid transparent;
     font-size: $font-sm;
-    font-weight: 600;
+    font-weight: 500;
     color: $text-secondary;
     transition: $transition-fast;
+    box-sizing: border-box;
+
+    &:active {
+      background: $bg-hover;
+    }
 
     &.is-active {
-      background: $text-primary;
-      border-color: $text-primary;
-      color: $text-white;
+      background: $bg-card;
+      border-color: $border-color;
+      color: $text-primary;
+      font-weight: 600;
+      box-shadow: $shadow-sm;
     }
   }
 
@@ -692,11 +655,11 @@ button.btn-restore {
     min-width: 32rpx;
     height: 32rpx;
     padding: 0 8rpx;
-    border-radius: $radius-full;
-    background: $accent-lemon;
-    color: $text-primary;
+    border-radius: $radius-xs;
+    background: $primary-bg;
+    color: $primary;
     font-size: 20rpx;
-    font-weight: 800;
+    font-weight: 700;
     line-height: 32rpx;
     text-align: center;
     box-sizing: border-box;
@@ -708,26 +671,26 @@ button.btn-restore {
   background: $bg-card;
   border-radius: $radius-lg;
   padding: $space-4;
+  border: 1rpx solid $border-light;
   box-shadow: $shadow-sm;
-  border: 2rpx solid $border-light;
 
   &__hd {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: $space-3;
+    margin-bottom: $space-2;
   }
 
   &__title {
     font-size: $font-base;
-    font-weight: 800;
+    font-weight: 600;
     color: $text-primary;
   }
 
   &__more {
     font-size: $font-xs;
-    font-weight: 600;
-    color: $primary;
+    font-weight: 500;
+    color: $text-secondary;
   }
 }
 
@@ -737,8 +700,8 @@ button.btn-restore {
   align-items: center;
   justify-content: space-between;
   gap: $space-3;
-  padding: 26rpx 0;
-  border-bottom: 2rpx dashed $border-color;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid $border-light;
 
   &:last-child {
     border-bottom: none;
@@ -752,14 +715,14 @@ button.btn-restore {
 
   &__value {
     font-size: $font-sm;
-    font-weight: 600;
+    font-weight: 500;
     color: $text-primary;
     text-align: right;
     word-break: break-all;
   }
 }
 
-// 底部悬浮操作栏
+// 底部操作栏
 .ui-bottom-bar {
   position: fixed;
   left: 0;
@@ -767,58 +730,70 @@ button.btn-restore {
   bottom: 0;
   z-index: 50;
   display: flex;
-  gap: $space-3;
-  padding: $space-3 $space-5 calc(env(safe-area-inset-bottom) + #{$space-3});
-  background: rgba(255, 255, 255, 0.96);
-  border-top: 2rpx solid $border-light;
-  box-shadow: 0 -8rpx 30rpx rgba(47, 124, 246, 0.06);
+  gap: $space-2;
+  padding: $space-2 $page-gutter calc(env(safe-area-inset-bottom) + #{$space-2});
+  background: $bg-card;
+  border-top: 1rpx solid $border-light;
 }
 
 .ui-bottom-spacer {
-  height: calc(env(safe-area-inset-bottom) + 180rpx);
+  height: calc(env(safe-area-inset-bottom) + 160rpx);
 }
 
-// 圆角大按钮
+// 大按钮
 .ui-btn {
   flex: 1;
-  height: 96rpx;
-  border-radius: $radius-full;
+  height: 92rpx;
+  border-radius: $radius-md;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: $space-1;
   font-size: $font-base;
-  font-weight: 700;
+  font-weight: 600;
+  box-sizing: border-box;
   transition: $transition-fast;
-
-  &:active {
-    transform: scale(0.97);
-    opacity: 0.9;
-  }
 
   &--primary {
     background: $primary;
     color: $text-white;
-    box-shadow: $shadow-primary;
+
+    &:active {
+      background: $primary-dark;
+    }
   }
 
   &--lemon {
-    background: $accent-lemon;
-    color: $text-primary;
+    background: $text-primary;
+    color: $text-white;
+
+    &:active {
+      opacity: 0.88;
+    }
   }
 
   &--ghost {
-    background: $bg-hover;
-    color: $primary;
+    background: $bg-card;
+    color: $text-primary;
+    border: 1rpx solid $border-color;
+
+    &:active {
+      background: $bg-hover;
+    }
   }
 
   &--danger {
-    background: $danger-bg;
+    background: $bg-card;
     color: $danger;
+    border: 1rpx solid $border-color;
+
+    &:active {
+      background: $danger-bg;
+    }
   }
 
   &.is-disabled {
-    opacity: 0.5;
+    opacity: 0.45;
     pointer-events: none;
   }
 }
@@ -826,38 +801,36 @@ button.btn-restore {
 // 悬浮新建按钮
 .ui-fab {
   position: fixed;
-  right: $space-5;
-  bottom: calc(env(safe-area-inset-bottom) + 48rpx);
+  right: $page-gutter;
+  bottom: calc(env(safe-area-inset-bottom) + 40rpx);
   z-index: 40;
-  height: 104rpx;
-  padding: 0 40rpx;
+  height: 96rpx;
+  padding: 0 36rpx 0 28rpx;
   border-radius: $radius-full;
-  background: $text-primary;
+  background: $primary;
   color: $text-white;
   display: flex;
   align-items: center;
   gap: 12rpx;
-  box-shadow: 0 16rpx 40rpx rgba(21, 34, 56, 0.25);
+  box-shadow: $shadow-primary, $shadow-lg;
+  transition: $transition-fast;
 
   &:active {
-    transform: scale(0.95);
+    background: $primary-dark;
+    transform: scale(0.97);
   }
 
   &__plus {
-    width: 48rpx;
-    height: 48rpx;
-    border-radius: 50%;
-    background: $accent-lemon;
-    color: $text-primary;
-    font-size: 40rpx;
-    font-weight: 800;
-    line-height: 46rpx;
-    text-align: center;
+    font-size: 44rpx;
+    font-weight: 400;
+    line-height: 1;
+    color: $text-white;
+    margin-top: -4rpx;
   }
 
   &__text {
     font-size: $font-sm;
-    font-weight: 700;
+    font-weight: 600;
   }
 }
 
@@ -865,30 +838,19 @@ button.btn-restore {
 .ui-form-group {
   background: $bg-card;
   border-radius: $radius-lg;
-  padding: $space-2 $space-4;
-  margin: 0 $space-5 $space-4;
-  border: 2rpx solid $border-light;
-  box-shadow: $shadow-sm;
+  padding: $space-1 $space-4;
+  margin: 0 $page-gutter $space-4;
+  border: 1rpx solid $border-light;
 }
 
 .ui-form-label {
   display: flex;
   align-items: center;
-  gap: 10rpx;
-  padding: $space-3 $space-5 $space-2;
+  padding: $space-3 $page-gutter $space-2;
   font-size: $font-xs;
-  font-weight: 800;
-  color: $text-secondary;
-  letter-spacing: 0.06em;
-
-  &::before {
-    content: '';
-    width: 12rpx;
-    height: 12rpx;
-    border-radius: 4rpx;
-    background: $accent-lemon;
-    transform: rotate(45deg);
-  }
+  font-weight: 500;
+  color: $text-hint;
+  letter-spacing: 0.02em;
 }
 
 // 底部抽屉
@@ -896,25 +858,26 @@ button.btn-restore {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgba(21, 34, 56, 0.4);
+  background: rgba(15, 23, 42, 0.4);
   display: flex;
   align-items: flex-end;
+  animation: fadeIn 0.2s ease-out;
 }
 
 .ui-sheet {
   width: 100%;
   max-height: 80vh;
-  background: $bg-page;
+  background: $bg-card;
   border-radius: $radius-xl $radius-xl 0 0;
-  padding: $space-2 $space-5 calc(env(safe-area-inset-bottom) + #{$space-4});
+  padding: $space-2 $page-gutter calc(env(safe-area-inset-bottom) + #{$space-3});
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   animation: slideUp 0.25s ease-out;
 
   &__handle {
-    width: 80rpx;
-    height: 10rpx;
+    width: 72rpx;
+    height: 8rpx;
     border-radius: $radius-full;
     background: $border-color;
     margin: 0 auto $space-3;
@@ -922,7 +885,7 @@ button.btn-restore {
 
   &__title {
     font-size: $font-md;
-    font-weight: 800;
+    font-weight: 600;
     color: $text-primary;
     margin-bottom: $space-3;
   }

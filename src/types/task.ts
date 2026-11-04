@@ -61,17 +61,17 @@ export enum TaskStatus {
 }
 
 export const TaskStatusMap: Record<number, { text: string; color: string }> = {
-  [TaskStatus.PENDING_ACCEPT]: { text: '待接受', color: '#F59E0B' },
-  [TaskStatus.ACCEPTED]: { text: '进行中', color: '#6366F1' },
-  [TaskStatus.REJECTED]: { text: '已拒绝', color: '#EF4444' },
-  // [TaskStatus.IN_PROGRESS]: { text: '进行中', color: '#6366F1' },  // 已与 ACCEPTED 合并
-  [TaskStatus.PENDING_AUDIT]: { text: '待审核', color: '#F59E0B' },
-  [TaskStatus.COMPLETED]: { text: '已完成', color: '#10B981' },
-  [TaskStatus.OVERDUE]: { text: '已超时', color: '#EF4444' },
-  [TaskStatus.REJECTED_BY_AUDIT]: { text: '已驳回', color: '#EF4444' },
+  [TaskStatus.PENDING_ACCEPT]: { text: '待接受', color: '#D97706' },
+  [TaskStatus.ACCEPTED]: { text: '进行中', color: '#2563EB' },
+  [TaskStatus.REJECTED]: { text: '已拒绝', color: '#E5484D' },
+  // [TaskStatus.IN_PROGRESS]: { text: '进行中', color: '#2563EB' },  // 已与 ACCEPTED 合并
+  [TaskStatus.PENDING_AUDIT]: { text: '待审核', color: '#D97706' },
+  [TaskStatus.COMPLETED]: { text: '已完成', color: '#12A150' },
+  [TaskStatus.OVERDUE]: { text: '已超时', color: '#E5484D' },
+  [TaskStatus.REJECTED_BY_AUDIT]: { text: '已驳回', color: '#E5484D' },
   [TaskStatus.CANCELLED]: { text: '已取消', color: '#94A3B8' },
   // 兼容历史数据：status=3 显示为"进行中"
-  [3]: { text: '进行中', color: '#6366F1' },
+  [3]: { text: '进行中', color: '#2563EB' },
 }
 
 export enum ExecutorStatus {
@@ -84,10 +84,10 @@ export enum ExecutorStatus {
 }
 
 export const ExecutorStatusMap: Record<number, { text: string; color: string }> = {
-  [ExecutorStatus.PENDING_ACCEPT]: { text: '待接受', color: '#F59E0B' },
-  [ExecutorStatus.ACCEPTED]: { text: '进行中', color: '#6366F1' },
-  [ExecutorStatus.REJECTED]: { text: '已拒绝', color: '#EF4444' },
-  [ExecutorStatus.PENDING_AUDIT]: { text: '待审核', color: '#F59E0B' },
-  [ExecutorStatus.COMPLETED]: { text: '已完成', color: '#10B981' },
-  [ExecutorStatus.REJECTED_BY_AUDIT]: { text: '已驳回', color: '#EF4444' },
+  [ExecutorStatus.PENDING_ACCEPT]: { text: '待接受', color: '#D97706' },
+  [ExecutorStatus.ACCEPTED]: { text: '进行中', color: '#2563EB' },
+  [ExecutorStatus.REJECTED]: { text: '已拒绝', color: '#E5484D' },
+  [ExecutorStatus.PENDING_AUDIT]: { text: '待审核', color: '#D97706' },
+  [ExecutorStatus.COMPLETED]: { text: '已完成', color: '#12A150' },
+  [ExecutorStatus.REJECTED_BY_AUDIT]: { text: '已驳回', color: '#E5484D' },
 }

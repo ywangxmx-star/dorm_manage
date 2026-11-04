@@ -6,16 +6,20 @@
       </view>
       <view class="bc-info">
         <text class="bc-title">{{ bill.title }}</text>
-        <text class="bc-meta">{{ billTypeText }} · {{ formatDate(bill.create_time, 'MM-DD HH:mm') }}</text>
+        <view class="bc-meta">
+          <text>{{ billTypeText }}</text>
+          <text class="bc-meta-dot">·</text>
+          <text>{{ formatDate(bill.create_time, 'MM-DD HH:mm') }}</text>
+        </view>
       </view>
       <view class="bc-amount-wrap">
         <text class="bc-amount">{{ formatAmount(bill.amount) }}</text>
         <text class="bc-settle" :class="{ 'is-settled': bill.is_settled }">{{ bill.is_settled ? '已结清' : '未结清' }}</text>
       </view>
     </view>
-    <view v-if="myPayInfo" class="bc-mine" :class="{ 'is-paid': myPayInfo.isPaid }">
-      <text class="bc-mine-label">{{ myPayInfo.isPaid ? '我已付清' : '我需分摊' }}</text>
-      <text class="bc-mine-amount">{{ formatAmount(myPayInfo.amount) }}</text>
+    <view v-if="myPayInfo" class="bc-mine">
+      <text class="bc-mine-label">{{ myPayInfo.isPaid ? '我已付清' : '我的分摊' }}</text>
+      <text class="bc-mine-amount" :class="{ 'is-paid': myPayInfo.isPaid }">{{ formatAmount(myPayInfo.amount) }}</text>
     </view>
   </view>
 </template>
@@ -52,16 +56,16 @@ const myPayInfo = computed(() => {
 .bill-card {
   background: $bg-card;
   border-radius: $radius-lg;
-  padding: $space-4;
-  border: 2rpx solid $border-light;
+  padding: 28rpx $space-4;
+  border: 1rpx solid $border-light;
   box-shadow: $shadow-sm;
   display: flex;
   flex-direction: column;
-  gap: $space-3;
+  gap: 20rpx;
   transition: $transition-fast;
 
   &:active {
-    transform: scale(0.98);
+    background: $bg-subtle;
   }
 }
 
@@ -74,22 +78,25 @@ const myPayInfo = computed(() => {
 .bc-badge {
   width: 80rpx;
   height: 80rpx;
-  border-radius: 26rpx;
-  background: $accent-lemon;
+  border-radius: $radius-md;
+  background: $primary-bg;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transform: rotate(-4deg);
 
   &.is-settled {
-    background: $success-bg;
+    background: $bg-hover;
   }
 
   &-text {
-    font-size: $font-md;
-    font-weight: 900;
-    color: $text-primary;
+    font-size: $font-sm;
+    font-weight: 600;
+    color: $primary;
+  }
+
+  &.is-settled &-text {
+    color: $text-hint;
   }
 }
 
@@ -98,12 +105,12 @@ const myPayInfo = computed(() => {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4rpx;
+  gap: 6rpx;
 }
 
 .bc-title {
   font-size: $font-base;
-  font-weight: 800;
+  font-weight: 600;
   color: $text-primary;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -111,32 +118,40 @@ const myPayInfo = computed(() => {
 }
 
 .bc-meta {
-  font-size: $font-xs;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 22rpx;
   color: $text-hint;
+
+  &-dot {
+    color: $border-color;
+  }
 }
 
 .bc-amount-wrap {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 4rpx;
+  gap: 6rpx;
   flex-shrink: 0;
 }
 
 .bc-amount {
+  font-family: $font-num;
   font-size: $font-md;
-  font-weight: 900;
+  font-weight: 700;
   color: $text-primary;
-  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
 }
 
 .bc-settle {
   font-size: 22rpx;
-  font-weight: 700;
+  font-weight: 500;
   color: $warning;
 
   &.is-settled {
-    color: $success;
+    color: $text-hint;
   }
 }
 
@@ -144,28 +159,24 @@ const myPayInfo = computed(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14rpx 20rpx;
-  border-radius: $radius-md;
-  background: $primary-bg;
-
-  &.is-paid {
-    background: $success-bg;
-  }
+  padding-top: 20rpx;
+  border-top: 1rpx solid $border-light;
 
   &-label {
     font-size: $font-xs;
-    font-weight: 600;
     color: $text-secondary;
   }
 
   &-amount {
+    font-family: $font-num;
     font-size: $font-sm;
-    font-weight: 800;
+    font-weight: 700;
     color: $primary;
-  }
-}
+    font-variant-numeric: tabular-nums;
 
-.bc-mine.is-paid .bc-mine-amount {
-  color: $success;
+    &.is-paid {
+      color: $success;
+    }
+  }
 }
 </style>

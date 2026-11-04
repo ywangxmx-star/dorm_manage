@@ -334,7 +334,7 @@ function formatDeadline(deadline: string) {
 .hero-banner {
   position: relative;
   background: linear-gradient(155deg, #12B5A5 0%, #2FCFBE 55%, #7EE8DA 100%);
-  padding: calc(var(--status-bar-height) + 24rpx) $space-4 $space-6;
+  padding: $space-3 $space-4 $space-6;
   overflow: hidden;
 }
 

@@ -2,27 +2,22 @@
   <view class="home-page">
     <view v-if="loading" class="loading-page">
       <view class="loading-spinner spinner-lg"></view>
-      <text class="loading-text">正在整理宿舍动态...</text>
+      <text class="loading-text">正在加载宿舍动态</text>
     </view>
 
     <template v-else-if="currentRoom">
       <view class="home-body">
         <view class="top">
           <view class="top-room" @click="showRoomPicker = true">
-            <view class="top-room-avatar">
-              <text class="top-room-avatar-text">{{ currentRoom.room_name.charAt(0) }}</text>
-            </view>
-            <view class="top-room-info">
-              <text class="top-room-eyebrow">我的小窝</text>
-              <view class="top-room-name-row">
-                <text class="top-room-name">{{ currentRoom.room_name }}</text>
-                <text class="top-room-caret">▾</text>
-              </view>
+            <text class="top-room-eyebrow">{{ todayLabel }}</text>
+            <view class="top-room-name-row">
+              <text class="top-room-name">{{ currentRoom.room_name }}</text>
+              <image class="top-room-caret" src="/static/icons/chevron-right.png" mode="aspectFit" />
             </view>
           </view>
           <view class="top-members" @click="goMembers">
+            <image class="top-members-icon" src="/static/icons/users.png" mode="aspectFit" />
             <text class="top-members-num">{{ currentRoom.member_count }}</text>
-            <text class="top-members-lbl">室友</text>
           </view>
         </view>
 
@@ -32,7 +27,7 @@
           :refresher-enabled="refresherEnabled"
           :refresher-threshold="REFRESHER_THRESHOLD"
           refresher-default-style="black"
-          refresher-background="#F3F7FD"
+          refresher-background="#F4F5F7"
           :upper-threshold="30"
           :refresher-triggered="refreshing"
           @scroll="onContentScroll"
@@ -41,71 +36,55 @@
           @refresherrefresh="onRefresh"
         >
           <view class="content">
-            <view v-if="currentRoom.notice" class="notice">
-              <view class="notice-tape"></view>
-              <text class="notice-label">宿舍公告</text>
-              <text class="notice-text">{{ currentRoom.notice }}</text>
-            </view>
-
-            <view class="bento">
-              <view class="tile tile--task" @click="goTaskList">
-                <view class="tile-top">
-                  <view class="tile-icon tile-icon--light">
-                    <image class="tile-icon-img" src="/static/icons/task.png" mode="aspectFit" />
-                  </view>
-                  <text class="tile-arrow tile-arrow--light">↗</text>
+            <view class="overview slide-up">
+              <view class="overview-hd">
+                <text class="overview-title">今日概览</text>
+                <text class="overview-hint">{{ summaryText }}</text>
+              </view>
+              <view class="overview-stats">
+                <view class="stat" @click="goTaskList">
+                  <text class="stat-num" :class="{ 'is-zero': !todayTasks.length }">{{ todayTasks.length }}</text>
+                  <text class="stat-lbl">今日待办</text>
                 </view>
-                <view class="tile-bottom">
-                  <text class="tile-num tile-num--light">{{ todayTasks.length }}</text>
-                  <text class="tile-title tile-title--light">今日待办</text>
-                  <text class="tile-desc tile-desc--light">{{ todayTasks.length ? '加油，马上搞定' : '今天很轻松' }}</text>
+                <view class="stat-divider"></view>
+                <view class="stat" @click="goBillList">
+                  <text class="stat-num" :class="{ 'is-zero': !unpaidBills.length }">{{ unpaidBills.length }}</text>
+                  <text class="stat-lbl">待付账单</text>
+                </view>
+                <view class="stat-divider"></view>
+                <view class="stat" @click="goVoteList">
+                  <text class="stat-num" :class="{ 'is-zero': !activeVotes.length }">{{ activeVotes.length }}</text>
+                  <text class="stat-lbl">进行中投票</text>
                 </view>
               </view>
-
-              <view class="bento-col">
-                <view class="tile tile--bill" @click="goBillList">
-                  <view class="tile-row">
-                    <view class="tile-icon">
-                      <image class="tile-icon-img" src="/static/icons/wallet.png" mode="aspectFit" />
-                    </view>
-                    <text class="tile-num">{{ unpaidBills.length }}</text>
-                  </view>
-                  <text class="tile-title">待付账单</text>
-                </view>
-                <view class="tile tile--vote" @click="goVoteList">
-                  <view class="tile-row">
-                    <view class="tile-icon">
-                      <image class="tile-icon-img" src="/static/icons/receipt.png" mode="aspectFit" />
-                    </view>
-                    <text class="tile-num">{{ activeVotes.length }}</text>
-                  </view>
-                  <text class="tile-title">进行中投票</text>
-                </view>
+              <view v-if="currentRoom.notice" class="overview-notice">
+                <text class="overview-notice-tag">公告</text>
+                <text class="overview-notice-text">{{ currentRoom.notice }}</text>
               </view>
             </view>
 
             <view class="quick">
               <view v-if="isLeader" class="quick-item" @click="goCreateTask">
-                <view class="quick-dot quick-dot--blue">
-                  <image class="quick-dot-img" src="/static/icons/task.png" mode="aspectFit" />
+                <view class="quick-icon">
+                  <image class="quick-icon-img" src="/static/icons/task.png" mode="aspectFit" />
                 </view>
                 <text class="quick-text">发布任务</text>
               </view>
               <view class="quick-item" @click="goCreateBill">
-                <view class="quick-dot quick-dot--lemon">
-                  <image class="quick-dot-img" src="/static/icons/wallet.png" mode="aspectFit" />
+                <view class="quick-icon">
+                  <image class="quick-icon-img" src="/static/icons/wallet.png" mode="aspectFit" />
                 </view>
                 <text class="quick-text">记一笔</text>
               </view>
-              <view class="quick-item" @click="goBillList">
-                <view class="quick-dot quick-dot--mint">
-                  <image class="quick-dot-img" src="/static/icons/receipt.png" mode="aspectFit" />
+              <view class="quick-item" @click="goVoteList">
+                <view class="quick-icon">
+                  <image class="quick-icon-img" src="/static/icons/vote.png" mode="aspectFit" />
                 </view>
-                <text class="quick-text">账单</text>
+                <text class="quick-text">投票</text>
               </view>
               <view class="quick-item" @click="goMembers">
-                <view class="quick-dot quick-dot--pink">
-                  <image class="quick-dot-img" src="/static/icons/users.png" mode="aspectFit" />
+                <view class="quick-icon">
+                  <image class="quick-icon-img" src="/static/icons/users.png" mode="aspectFit" />
                 </view>
                 <text class="quick-text">室友</text>
               </view>
@@ -117,7 +96,10 @@
                   <text class="block-title">今日待办</text>
                   <text v-if="todayTasks.length" class="block-count">{{ todayTasks.length }}</text>
                 </view>
-                <text class="block-more" @click="goTaskList">全部 ›</text>
+                <view class="block-more" @click="goTaskList">
+                  <text>全部</text>
+                  <image class="block-more-icon" src="/static/icons/chevron-right.png" mode="aspectFit" />
+                </view>
               </view>
               <view v-if="todayTasks.length" class="block-list">
                 <TaskCard
@@ -127,11 +109,12 @@
                   @click="goTaskDetail(task.id)"
                 />
                 <view v-if="todayTasks.length > maxVisibleItems" class="block-expand" @click="toggleTasks">
-                  <text class="block-expand-text">{{ showAllTasks ? '收起' : `再看 ${todayTasks.length - maxVisibleItems} 条` }}</text>
+                  <text class="block-expand-text">{{ showAllTasks ? '收起' : `展开其余 ${todayTasks.length - maxVisibleItems} 项` }}</text>
                 </view>
               </view>
               <view v-else class="block-empty">
-                <EmptyState icon="/static/icons/task.png" title="一切顺利" text="暂无待办任务" />
+                <text class="block-empty-title">今天没有待办</text>
+                <text class="block-empty-text">到期任务会出现在这里</text>
               </view>
             </view>
 
@@ -139,9 +122,12 @@
               <view class="block-hd">
                 <view class="block-hd-left">
                   <text class="block-title">待付账单</text>
-                  <text v-if="unpaidBills.length" class="block-count block-count--lemon">{{ unpaidBills.length }}</text>
+                  <text v-if="unpaidBills.length" class="block-count">{{ unpaidBills.length }}</text>
                 </view>
-                <text class="block-more" @click="goBillList">全部 ›</text>
+                <view class="block-more" @click="goBillList">
+                  <text>全部</text>
+                  <image class="block-more-icon" src="/static/icons/chevron-right.png" mode="aspectFit" />
+                </view>
               </view>
               <view v-if="unpaidBills.length" class="block-list">
                 <BillCard
@@ -151,11 +137,12 @@
                   @click="goBillDetail(bill.id)"
                 />
                 <view v-if="unpaidBills.length > maxVisibleItems" class="block-expand" @click="toggleBills">
-                  <text class="block-expand-text">{{ showAllBills ? '收起' : `再看 ${unpaidBills.length - maxVisibleItems} 条` }}</text>
+                  <text class="block-expand-text">{{ showAllBills ? '收起' : `展开其余 ${unpaidBills.length - maxVisibleItems} 笔` }}</text>
                 </view>
               </view>
               <view v-else class="block-empty">
-                <EmptyState icon="/static/icons/wallet.png" title="账单已清" text="暂无待付账单" />
+                <text class="block-empty-title">账单都已结清</text>
+                <text class="block-empty-text">新的公共开销可以点「记一笔」</text>
               </view>
             </view>
 
@@ -167,68 +154,40 @@
 
     <template v-else>
       <view class="welcome">
-        <view class="welcome-art">
-          <view class="welcome-sticker welcome-sticker--blue">
-            <image class="welcome-sticker-img" src="/static/icons/app.png" mode="aspectFill" />
+        <view class="welcome-main">
+          <image class="welcome-logo" src="/static/icons/app.png" mode="aspectFill" />
+          <view class="welcome-copy">
+            <text class="welcome-title">和室友一起，把日子过明白</text>
+            <text class="welcome-desc">校园宿舍或合租公寓都适用，值日、分账、投票集中在一处管理。</text>
           </view>
-          <view class="welcome-sticker welcome-sticker--lemon">
-            <text class="welcome-sticker-text">记账</text>
+          <view class="features">
+            <view v-for="f in features" :key="f.title" class="feature">
+              <view class="feature-icon">
+                <image class="feature-icon-img" :src="f.icon" mode="aspectFit" />
+              </view>
+              <view class="feature-info">
+                <text class="feature-title">{{ f.title }}</text>
+                <text class="feature-desc">{{ f.desc }}</text>
+              </view>
+            </view>
           </view>
-          <view class="welcome-sticker welcome-sticker--pink">
-            <text class="welcome-sticker-text">值日</text>
-          </view>
-          <view class="welcome-sticker welcome-sticker--mint">
-            <text class="welcome-sticker-text">投票</text>
-          </view>
-        </view>
-        <view class="welcome-copy">
-          <text class="welcome-title">和室友一起，{{ '\n' }}把日子过明白</text>
-          <text class="welcome-desc">无论是校园宿舍还是合租公寓，值日、分账、投票都能在这里轻松搞定。</text>
         </view>
         <view class="welcome-actions">
           <view class="ui-btn ui-btn--primary" @click="goCreateRoom">创建宿舍</view>
-          <view class="ui-btn ui-btn--ghost" @click="goJoinRoom">我有邀请码</view>
+          <view class="ui-btn ui-btn--ghost" @click="goJoinRoom">使用邀请码加入</view>
         </view>
       </view>
     </template>
 
-    <view v-if="showRoomPicker" class="ui-sheet-mask" @click="showRoomPicker = false">
-      <view class="ui-sheet" @click.stop>
-        <view class="ui-sheet__handle"></view>
-        <view class="sheet-head">
-          <text class="ui-sheet__title">切换宿舍</text>
-          <view class="sheet-close" @click="showRoomPicker = false">
-            <image class="sheet-close-icon" src="/static/icons/x.png" mode="aspectFit" />
-          </view>
-        </view>
-        <scroll-view scroll-y class="sheet-list">
-          <view class="sheet-list-inner">
-            <view
-              v-for="room in myRooms"
-              :key="room.id"
-              class="sheet-item"
-              :class="{ 'is-active': room.id === currentRoom?.id }"
-              @click="switchRoom(room)"
-            >
-              <view class="sheet-item-avatar">
-                <text class="sheet-item-avatar-text">{{ room.room_name.charAt(0) }}</text>
-              </view>
-              <view class="sheet-item-info">
-                <text class="sheet-item-name">{{ room.room_name }}</text>
-                <text class="sheet-item-meta">{{ room.member_count }} 位室友</text>
-              </view>
-              <view v-if="room.id === currentRoom?.id" class="sheet-item-check">
-                <text class="sheet-item-check-icon">✓</text>
-              </view>
-            </view>
-          </view>
-        </scroll-view>
-        <view class="sheet-actions">
-          <view class="ui-btn ui-btn--ghost" @click="showRoomPicker = false; goCreateRoom()">创建宿舍</view>
-          <view class="ui-btn ui-btn--primary" @click="showRoomPicker = false; goJoinRoom()">加入宿舍</view>
-        </view>
-      </view>
-    </view>
+    <RoomPickerSheet
+      v-model="showRoomPicker"
+      :rooms="myRooms"
+      :current-room-id="currentRoom?.id"
+      show-footer
+      @select="switchRoom"
+      @create="showRoomPicker = false; goCreateRoom()"
+      @join="showRoomPicker = false; goJoinRoom()"
+    />
   </view>
 </template>
 
@@ -243,7 +202,7 @@ import { getBillList } from '@/api/bill'
 import { getVoteList } from '@/api/vote'
 import TaskCard from '@/components/TaskCard.vue'
 import BillCard from '@/components/BillCard.vue'
-import EmptyState from '@/components/EmptyState.vue'
+import RoomPickerSheet from '@/components/RoomPickerSheet.vue'
 import type { Task } from '@/types/task'
 import type { Bill } from '@/types/bill'
 import type { Vote } from '@/types/vote'
@@ -260,6 +219,12 @@ const REFRESHER_THRESHOLD = 80
 const REFRESHER_SCROLL_LOCK = 10
 const LOAD_TIMEOUT_MS = 10000
 
+const features = [
+  { icon: '/static/icons/task.png', title: '值日与分工', desc: '发布任务、指派室友、到期提醒' },
+  { icon: '/static/icons/wallet.png', title: '公共账单', desc: '水电网费自动分摊，谁付了一目了然' },
+  { icon: '/static/icons/vote.png', title: '宿舍投票', desc: '大小事一起决定，结果实时可见' },
+]
+
 const loading = ref(false)
 const showRoomPicker = ref(false)
 const refresherEnabled = ref(true)
@@ -271,6 +236,17 @@ const showAllTasks = ref(false)
 const showAllBills = ref(false)
 const maxVisibleItems = 2
 let pageLoadSeq = 0
+
+const todayLabel = computed(() => {
+  const d = new Date()
+  const weekDays = ['日', '一', '二', '三', '四', '五', '六']
+  return `${d.getMonth() + 1}月${d.getDate()}日 星期${weekDays[d.getDay()]}`
+})
+
+const summaryText = computed(() => {
+  const pending = todayTasks.value.length + unpaidBills.value.length + activeVotes.value.length
+  return pending ? `共 ${pending} 项需要处理` : '暂无需要处理的事项'
+})
 
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -456,10 +432,6 @@ function goCreateBill() {
 }
 function goBillList() { uni.switchTab({ url: '/pages/bill/list' }) }
 function goMembers() { uni.navigateTo({ url: '/pages/room/members' }) }
-function goRoomManage(roomId: number) {
-  showRoomPicker.value = false
-  uni.navigateTo({ url: `/pages/room/detail?id=${roomId}` })
-}
 function goTaskList() { uni.switchTab({ url: '/pages/task/list' }) }
 function goVoteList() { uni.navigateTo({ url: '/pages/vote/list' }) }
 function goTaskDetail(id: number) { uni.navigateTo({ url: `/pages/task/detail?id=${id}` }) }
@@ -501,7 +473,7 @@ function goBillDetail(id: number) { uni.navigateTo({ url: `/pages/bill/detail?id
 }
 
 .content {
-  padding: 0 $space-5;
+  padding: 0 $page-gutter;
   display: flex;
   flex-direction: column;
   gap: $space-5;
@@ -511,270 +483,192 @@ function goBillDetail(id: number) { uni.navigateTo({ url: `/pages/bill/detail?id
   height: calc(env(safe-area-inset-bottom) + 24rpx);
 }
 
-/* -------- 顶部宿舍栏 -------- */
+/* -------- 顶部 -------- */
 .top {
   flex-shrink: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: $space-3;
-  padding: calc(var(--status-bar-height) + 32rpx) $space-5 $space-4;
+  padding: calc(var(--status-bar-height) + 32rpx) $page-gutter $space-4;
 }
 
 .top-room {
-  display: flex;
-  align-items: center;
-  gap: $space-3;
   flex: 1;
   min-width: 0;
-
-  &:active {
-    opacity: 0.8;
-  }
-}
-
-.top-room-avatar {
-  width: 96rpx;
-  height: 96rpx;
-  border-radius: 32rpx;
-  background: $accent-lemon;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transform: rotate(-6deg);
-  box-shadow: 0 8rpx 0 rgba(21, 34, 56, 0.08);
-
-  &-text {
-    font-size: 44rpx;
-    font-weight: 900;
-    color: $text-primary;
-  }
-}
-
-.top-room-info {
   display: flex;
   flex-direction: column;
-  min-width: 0;
-}
+  gap: 4rpx;
 
-.top-room-eyebrow {
-  font-size: $font-xs;
-  color: $text-hint;
-  font-weight: 600;
-}
+  &:active {
+    opacity: 0.7;
+  }
 
-.top-room-name-row {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-  min-width: 0;
-}
+  &-eyebrow {
+    font-size: $font-xs;
+    color: $text-hint;
+  }
 
-.top-room-name {
-  font-size: 44rpx;
-  font-weight: 800;
-  color: $text-primary;
-  letter-spacing: -0.02em;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
+  &-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8rpx;
+    min-width: 0;
+  }
 
-.top-room-caret {
-  font-size: $font-sm;
-  color: $primary;
+  &-name {
+    font-size: $font-lg;
+    font-weight: 700;
+    color: $text-primary;
+    line-height: 1.25;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &-caret {
+    width: 28rpx;
+    height: 28rpx;
+    flex-shrink: 0;
+    opacity: 0.5;
+    transform: rotate(90deg);
+  }
 }
 
 .top-members {
   flex-shrink: 0;
   display: flex;
-  align-items: baseline;
-  gap: 6rpx;
-  padding: 14rpx 26rpx;
+  align-items: center;
+  gap: 10rpx;
+  height: 64rpx;
+  padding: 0 22rpx;
   background: $bg-card;
   border-radius: $radius-full;
-  border: 2rpx solid $border-color;
+  border: 1rpx solid $border-color;
+
+  &:active {
+    background: $bg-hover;
+  }
+
+  &-icon {
+    width: 30rpx;
+    height: 30rpx;
+    opacity: 0.7;
+  }
 
   &-num {
-    font-size: $font-base;
-    font-weight: 800;
+    font-size: $font-sm;
+    font-weight: 600;
+    color: $text-primary;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* -------- 今日概览 -------- */
+.overview {
+  background: $bg-card;
+  border-radius: $radius-xl;
+  border: 1rpx solid $border-light;
+  box-shadow: $shadow-md;
+  overflow: hidden;
+
+  &-hd {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28rpx $space-4 0;
+  }
+
+  &-title {
+    font-size: $font-sm;
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  &-hint {
+    font-size: $font-xs;
+    color: $text-hint;
+  }
+
+  &-stats {
+    display: flex;
+    align-items: center;
+    padding: $space-4 0 $space-4;
+  }
+
+  &-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 16rpx;
+    padding: 24rpx $space-4;
+    background: $bg-subtle;
+    border-top: 1rpx solid $border-light;
+
+    &-tag {
+      flex-shrink: 0;
+      padding: 2rpx 12rpx;
+      border-radius: $radius-xs;
+      background: $primary-bg;
+      color: $primary;
+      font-size: 22rpx;
+      font-weight: 600;
+      line-height: 1.6;
+    }
+
+    &-text {
+      flex: 1;
+      font-size: $font-xs;
+      color: $text-secondary;
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+    }
+  }
+}
+
+.stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rpx;
+
+  &:active {
+    opacity: 0.6;
+  }
+
+  &-num {
+    font-family: $font-num;
+    font-size: $font-xl;
+    font-weight: 700;
     color: $primary;
+    line-height: 1.15;
+    font-variant-numeric: tabular-nums;
+
+    &.is-zero {
+      color: $text-primary;
+    }
   }
 
   &-lbl {
     font-size: $font-xs;
     color: $text-secondary;
   }
-}
 
-/* -------- 公告便利贴 -------- */
-.notice {
-  position: relative;
-  margin-top: $space-2;
-  padding: $space-5 $space-4 $space-4;
-  background: $accent-lemon-soft;
-  border-radius: $radius-md;
-  transform: rotate(-1deg);
-  display: flex;
-  flex-direction: column;
-  gap: 8rpx;
-
-  &-tape {
-    position: absolute;
-    top: -14rpx;
-    left: 50%;
-    width: 140rpx;
-    height: 32rpx;
-    margin-left: -70rpx;
-    background: rgba(47, 124, 246, 0.25);
-    border-radius: 6rpx;
-    transform: rotate(3deg);
+  &-divider {
+    width: 1rpx;
+    height: 72rpx;
+    background: $border-light;
   }
-
-  &-label {
-    font-size: $font-xs;
-    font-weight: 800;
-    color: $accent-lemon-text;
-  }
-
-  &-text {
-    font-size: $font-sm;
-    color: $text-primary;
-    line-height: 1.6;
-  }
-}
-
-/* -------- 便当盒宫格 -------- */
-.bento {
-  display: flex;
-  gap: $space-3;
-}
-
-.bento-col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: $space-3;
-}
-
-.tile {
-  border-radius: $radius-lg;
-  padding: $space-4;
-  box-sizing: border-box;
-  transition: $transition-fast;
-
-  &:active {
-    transform: scale(0.97);
-  }
-
-  &--task {
-    flex: 1;
-    min-height: 360rpx;
-    background: $primary;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    box-shadow: $shadow-primary;
-  }
-
-  &--bill {
-    flex: 1;
-    background: $accent-lemon;
-  }
-
-  &--vote {
-    flex: 1;
-    background: $bg-card;
-    border: 2rpx solid $border-color;
-  }
-}
-
-.tile-top,
-.tile-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.tile-icon {
-  width: 64rpx;
-  height: 64rpx;
-  border-radius: 20rpx;
-  background: rgba(255, 255, 255, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &--light {
-    background: rgba(255, 255, 255, 0.22);
-  }
-
-  &-img {
-    width: 36rpx;
-    height: 36rpx;
-  }
-}
-
-.tile--vote .tile-icon {
-  background: $accent-violet-bg;
-}
-
-.tile-arrow {
-  font-size: $font-md;
-  font-weight: 700;
-
-  &--light {
-    color: rgba(255, 255, 255, 0.9);
-  }
-}
-
-.tile-bottom {
-  display: flex;
-  flex-direction: column;
-  gap: 4rpx;
-}
-
-.tile-num {
-  font-size: 64rpx;
-  font-weight: 900;
-  line-height: 1;
-  color: $text-primary;
-  letter-spacing: -0.03em;
-
-  &--light {
-    font-size: 112rpx;
-    color: $text-white;
-  }
-}
-
-.tile-title {
-  display: block;
-  margin-top: $space-2;
-  font-size: $font-sm;
-  font-weight: 700;
-  color: $text-primary;
-
-  &--light {
-    margin-top: $space-1;
-    font-size: $font-base;
-    color: $text-white;
-  }
-}
-
-.tile-desc--light {
-  font-size: $font-xs;
-  color: rgba(255, 255, 255, 0.8);
 }
 
 /* -------- 快捷入口 -------- */
 .quick {
   display: flex;
   justify-content: space-between;
-  padding: $space-4 $space-3;
-  background: $bg-card;
-  border-radius: $radius-lg;
-  border: 2rpx solid $border-light;
+  padding: 0 $space-2;
 }
 
 .quick-item {
@@ -782,25 +676,23 @@ function goBillDetail(id: number) { uni.navigateTo({ url: `/pages/bill/detail?id
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12rpx;
+  gap: 14rpx;
 
   &:active {
-    opacity: 0.7;
+    opacity: 0.6;
   }
 }
 
-.quick-dot {
-  width: 88rpx;
-  height: 88rpx;
-  border-radius: 50%;
+.quick-icon {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: $radius-lg;
+  background: $bg-card;
+  border: 1rpx solid $border-light;
+  box-shadow: $shadow-sm;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  &--blue { background: $primary-bg; }
-  &--lemon { background: $accent-lemon-soft; }
-  &--mint { background: $success-bg; }
-  &--pink { background: $accent-violet-bg; }
 
   &-img {
     width: 44rpx;
@@ -810,285 +702,207 @@ function goBillDetail(id: number) { uni.navigateTo({ url: `/pages/bill/detail?id
 
 .quick-text {
   font-size: $font-xs;
-  font-weight: 600;
+  font-weight: 500;
   color: $text-primary;
 }
 
 /* -------- 列表区块 -------- */
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+}
+
 .block-hd {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: $space-3;
-}
 
-.block-hd-left {
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
+  &-left {
+    display: flex;
+    align-items: center;
+    gap: 12rpx;
+  }
 }
 
 .block-title {
   font-size: $font-md;
-  font-weight: 800;
+  font-weight: 600;
   color: $text-primary;
 }
 
 .block-count {
-  min-width: 40rpx;
-  height: 40rpx;
-  padding: 0 12rpx;
-  border-radius: $radius-full;
-  background: $primary;
-  color: $text-white;
+  min-width: 36rpx;
+  height: 36rpx;
+  padding: 0 10rpx;
+  border-radius: $radius-xs;
+  background: $bg-hover;
+  color: $text-secondary;
   font-size: 22rpx;
-  font-weight: 800;
-  line-height: 40rpx;
+  font-weight: 600;
+  line-height: 36rpx;
   text-align: center;
   box-sizing: border-box;
-
-  &--lemon {
-    background: $accent-lemon;
-    color: $text-primary;
-  }
 }
 
 .block-more {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
   font-size: $font-xs;
-  font-weight: 600;
   color: $text-secondary;
-  padding: 8rpx 20rpx;
-  background: $bg-card;
-  border-radius: $radius-full;
+
+  &-icon {
+    width: 24rpx;
+    height: 24rpx;
+    opacity: 0.5;
+  }
 }
 
 .block-list {
   display: flex;
   flex-direction: column;
-  gap: $space-3;
+  gap: $space-2;
 }
 
 .block-expand {
   display: flex;
   justify-content: center;
-  padding: $space-2 0;
+  padding: 20rpx 0;
 
   &-text {
     font-size: $font-xs;
-    font-weight: 600;
+    font-weight: 500;
     color: $primary;
   }
 }
 
 .block-empty {
-  background: $bg-card;
-  border-radius: $radius-lg;
-  border: 2rpx dashed $border-color;
-}
-
-/* -------- 无宿舍欢迎页 -------- */
-.welcome {
-  min-height: 100vh;
-  box-sizing: border-box;
-  padding: calc(var(--status-bar-height) + 120rpx) $space-6 calc(env(safe-area-inset-bottom) + 60rpx);
   display: flex;
   flex-direction: column;
-  gap: $space-8;
-}
-
-.welcome-art {
-  position: relative;
-  height: 420rpx;
-}
-
-.welcome-sticker {
-  position: absolute;
-  display: flex;
   align-items: center;
-  justify-content: center;
-  border-radius: 40rpx;
-  box-shadow: 0 10rpx 0 rgba(21, 34, 56, 0.06);
+  gap: 6rpx;
+  padding: $space-6 $space-4;
+  background: $bg-card;
+  border-radius: $radius-lg;
+  border: 1rpx dashed $border-color;
 
-  &--blue {
-    left: 50%;
-    top: 60rpx;
-    width: 240rpx;
-    height: 240rpx;
-    margin-left: -120rpx;
-    background: $primary;
-    transform: rotate(-4deg);
-    overflow: hidden;
-  }
-
-  &--lemon {
-    left: 20rpx;
-    top: 20rpx;
-    padding: 18rpx 32rpx;
-    background: $accent-lemon;
-    transform: rotate(-10deg);
-  }
-
-  &--pink {
-    right: 10rpx;
-    top: 80rpx;
-    padding: 18rpx 32rpx;
-    background: $accent-violet;
-    transform: rotate(8deg);
-  }
-
-  &--mint {
-    left: 60rpx;
-    bottom: 20rpx;
-    padding: 18rpx 32rpx;
-    background: $success;
-    transform: rotate(6deg);
-  }
-
-  &-img {
-    width: 100%;
-    height: 100%;
+  &-title {
+    font-size: $font-sm;
+    font-weight: 600;
+    color: $text-primary;
   }
 
   &-text {
-    font-size: $font-sm;
-    font-weight: 800;
-    color: $text-primary;
+    font-size: $font-xs;
+    color: $text-hint;
   }
 }
 
-.welcome-sticker--pink .welcome-sticker-text,
-.welcome-sticker--mint .welcome-sticker-text {
-  color: $text-white;
+/* -------- 未加入宿舍 -------- */
+.welcome {
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: calc(var(--status-bar-height) + 120rpx) $page-gutter calc(env(safe-area-inset-bottom) + 48rpx);
+}
+
+.welcome-main {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.welcome-logo {
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-md;
 }
 
 .welcome-copy {
   display: flex;
   flex-direction: column;
-  gap: $space-3;
+  gap: $space-2;
 }
 
 .welcome-title {
-  font-size: 60rpx;
-  font-weight: 900;
+  font-size: 52rpx;
+  font-weight: 700;
   color: $text-primary;
-  line-height: 1.25;
-  letter-spacing: -0.02em;
-  white-space: pre-line;
+  line-height: 1.3;
 }
 
 .welcome-desc {
   font-size: $font-sm;
   color: $text-secondary;
-  line-height: 1.7;
+  line-height: 1.6;
 }
 
-.welcome-actions {
-  margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  gap: $space-3;
-}
-
-/* -------- 切换宿舍抽屉 -------- */
-.sheet-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.sheet-close {
-  width: 64rpx;
-  height: 64rpx;
-  border-radius: 50%;
+.features {
   background: $bg-card;
+  border-radius: $radius-xl;
+  border: 1rpx solid $border-light;
+  padding: 0 $space-4;
+}
+
+.feature {
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-bottom: $space-3;
+  gap: $space-3;
+  padding: 28rpx 0;
+  border-bottom: 1rpx solid $border-light;
+
+  &:last-child {
+    border-bottom: none;
+  }
 
   &-icon {
-    width: 28rpx;
-    height: 28rpx;
-  }
-}
-
-.sheet-list {
-  max-height: 50vh;
-}
-
-.sheet-list-inner {
-  display: flex;
-  flex-direction: column;
-  gap: $space-2;
-}
-
-.sheet-item {
-  display: flex;
-  align-items: center;
-  gap: $space-3;
-  padding: $space-3;
-  background: $bg-card;
-  border-radius: $radius-md;
-  border: 3rpx solid transparent;
-
-  &.is-active {
-    border-color: $primary;
-  }
-
-  &-avatar {
-    width: 80rpx;
-    height: 80rpx;
-    border-radius: 26rpx;
-    background: $accent-lemon-soft;
+    width: 72rpx;
+    height: 72rpx;
+    border-radius: $radius-md;
+    background: $primary-bg;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 
-    &-text {
-      font-size: $font-md;
-      font-weight: 800;
-      color: $accent-lemon-text;
+    &-img {
+      width: 36rpx;
+      height: 36rpx;
     }
   }
 
   &-info {
-    flex: 1;
     display: flex;
     flex-direction: column;
+    gap: 4rpx;
     min-width: 0;
   }
 
-  &-name {
-    font-size: $font-base;
-    font-weight: 700;
+  &-title {
+    font-size: $font-sm;
+    font-weight: 600;
     color: $text-primary;
   }
 
-  &-meta {
+  &-desc {
     font-size: $font-xs;
     color: $text-hint;
   }
-
-  &-check {
-    width: 44rpx;
-    height: 44rpx;
-    border-radius: 50%;
-    background: $primary;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    &-icon {
-      font-size: 24rpx;
-      color: $text-white;
-      font-weight: 800;
-    }
-  }
 }
 
-.sheet-actions {
+.welcome-actions {
   display: flex;
-  gap: $space-3;
-  margin-top: $space-4;
+  flex-direction: column;
+  gap: $space-2;
+  padding-top: $space-6;
+
+  .ui-btn {
+    flex: none;
+    width: 100%;
+  }
 }
 </style>

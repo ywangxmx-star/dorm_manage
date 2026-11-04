@@ -34,35 +34,35 @@ defineEmits(['action'])
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: $space-16 $space-10;
+  padding: $space-12 $space-8;
 
   .empty-icon-wrap {
-    width: 160rpx;
-    height: 160rpx;
-    margin-bottom: $space-7;
-    background: linear-gradient(135deg, rgba($primary, 0.08), rgba($primary-light, 0.04));
-    border-radius: 50%;
+    width: 112rpx;
+    height: 112rpx;
+    margin-bottom: $space-4;
+    background: $bg-hover;
+    border-radius: $radius-lg;
     display: flex;
     align-items: center;
     justify-content: center;
 
     .empty-icon-img {
-      width: 72rpx;
-      height: 72rpx;
-      opacity: 0.4;
+      width: 52rpx;
+      height: 52rpx;
+      opacity: 0.45;
     }
 
     .empty-icon-text {
-      font-size: 72rpx;
-      opacity: 0.3;
+      font-size: 48rpx;
+      color: $text-hint;
     }
   }
 
   .empty-title {
-    font-size: $font-md;
+    font-size: $font-base;
     font-weight: 600;
-    color: $text-secondary;
-    margin-bottom: $space-2;
+    color: $text-primary;
+    margin-bottom: $space-1;
   }
 
   .empty-text {
@@ -73,7 +73,7 @@ defineEmits(['action'])
   }
 
   .empty-action {
-    margin-top: $space-7;
+    margin-top: $space-5;
   }
 }
 </style>

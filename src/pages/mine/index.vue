@@ -3,49 +3,45 @@
     <scroll-view class="page-scroll" scroll-y>
       <view class="page-scroll-inner">
         <view class="hero">
-          <text class="hero-date">{{ todayDate }}</text>
-          <view class="id-card" @click="goProfile">
-            <view class="id-card-top">
-              <text class="id-card-brand">舍小圈 · 住户卡</text>
-              <text class="id-card-edit">编辑资料 ›</text>
-            </view>
-            <view class="id-card-main">
-              <view class="id-avatar">
-                <MemberAvatar :avatar="avatarUrl" :nickname="userInfo?.nickname || '未登录'" />
+          <text class="hero-title">我的</text>
+          <view class="profile">
+            <view class="profile-main" @click="goProfile">
+              <MemberAvatar :avatar="avatarUrl" :nickname="userInfo?.nickname || '未登录'" />
+              <view class="profile-info">
+                <text class="profile-name">{{ userInfo?.nickname || '未登录' }}</text>
+                <text class="profile-id">ID {{ userInfo?.id || '------' }}</text>
               </view>
-              <view class="id-info">
-                <text class="id-name">{{ userInfo?.nickname || '未登录' }}</text>
-                <text class="id-no">NO.{{ userInfo?.id || '------' }}</text>
+              <view class="profile-edit">
+                <text>编辑资料</text>
+                <image class="chevron" src="/static/icons/chevron-right.png" mode="aspectFit" />
               </view>
             </view>
-            <view class="id-card-foot" @click.stop="currentRoom ? openRoomPicker() : goMyRooms()">
-              <view class="id-room">
-                <text class="id-room-lbl">当前宿舍</text>
-                <text class="id-room-name">{{ currentRoom ? currentRoom.room_name : '还没有加入宿舍' }}</text>
-              </view>
-              <view class="id-switch">
-                <text>{{ currentRoom ? (myRooms.length > 1 ? '切换' : '查看') : '去加入' }}</text>
-              </view>
+            <view class="profile-room" @click="currentRoom ? openRoomPicker() : goMyRooms()">
+              <image class="profile-room-icon" src="/static/icons/home.png" mode="aspectFit" />
+              <text class="profile-room-name">{{ currentRoom ? currentRoom.room_name : '还没有加入宿舍' }}</text>
+              <text class="profile-room-action">{{ currentRoom ? (myRooms.length > 1 ? '切换' : '查看') : '去加入' }}</text>
             </view>
           </view>
         </view>
 
         <view v-if="currentRoom" class="kpi slide-up">
-          <view class="kpi-item kpi-item--blue" @click="goTaskList">
-            <text class="kpi-num">{{ myPendingTaskCount }}</text>
+          <view class="kpi-item" @click="goTaskList">
+            <text class="kpi-num" :class="{ 'is-zero': !myPendingTaskCount }">{{ myPendingTaskCount }}</text>
             <text class="kpi-lbl">我的待办</text>
           </view>
-          <view class="kpi-item kpi-item--lemon" @click="goBillList">
-            <text class="kpi-num">{{ myUnpaidBillCount }}</text>
+          <view class="kpi-divider"></view>
+          <view class="kpi-item" @click="goBillList">
+            <text class="kpi-num" :class="{ 'is-zero': !myUnpaidBillCount }">{{ myUnpaidBillCount }}</text>
             <text class="kpi-lbl">我的待付</text>
           </view>
-          <view class="kpi-item kpi-item--mint" @click="goVote">
-            <text class="kpi-num">{{ myPendingVoteCount }}</text>
+          <view class="kpi-divider"></view>
+          <view class="kpi-item" @click="goVote">
+            <text class="kpi-num" :class="{ 'is-zero': !myPendingVoteCount }">{{ myPendingVoteCount }}</text>
             <text class="kpi-lbl">待投票</text>
           </view>
         </view>
 
-        <text class="ui-form-label">常用</text>
+        <text class="section-label">常用功能</text>
         <view class="grid">
           <view class="grid-item" @click="goMyRooms">
             <view class="grid-icon"><image class="grid-icon-img" src="/static/icons/home.png" mode="aspectFit" /></view>
@@ -65,16 +61,17 @@
           </view>
         </view>
 
-        <view class="ui-form-group list">
+        <text class="section-label">更多</text>
+        <view class="list">
           <view class="list-item" @click="goNotifications">
             <image class="list-icon" src="/static/icons/bell.png" mode="aspectFit" />
             <text class="list-text">消息通知</text>
-            <text class="list-arrow">›</text>
+            <image class="chevron" src="/static/icons/chevron-right.png" mode="aspectFit" />
           </view>
           <view class="list-item" @click="goFeedback">
             <image class="list-icon" src="/static/icons/star.png" mode="aspectFit" />
             <text class="list-text">意见反馈</text>
-            <text class="list-arrow">›</text>
+            <image class="chevron" src="/static/icons/chevron-right.png" mode="aspectFit" />
           </view>
         </view>
 
@@ -202,169 +199,178 @@ function handleLogout() {
 }
 
 .page-scroll-inner {
-  padding-top: calc(var(--status-bar-height) + 40rpx);
+  padding-top: calc(var(--status-bar-height) + 32rpx);
 }
 
 .hero {
-  padding: 0 $space-5;
-  display: flex;
-  flex-direction: column;
-  gap: $space-3;
-
-  &-date {
-    font-size: $font-xs;
-    font-weight: 700;
-    color: $primary;
-    letter-spacing: 0.06em;
-  }
-}
-
-/* 住户卡 */
-.id-card {
-  background: $primary;
-  border-radius: $radius-xl;
-  padding: $space-5;
+  padding: 0 $page-gutter;
   display: flex;
   flex-direction: column;
   gap: $space-4;
-  box-shadow: $shadow-primary;
 
-  &-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  &-title {
+    font-size: $font-lg;
+    font-weight: 700;
+    color: $text-primary;
   }
+}
 
-  &-brand {
-    font-size: 22rpx;
-    font-weight: 800;
-    color: rgba(255, 255, 255, 0.75);
-    letter-spacing: 0.08em;
-  }
-
-  &-edit {
-    font-size: 22rpx;
-    color: rgba(255, 255, 255, 0.85);
-  }
+.profile {
+  background: $bg-card;
+  border-radius: $radius-xl;
+  border: 1rpx solid $border-light;
+  box-shadow: $shadow-md;
+  overflow: hidden;
 
   &-main {
     display: flex;
     align-items: center;
-    gap: $space-4;
+    gap: $space-3;
+    padding: $space-5 $space-4;
+
+    &:active {
+      background: $bg-subtle;
+    }
   }
 
-  &-foot {
+  &-info {
+    flex: 1;
+    min-width: 0;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: $space-3 $space-4;
-    background: $bg-card;
-    border-radius: $radius-lg;
-  }
-}
-
-.id-avatar {
-  padding: 6rpx;
-  border-radius: 50%;
-  background: $accent-lemon;
-}
-
-.id-info {
-  display: flex;
-  flex-direction: column;
-  gap: 6rpx;
-  min-width: 0;
-}
-
-.id-name {
-  font-size: 44rpx;
-  font-weight: 900;
-  color: $text-white;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.id-no {
-  font-size: $font-xs;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.75);
-  letter-spacing: 0.1em;
-}
-
-.id-room {
-  display: flex;
-  flex-direction: column;
-  gap: 2rpx;
-  min-width: 0;
-
-  &-lbl {
-    font-size: 22rpx;
-    color: $text-hint;
+    flex-direction: column;
+    gap: 6rpx;
   }
 
   &-name {
-    font-size: $font-sm;
-    font-weight: 800;
+    font-size: $font-md;
+    font-weight: 600;
     color: $text-primary;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+
+  &-id {
+    font-size: $font-xs;
+    color: $text-hint;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &-edit {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 4rpx;
+    font-size: $font-xs;
+    color: $text-secondary;
+  }
+
+  &-room {
+    display: flex;
+    align-items: center;
+    gap: 16rpx;
+    padding: 24rpx $space-4;
+    background: $bg-subtle;
+    border-top: 1rpx solid $border-light;
+
+    &:active {
+      background: $bg-hover;
+    }
+
+    &-icon {
+      width: 32rpx;
+      height: 32rpx;
+      opacity: 0.6;
+    }
+
+    &-name {
+      flex: 1;
+      min-width: 0;
+      font-size: $font-sm;
+      font-weight: 500;
+      color: $text-primary;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &-action {
+      flex-shrink: 0;
+      font-size: $font-xs;
+      font-weight: 600;
+      color: $primary;
+    }
+  }
 }
 
-.id-switch {
+.chevron {
+  width: 26rpx;
+  height: 26rpx;
+  opacity: 0.4;
   flex-shrink: 0;
-  padding: 10rpx 24rpx;
-  border-radius: $radius-full;
-  background: $accent-lemon;
-  font-size: $font-xs;
-  font-weight: 800;
-  color: $text-primary;
 }
 
-/* KPI */
 .kpi {
   display: flex;
-  gap: $space-3;
-  padding: $space-4 $space-5 0;
+  align-items: center;
+  margin: $space-3 $page-gutter 0;
+  padding: $space-4 0;
+  background: $bg-card;
+  border-radius: $radius-lg;
+  border: 1rpx solid $border-light;
 }
 
 .kpi-item {
   flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 4rpx;
-  padding: $space-4 $space-3;
-  border-radius: $radius-lg;
-
-  &--blue { background: $primary-bg; }
-  &--lemon { background: $accent-lemon-soft; }
-  &--mint { background: $success-bg; }
 
   &:active {
-    transform: scale(0.97);
+    opacity: 0.6;
   }
 }
 
+.kpi-divider {
+  width: 1rpx;
+  height: 64rpx;
+  background: $border-light;
+}
+
 .kpi-num {
-  font-size: 56rpx;
-  font-weight: 900;
-  color: $text-primary;
-  line-height: 1.1;
+  font-family: $font-num;
+  font-size: $font-xl;
+  font-weight: 700;
+  color: $primary;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+
+  &.is-zero {
+    color: $text-primary;
+  }
 }
 
 .kpi-lbl {
   font-size: $font-xs;
-  font-weight: 600;
   color: $text-secondary;
 }
 
-/* 宫格 */
+.section-label {
+  display: block;
+  padding: $space-6 $page-gutter $space-2;
+  font-size: $font-xs;
+  font-weight: 500;
+  color: $text-hint;
+}
+
 .grid {
   display: flex;
-  gap: $space-3;
-  padding: 0 $space-5 $space-4;
+  margin: 0 $page-gutter;
+  padding: $space-4 0;
+  background: $bg-card;
+  border-radius: $radius-lg;
+  border: 1rpx solid $border-light;
 }
 
 .grid-item {
@@ -372,21 +378,17 @@ function handleLogout() {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12rpx;
-  padding: $space-4 0;
-  background: $bg-card;
-  border-radius: $radius-lg;
-  border: 2rpx solid $border-light;
+  gap: 14rpx;
 
   &:active {
-    transform: scale(0.96);
+    opacity: 0.6;
   }
 }
 
 .grid-icon {
   width: 80rpx;
   height: 80rpx;
-  border-radius: 28rpx;
+  border-radius: $radius-md;
   background: $primary-bg;
   display: flex;
   align-items: center;
@@ -400,8 +402,16 @@ function handleLogout() {
 
 .grid-text {
   font-size: $font-xs;
-  font-weight: 700;
+  font-weight: 500;
   color: $text-primary;
+}
+
+.list {
+  margin: 0 $page-gutter;
+  padding: 0 $space-4;
+  background: $bg-card;
+  border-radius: $radius-lg;
+  border: 1rpx solid $border-light;
 }
 
 .list-item {
@@ -409,23 +419,27 @@ function handleLogout() {
   align-items: center;
   gap: $space-3;
   height: 104rpx;
+  border-bottom: 1rpx solid $border-light;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:active {
+    opacity: 0.6;
+  }
 }
 
 .list-icon {
-  width: 40rpx;
-  height: 40rpx;
+  width: 36rpx;
+  height: 36rpx;
+  opacity: 0.7;
 }
 
 .list-text {
   flex: 1;
   font-size: $font-sm;
-  font-weight: 700;
   color: $text-primary;
-}
-
-.list-arrow {
-  font-size: $font-md;
-  color: $text-hint;
 }
 
 .foot {
@@ -433,7 +447,7 @@ function handleLogout() {
   flex-direction: column;
   align-items: center;
   gap: $space-3;
-  padding: $space-3 $space-5 0;
+  padding: $space-8 $page-gutter 0;
 }
 
 .foot-btn {
