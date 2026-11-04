@@ -1,33 +1,38 @@
 <template>
-  <view class="create-room-page">
-    <view class="form card slide-up">
-      <FormSection label="宿舍名称" required>
-        <input v-model="form.room_name" class="input-field" placeholder="请输入宿舍名称" maxlength="64" />
-      </FormSection>
-      <FormSection label="宿舍公告" description="向成员展示的重要信息">
-        <textarea v-model="form.notice" class="textarea-field" placeholder="请输入公告" maxlength="200" />
-      </FormSection>
-      <FormSection label="最大人数">
-        <picker :range="memberOptions" :value="memberIndex" @change="onMemberChange">
-          <view class="picker-display">
-            <text>{{ memberOptions[memberIndex] }}</text>
-            <text class="picker-arrow">▼</text>
-          </view>
-        </picker>
-      </FormSection>
-      <FormSection label="宿舍类型">
-        <picker :range="typeOptions" :range-key="'label'" :value="typeIndex" @change="onTypeChange">
-          <view class="picker-display">
-            <text>{{ typeOptions[typeIndex].label }}</text>
-            <text class="picker-arrow">▼</text>
-          </view>
-        </picker>
-      </FormSection>
+  <view class="page">
+    <text class="ui-form-label">基本信息</text>
+    <view class="ui-form-group">
+      <view class="ui-field">
+        <text class="ui-field__label">宿舍名称<text class="req">*</text></text>
+        <input v-model="form.room_name" class="ui-input" placeholder="请输入宿舍名称" maxlength="64" />
+      </view>
+      <picker :range="memberOptions" :value="memberIndex" @change="onMemberChange">
+        <view class="ui-row">
+          <text class="ui-row__label">最大人数</text>
+          <view class="ui-row__value"><text>{{ memberOptions[memberIndex] }}</text><view class="ui-row__arrow"></view></view>
+        </view>
+      </picker>
+      <picker :range="typeOptions" :range-key="'label'" :value="typeIndex" @change="onTypeChange">
+        <view class="ui-row">
+          <text class="ui-row__label">宿舍类型</text>
+          <view class="ui-row__value"><text>{{ typeOptions[typeIndex].label }}</text><view class="ui-row__arrow"></view></view>
+        </view>
+      </picker>
     </view>
-    <button class="btn-primary submit-btn" :class="{ 'is-loading': submitting }" :disabled="!form.room_name" @click="handleSubmit">
-      <text v-if="!submitting">创建宿舍</text>
-      <view v-else class="loading-spinner spinner-sm"></view>
-    </button>
+
+    <text class="ui-form-label">宿舍公告<text class="label-sub"> · 选填</text></text>
+    <view class="ui-form-group">
+      <view class="ui-field">
+        <textarea v-model="form.notice" class="ui-textarea" placeholder="向成员展示的重要信息" maxlength="200" />
+      </view>
+    </view>
+
+    <view class="ui-bottom-spacer"></view>
+    <view class="ui-bottom-bar">
+      <view class="ui-btn ui-btn--primary" :class="{ 'is-disabled': !form.room_name || submitting }" @click="form.room_name && !submitting && handleSubmit()">
+        {{ submitting ? '创建中...' : '创建宿舍' }}
+      </view>
+    </view>
   </view>
 </template>
 
@@ -65,55 +70,19 @@ async function handleSubmit() {
 <style lang="scss" scoped>
 @use '@/styles/variables.scss' as *;
 
-.create-room-page {
-  padding: $space-4;
+.page {
   min-height: 100vh;
   background: $bg-page;
+  padding-top: $space-1;
 }
 
-.form {
-  padding: $space-5 $space-5 $space-2;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 6rpx;
-    background: $primary;
-    opacity: 0.4;
-    border-radius: 0 $radius-sm $radius-sm 0;
-  }
-
-  .picker-display {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 88rpx;
-    padding: 0 $space-4;
-    font-size: $font-base;
-    color: $text-primary;
-    background-color: $bg-page;
-    border: 2rpx solid $border-color;
-    border-radius: $radius-md;
-    transition: $transition-fast;
-
-    &:focus-within {
-      border-color: $primary;
-      box-shadow: 0 0 0 4rpx $primary-bg;
-    }
-
-    .picker-arrow {
-      font-size: $font-xs;
-      color: $text-hint;
-    }
-  }
+.req {
+  color: $danger;
+  margin-left: 4rpx;
 }
 
-.submit-btn {
-  margin-top: $space-5;
+.label-sub {
+  color: $text-hint;
+  font-weight: 400;
 }
 </style>

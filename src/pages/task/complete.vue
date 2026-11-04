@@ -1,36 +1,41 @@
 <template>
-  <view class="complete-page">
-    <view class="intro">
-      <view class="intro-badge">DONE</view>
-      <text class="intro-title">任务搞定了？</text>
-      <text class="intro-sub">留个备注或拍张照，方便宿舍长确认</text>
+  <view class="ui-page">
+    <view class="ui-header">
+      <text class="ui-header__title">提交完成</text>
+      <text class="ui-header__sub">留个备注或拍张照，方便宿舍长确认</text>
     </view>
 
     <text class="ui-form-label">完成备注</text>
     <view class="ui-form-group">
-      <textarea v-model="remark" class="remark" placeholder="比如：垃圾已倒，顺便擦了桌子（选填）" />
+      <view class="ui-field">
+        <textarea v-model="remark" class="ui-textarea" placeholder="比如：垃圾已倒，顺便擦了桌子（选填）" maxlength="200" />
+      </view>
     </view>
 
     <view class="label-row">
       <text class="ui-form-label">现场照片</text>
-      <text class="label-extra">{{ images.length }}/3</text>
+      <text class="label-extra num">{{ images.length }}/3</text>
     </view>
-    <view class="image-grid">
-      <view v-for="(img, idx) in images" :key="idx" class="image-wrap">
-        <image :src="img" class="preview-img" mode="aspectFill" />
-        <view class="remove-btn" @click.stop="removeImage(idx)">×</view>
-      </view>
-      <view v-if="images.length < 3" class="upload-area" @click="chooseImage">
-        <image src="/static/icons/upload.png" class="upload-icon" />
-        <text class="upload-text">添加照片</text>
+    <view class="ui-form-group photo-group">
+      <view class="image-grid">
+        <view v-for="(img, idx) in images" :key="idx" class="image-cell">
+          <image :src="img" class="preview-img" mode="aspectFill" />
+          <view class="remove-btn" aria-label="删除照片" @click.stop="removeImage(idx)">
+            <view class="remove-btn__x"></view>
+          </view>
+        </view>
+        <view v-if="images.length < 3" class="image-cell upload-area" @click="chooseImage">
+          <view class="upload-plus"></view>
+          <text class="upload-text">添加照片</text>
+        </view>
       </view>
     </view>
 
     <view class="ui-bottom-spacer"></view>
     <view class="ui-bottom-bar">
       <view class="ui-btn ui-btn--primary" :class="{ 'is-disabled': submitting }" @click="handleSubmit">
-        <text v-if="!submitting">提交完成</text>
-        <view v-else class="loading-spinner spinner-sm"></view>
+        <view v-if="submitting" class="loading-spinner spinner-sm btn-spinner"></view>
+        <text>{{ submitting ? '提交中...' : '提交完成' }}</text>
       </view>
     </view>
   </view>
@@ -40,7 +45,6 @@
 import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { completeTask } from '@/api/task'
-import FormSection from '@/components/FormSection.vue'
 
 let taskId = 0
 const remark = ref('')
@@ -99,119 +103,118 @@ async function handleSubmit() {
 <style lang="scss" scoped>
 @use '@/styles/variables.scss' as *;
 
-.complete-page {
-  min-height: 100vh;
-  background: $bg-page;
-  padding-top: $space-5;
-}
-
-.intro {
-  padding: 0 $space-5 $space-3;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8rpx;
-
-  &-badge {
-    padding: 6rpx 20rpx;
-    border-radius: $radius-full;
-    background: $accent-lemon;
-    color: $text-primary;
-    font-size: 22rpx;
-    font-weight: 900;
-    letter-spacing: 0.1em;
-    transform: rotate(-4deg);
-  }
-
-  &-title {
-    margin-top: $space-2;
-    font-size: 48rpx;
-    font-weight: 900;
-    color: $text-primary;
-  }
-
-  &-sub {
-    font-size: $font-sm;
-    color: $text-secondary;
-  }
-}
-
-.remark {
-  width: 100%;
-  height: 220rpx;
-  padding: $space-2 0;
-  font-size: $font-sm;
-  color: $text-primary;
-  line-height: 1.6;
-}
-
 .label-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-right: $space-5;
+  padding-right: $page-gutter;
 }
 
 .label-extra {
   font-size: $font-xs;
-  font-weight: 700;
-  color: $primary;
+  color: $text-secondary;
+}
+
+.photo-group {
+  padding-top: $space-4;
+  padding-bottom: $space-4;
 }
 
 .image-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $space-3;
-  padding: 0 $space-5;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $space-2;
 }
 
-.image-wrap,
-.upload-area {
+.image-cell {
   position: relative;
-  width: 200rpx;
-  height: 200rpx;
-  border-radius: $radius-lg;
+  width: 100%;
+  padding-top: 100%;
+  border-radius: $radius-sm;
   overflow: hidden;
+  background: $bg-subtle;
 }
 
 .preview-img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
 }
 
 .remove-btn {
   position: absolute;
-  top: 10rpx;
-  right: 10rpx;
-  width: 44rpx;
-  height: 44rpx;
+  top: 8rpx;
+  right: 8rpx;
+  width: 40rpx;
+  height: 40rpx;
   border-radius: 50%;
-  background: rgba(21, 34, 56, 0.6);
-  color: $text-white;
-  font-size: 32rpx;
-  line-height: 40rpx;
-  text-align: center;
+  background: rgba(15, 23, 42, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &__x {
+    position: relative;
+    width: 18rpx;
+    height: 18rpx;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 3rpx;
+      margin-top: -1.5rpx;
+      background: $text-white;
+      border-radius: 2rpx;
+    }
+
+    &::before { transform: rotate(45deg); }
+    &::after { transform: rotate(-45deg); }
+  }
 }
 
 .upload-area {
-  background: $bg-card;
-  border: 3rpx dashed $primary-lighter;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10rpx;
+  border: 1rpx dashed $border-color;
   box-sizing: border-box;
 }
 
-.upload-icon {
-  width: 48rpx;
-  height: 48rpx;
+.upload-plus {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  width: 36rpx;
+  height: 36rpx;
+  transform: translate(-50%, -50%);
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    background: $text-secondary;
+    border-radius: 2rpx;
+  }
+
+  &::before { top: 50%; left: 0; width: 100%; height: 3rpx; margin-top: -1.5rpx; }
+  &::after { left: 50%; top: 0; height: 100%; width: 3rpx; margin-left: -1.5rpx; }
 }
 
 .upload-text {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 62%;
+  text-align: center;
   font-size: $font-xs;
-  font-weight: 600;
-  color: $primary;
+  color: $text-secondary;
+  line-height: 1;
+}
+
+.btn-spinner {
+  border-color: rgba(255, 255, 255, 0.35);
+  border-top-color: $text-white;
 }
 </style>

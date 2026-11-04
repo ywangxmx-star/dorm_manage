@@ -1,33 +1,40 @@
 <template>
-  <view class="feedback-page">
-    <view class="form card slide-up">
-      <FormSection label="反馈内容" required>
+  <view class="page">
+    <text class="ui-form-label">反馈内容<text class="req">*</text></text>
+    <view class="ui-form-group">
+      <view class="ui-field">
         <textarea
           v-model="content"
-          class="textarea-field"
+          class="ui-textarea feedback-textarea"
           placeholder="请详细描述您遇到的问题或建议"
-          placeholder-style="font-size: 32rpx; line-height: 44rpx; color: #9AA8BC"
           maxlength="500"
         />
-        <text class="char-count">{{ content.length }}/500</text>
-      </FormSection>
-      <FormSection label="截图（可选）" description="最多上传3张图片">
-        <view class="image-grid">
-          <view v-for="(img, idx) in images" :key="idx" class="image-wrap">
-            <image :src="img" class="preview-img" mode="aspectFill" />
-            <view class="remove-btn" @click.stop="removeImage(idx)">×</view>
-          </view>
-          <view v-if="images.length < 3" class="upload-area" @click="chooseImage">
-            <image class="upload-icon-img" src="/static/icons/upload.png" mode="aspectFill" />
-            <text class="upload-text">上传图片</text>
+        <text class="char-count num">{{ content.length }}/500</text>
+      </view>
+    </view>
+
+    <text class="ui-form-label">截图<text class="label-sub"> · 选填，最多 3 张</text></text>
+    <view class="ui-form-group">
+      <view class="image-grid">
+        <view v-for="(img, idx) in images" :key="idx" class="image-cell">
+          <image :src="img" class="image-cell__img" mode="aspectFill" />
+          <view class="image-cell__remove" aria-label="移除图片" @click.stop="removeImage(idx)">
+            <view class="x-mark"></view>
           </view>
         </view>
-      </FormSection>
+        <view v-if="images.length < 3" class="image-cell image-cell--add" @click="chooseImage">
+          <view class="plus-mark"></view>
+          <text class="add-text">上传图片</text>
+        </view>
+      </view>
     </view>
-    <button class="btn-primary submit-btn" :class="{ 'is-loading': submitting }" :disabled="!content.trim()" @click="handleSubmit">
-      <text v-if="!submitting">提交反馈</text>
-      <view v-else class="loading-spinner spinner-sm"></view>
-    </button>
+
+    <view class="ui-bottom-spacer"></view>
+    <view class="ui-bottom-bar">
+      <view class="ui-btn ui-btn--primary" :class="{ 'is-disabled': !content.trim() || submitting }" @click="content.trim() && !submitting && handleSubmit()">
+        {{ submitting ? '提交中...' : '提交反馈' }}
+      </view>
+    </view>
   </view>
 </template>
 
@@ -96,107 +103,122 @@ async function handleSubmit() {
 <style lang="scss" scoped>
 @use '@/styles/variables.scss' as *;
 
-.feedback-page {
-  padding: $space-4;
+.page {
   min-height: 100vh;
   background: $bg-page;
+  padding-top: $space-1;
 }
 
-.form {
-  padding: $space-5 $space-5 $space-2;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 6rpx;
-    background: $primary;
-    opacity: 0.4;
-    border-radius: 0 $radius-sm $radius-sm 0;
-  }
+.req {
+  color: $danger;
+  margin-left: 4rpx;
 }
 
-.textarea-field {
-  height: 200rpx;
-  line-height: 44rpx;
+.label-sub {
+  color: $text-hint;
+  font-weight: 400;
+}
+
+.feedback-textarea {
+  height: 240rpx;
 }
 
 .char-count {
   display: block;
+  padding-bottom: $space-2;
   text-align: right;
-  font-size: $font-xs;
+  font-size: 22rpx;
   color: $text-hint;
-  margin-top: $space-1;
+  line-height: 1;
 }
 
 .image-grid {
   display: flex;
-  gap: $space-3;
   flex-wrap: wrap;
-}
-
-.upload-area {
-  width: 180rpx;
-  height: 180rpx;
-  border: 2rpx dashed $primary;
-  border-radius: $radius-lg;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   gap: $space-2;
-  transition: $transition-fast;
-  background-color: $primary-bg;
-
-  &:active {
-    transform: scale(0.95);
-  }
-
-  .upload-icon-img {
-    width: 48rpx;
-    height: 48rpx;
-  }
-
-  .upload-text {
-    font-size: $font-xs;
-    color: $primary;
-    font-weight: 500;
-  }
+  padding: $space-3 0;
 }
 
-.image-wrap {
+.image-cell {
   position: relative;
   width: 180rpx;
   height: 180rpx;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  background: $bg-subtle;
+  box-sizing: border-box;
 
-  .preview-img {
+  &__img {
     width: 100%;
     height: 100%;
-    border-radius: $radius-lg;
   }
 
-  .remove-btn {
+  &__remove {
     position: absolute;
-    top: -12rpx;
-    right: -12rpx;
+    top: 8rpx;
+    right: 8rpx;
     width: 40rpx;
     height: 40rpx;
     border-radius: 50%;
-    background-color: $danger;
-    color: $text-white;
-    font-size: $font-sm;
+    background: rgba(15, 23, 42, 0.6);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: $shadow-sm;
+  }
+
+  &--add {
+    border: 2rpx dashed $border-color;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: $space-1;
+
+    &:active { background: $bg-hover; }
   }
 }
 
-.submit-btn {
-  margin-top: $space-5;
+.x-mark {
+  position: relative;
+  width: 18rpx;
+  height: 18rpx;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 3rpx;
+    margin-top: -1.5rpx;
+    background: $text-white;
+  }
+
+  &::before { transform: rotate(45deg); }
+  &::after { transform: rotate(-45deg); }
+}
+
+.plus-mark {
+  position: relative;
+  width: 36rpx;
+  height: 36rpx;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    background: $text-hint;
+    border-radius: 2rpx;
+  }
+
+  &::before { top: 50%; left: 0; width: 100%; height: 4rpx; margin-top: -2rpx; }
+  &::after { left: 50%; top: 0; height: 100%; width: 4rpx; margin-left: -2rpx; }
+}
+
+.add-text {
+  font-size: 22rpx;
+  color: $text-hint;
+  line-height: 1;
 }
 </style>

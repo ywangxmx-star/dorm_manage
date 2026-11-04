@@ -77,10 +77,46 @@ page {
 }
 
 // -- Buttons --
+// 抹平 uni-app button 默认的 padding / line-height(2.55) / margin，
+// 统一用 flex 居中，保证任意高度下文字都垂直水平居中。
 button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  box-sizing: border-box;
+  white-space: nowrap;
+
   &::after {
     border: none;
+    display: none;
   }
+}
+
+// -- Inputs --
+// 输入框只设高度与水平内边距，不设置垂直 padding 和 line-height，
+// 避免小程序/H5 中光标、占位文字与输入文字错位。
+input,
+.uni-input {
+  box-sizing: border-box;
+  min-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+textarea,
+.uni-textarea {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.input-placeholder,
+.uni-input-placeholder,
+.uni-textarea-placeholder {
+  color: $text-hint;
+  font-weight: 400;
 }
 
 .btn-primary,
@@ -358,8 +394,6 @@ button.btn-restore {
   transition: $transition-fast;
   box-sizing: border-box;
   caret-color: $primary;
-  display: flex;
-  align-items: center;
 
   &:focus {
     border-color: $primary;
@@ -751,8 +785,19 @@ button.btn-restore {
   gap: $space-1;
   font-size: $font-base;
   font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  text-align: center;
   box-sizing: border-box;
   transition: $transition-fast;
+
+  &--sm {
+    flex: none;
+    height: 60rpx;
+    padding: 0 $space-3;
+    border-radius: $radius-sm;
+    font-size: $font-xs;
+  }
 
   &--primary {
     background: $primary;
@@ -888,5 +933,248 @@ button.btn-restore {
     font-weight: 600;
     color: $text-primary;
     margin-bottom: $space-3;
+  }
+}
+
+// ============================================
+// Form Primitives（所有创建/编辑页统一使用）
+// ============================================
+
+// 页面容器：子页面统一的页边距与底部留白
+.ui-page {
+  min-height: 100vh;
+  background: $bg-page;
+  padding: $space-2 0 0;
+  box-sizing: border-box;
+}
+
+// 纵向字段：标签在上，输入框在下
+.ui-field {
+  padding: $space-3 0;
+  border-bottom: 1rpx solid $border-light;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &__hd {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-2;
+    margin-bottom: $space-2;
+  }
+
+  &__label {
+    font-size: $font-sm;
+    font-weight: 600;
+    color: $text-primary;
+    line-height: 1.4;
+  }
+
+  &__required {
+    color: $danger;
+    margin-left: 4rpx;
+  }
+
+  &__count {
+    font-size: 22rpx;
+    color: $text-hint;
+    font-family: $font-num;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  &__hint {
+    display: block;
+    margin-top: $space-2;
+    font-size: $font-xs;
+    color: $text-hint;
+    line-height: 1.5;
+  }
+}
+
+// 输入框：固定高度 + 仅水平 padding，光标与文字天然垂直居中
+.ui-input {
+  display: block;
+  width: 100%;
+  height: 88rpx;
+  padding: 0 $space-3;
+  font-size: $font-base;
+  color: $text-primary;
+  background: $bg-subtle;
+  border: 1rpx solid $border-light;
+  border-radius: $radius-sm;
+  box-sizing: border-box;
+  caret-color: $primary;
+
+  &--lg {
+    height: 96rpx;
+    font-size: $font-md;
+    font-weight: 600;
+  }
+
+  &--plain {
+    height: 72rpx;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+  }
+}
+
+.ui-textarea {
+  display: block;
+  width: 100%;
+  height: 200rpx;
+  padding: $space-3;
+  font-size: $font-sm;
+  line-height: 1.6;
+  color: $text-primary;
+  background: $bg-subtle;
+  border: 1rpx solid $border-light;
+  border-radius: $radius-sm;
+  box-sizing: border-box;
+  caret-color: $primary;
+}
+
+// 横向设置行：左标签 右值（选择器/开关/输入）
+.ui-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-3;
+  min-height: 104rpx;
+  padding: $space-2 0;
+  box-sizing: border-box;
+  border-bottom: 1rpx solid $border-light;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &__label {
+    flex-shrink: 0;
+    font-size: $font-sm;
+    font-weight: 500;
+    color: $text-primary;
+    line-height: 1.4;
+  }
+
+  &__label-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4rpx;
+    min-width: 0;
+  }
+
+  &__hint {
+    font-size: 22rpx;
+    color: $text-hint;
+    line-height: 1.4;
+  }
+
+  &__value {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8rpx;
+    font-size: $font-sm;
+    color: $text-secondary;
+    line-height: 1.4;
+    text-align: right;
+
+    &.is-empty {
+      color: $text-hint;
+    }
+  }
+
+  &__arrow {
+    flex-shrink: 0;
+    width: 14rpx;
+    height: 14rpx;
+    border-top: 3rpx solid $text-hint;
+    border-right: 3rpx solid $text-hint;
+    transform: rotate(45deg);
+    margin-left: 6rpx;
+  }
+
+  // 行内输入框：右对齐，与左侧标签同一基线
+  &__input {
+    flex: 1;
+    min-width: 0;
+    height: 72rpx;
+    padding: 0;
+    font-size: $font-sm;
+    color: $text-primary;
+    text-align: right;
+    background: transparent;
+    border: none;
+    caret-color: $primary;
+  }
+
+  &--sub {
+    padding-left: $space-4;
+  }
+}
+
+// picker 包裹的行：保证最后一行不出现分割线
+picker:last-child > .ui-row,
+.ui-form-group > picker:last-child .ui-row {
+  border-bottom: none;
+}
+
+// 底部操作栏内的提示文字 + 按钮纵向布局
+.ui-bottom-bar--stack {
+  flex-direction: column;
+  align-items: stretch;
+  gap: $space-2;
+
+  .ui-btn {
+    flex: none;
+  }
+}
+
+.ui-bottom-bar__hint {
+  font-size: 22rpx;
+  color: $text-hint;
+  text-align: center;
+  line-height: 1.4;
+}
+
+// 选择型胶囊（优先级/类型/分摊方式等）
+.ui-choice-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+}
+
+.ui-choice {
+  flex: 1;
+  min-width: 0;
+  height: 76rpx;
+  padding: 0 $space-3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  border-radius: $radius-sm;
+  background: $bg-card;
+  border: 1rpx solid $border-color;
+  font-size: $font-sm;
+  font-weight: 500;
+  color: $text-secondary;
+  box-sizing: border-box;
+  line-height: 1;
+  white-space: nowrap;
+  transition: $transition-fast;
+
+  &.is-active {
+    background: $primary-bg;
+    border-color: $primary;
+    color: $primary;
+    font-weight: 600;
   }
 }

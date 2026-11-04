@@ -1,38 +1,36 @@
 <template>
-  <view class="task-detail-page" v-if="task">
-    <view class="ticket">
-      <view class="ticket-top">
-        <view class="ticket-status" :style="{ color: statusInfo.color }">
-          <view class="ticket-status-dot" :style="{ backgroundColor: statusInfo.color }"></view>
+  <view class="detail-page" v-if="task">
+    <view class="ui-panel head">
+      <view class="head-tags">
+        <view class="status-tag" :style="{ color: statusInfo.color, backgroundColor: statusInfo.color + '14' }">
+          <view class="status-tag__dot" :style="{ backgroundColor: statusInfo.color }"></view>
           <text>{{ statusInfo.text }}</text>
         </view>
-        <view class="ticket-priority" :style="{ backgroundColor: priorityColor + '1A', color: priorityColor }">{{ priorityText }}</view>
-      </view>
-      <text class="ticket-title">{{ task.title }}</text>
-      <text v-if="task.description" class="ticket-desc">{{ task.description }}</text>
-      <view class="ticket-cut">
-        <view class="ticket-hole ticket-hole--l"></view>
-        <view class="ticket-dash"></view>
-        <view class="ticket-hole ticket-hole--r"></view>
-      </view>
-      <view class="ticket-stats">
-        <view class="ticket-stat">
-          <text class="ticket-stat-lbl">截止时间</text>
-          <text class="ticket-stat-val">{{ formatDate(task.deadline) }}</text>
+        <view class="status-tag" :style="{ color: priorityColor, backgroundColor: priorityColor + '14' }">
+          <text>{{ priorityText }}</text>
         </view>
-        <view class="ticket-stat">
-          <text class="ticket-stat-lbl">创建时间</text>
-          <text class="ticket-stat-val">{{ formatDate(task.create_time) }}</text>
+      </view>
+      <text class="head-title">{{ task.title }}</text>
+      <text v-if="task.description" class="head-desc">{{ task.description }}</text>
+      <view class="head-meta">
+        <view class="head-meta__item">
+          <text class="head-meta__lbl">截止时间</text>
+          <text class="head-meta__val num">{{ formatDate(task.deadline) }}</text>
+        </view>
+        <view class="head-meta__divider"></view>
+        <view class="head-meta__item">
+          <text class="head-meta__lbl">创建时间</text>
+          <text class="head-meta__val num">{{ formatDate(task.create_time) }}</text>
         </view>
       </view>
     </view>
 
-    <view v-if="task.is_urged && isExecutor" class="urge">
-      <image class="urge-icon" src="/static/icons/bell.png" mode="aspectFit" />
-      <text class="urge-text">宿舍长在催你啦，请尽快处理</text>
+    <view v-if="task.is_urged && isExecutor" class="notice notice--warn">
+      <image class="notice__icon" src="/static/icons/bell.png" mode="aspectFit" />
+      <text class="notice__text">宿舍长在催你啦，请尽快处理</text>
     </view>
 
-    <view v-if="task.is_cycle && !task.parent_cycle_id" class="ui-panel block">
+    <view v-if="task.is_cycle && !task.parent_cycle_id" class="ui-panel">
       <view class="cycle">
         <view class="cycle-icon">
           <image class="cycle-icon-img" src="/static/icons/refresh.png" mode="aspectFit" />
@@ -44,7 +42,7 @@
       </view>
     </view>
 
-    <view class="ui-panel block">
+    <view class="ui-panel">
       <view class="ui-panel__hd">
         <text class="ui-panel__title">执行人</text>
         <text class="panel-count">{{ task.executors?.length || 0 }} 人</text>
@@ -57,36 +55,31 @@
           <text class="person-name">{{ ex.nickname }}</text>
           <text
             class="person-status"
-            :style="{ color: ExecutorStatusMap[ex.status]?.color || '#9AA8BC', backgroundColor: (ExecutorStatusMap[ex.status]?.color || '#9AA8BC') + '1A' }"
+            :style="{ color: ExecutorStatusMap[ex.status]?.color || '#94A3B8', backgroundColor: (ExecutorStatusMap[ex.status]?.color || '#94A3B8') + '14' }"
           >{{ ExecutorStatusMap[ex.status]?.text || '未知' }}</text>
         </view>
       </view>
       <text v-else class="panel-empty">暂未指定执行人</text>
     </view>
 
-    <view v-if="finishRemark || finishImageUrls.length" class="ui-panel block">
+    <view v-if="finishRemark || finishImageUrls.length" class="ui-panel">
       <view class="ui-panel__hd">
         <text class="ui-panel__title">完成记录</text>
       </view>
       <text v-if="finishRemark" class="finish-remark">{{ finishRemark }}</text>
       <view v-if="finishImageUrls.length" class="finish-images">
-        <image
-          v-for="(url, idx) in finishImageUrls"
-          :key="idx"
-          :src="url"
-          class="finish-img"
-          mode="aspectFill"
-          @click="previewFinishImages(idx)"
-        />
+        <view v-for="(url, idx) in finishImageUrls" :key="idx" class="finish-cell" @click="previewFinishImages(idx)">
+          <image :src="url" class="finish-img" mode="aspectFill" />
+        </view>
       </view>
     </view>
 
-    <view v-if="statusHint" class="hint">
-      <text class="hint-tag">提示</text>
-      <text class="hint-text">{{ statusHint }}</text>
+    <view v-if="statusHint" class="notice">
+      <view class="notice__dot"></view>
+      <text class="notice__text notice__text--sub">{{ statusHint }}</text>
     </view>
 
-    <view v-if="isLeader && !canAudit && (canUrge || canStopCycle || canCancel || canDelete)" class="ui-panel block">
+    <view v-if="isLeader && !canAudit && (canUrge || canStopCycle || canCancel || canDelete)" class="ui-panel">
       <view class="ui-panel__hd">
         <text class="ui-panel__title">管理操作</text>
       </view>
@@ -333,152 +326,157 @@ function goComplete() { uni.navigateTo({ url: `/pages/task/complete?id=${taskId}
 <style lang="scss" scoped>
 @use '@/styles/variables.scss' as *;
 
-.task-detail-page {
+.detail-page {
   min-height: 100vh;
   background: $bg-page;
-  padding: $space-4 $space-5 0;
+  padding: $space-3 $page-gutter 0;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: $space-4;
+  gap: $space-3;
 }
 
-/* -------- 票据头卡 -------- */
-.ticket {
-  background: $primary;
-  border-radius: $radius-xl;
-  padding: $space-5 $space-5 $space-4;
+/* 头部信息 */
+.head {
   display: flex;
   flex-direction: column;
   gap: $space-2;
-  box-shadow: $shadow-primary;
 }
 
-.ticket-top {
+.head-tags {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: $space-1;
 }
 
-.ticket-status {
-  display: flex;
+.status-tag {
+  display: inline-flex;
   align-items: center;
-  gap: 10rpx;
-  padding: 8rpx 20rpx;
-  background: $bg-card;
-  border-radius: $radius-full;
-  font-size: $font-xs;
-  font-weight: 800;
+  gap: 8rpx;
+  height: 44rpx;
+  padding: 0 16rpx;
+  border-radius: $radius-xs;
+  font-size: 22rpx;
+  font-weight: 600;
+  line-height: 1;
+  box-sizing: border-box;
 
-  &-dot {
-    width: 14rpx;
-    height: 14rpx;
+  &__dot {
+    width: 12rpx;
+    height: 12rpx;
     border-radius: 50%;
   }
 }
 
-.ticket-priority {
-  padding: 8rpx 20rpx;
-  border-radius: $radius-full;
-  background: $bg-card !important;
-  font-size: $font-xs;
-  font-weight: 800;
-}
-
-.ticket-title {
-  margin-top: $space-2;
-  font-size: 48rpx;
-  font-weight: 900;
-  color: $text-white;
+.head-title {
+  margin-top: $space-1;
+  font-size: $font-lg;
+  font-weight: 700;
+  color: $text-primary;
   line-height: 1.3;
-  letter-spacing: -0.02em;
+  word-break: break-all;
 }
 
-.ticket-desc {
+.head-desc {
   font-size: $font-sm;
-  color: rgba(255, 255, 255, 0.85);
+  color: $text-secondary;
   line-height: 1.6;
+  word-break: break-all;
 }
 
-.ticket-cut {
-  position: relative;
+.head-meta {
+  margin-top: $space-2;
+  padding-top: $space-3;
+  border-top: 1rpx solid $border-light;
   display: flex;
   align-items: center;
-  margin: $space-3 (-$space-5) $space-2;
-}
 
-.ticket-hole {
-  width: 36rpx;
-  height: 36rpx;
-  border-radius: 50%;
-  background: $bg-page;
-  flex-shrink: 0;
+  &__item {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6rpx;
+  }
 
-  &--l { margin-left: -18rpx; }
-  &--r { margin-right: -18rpx; }
-}
+  &__divider {
+    width: 1rpx;
+    height: 56rpx;
+    background: $border-light;
+    margin: 0 $space-3;
+  }
 
-.ticket-dash {
-  flex: 1;
-  border-top: 3rpx dashed rgba(255, 255, 255, 0.4);
-  margin: 0 $space-2;
-}
-
-.ticket-stats {
-  display: flex;
-  gap: $space-3;
-}
-
-.ticket-stat {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4rpx;
-
-  &-lbl {
+  &__lbl {
     font-size: 22rpx;
-    color: rgba(255, 255, 255, 0.7);
+    color: $text-hint;
+    line-height: 1.4;
   }
 
-  &-val {
+  &__val {
     font-size: $font-sm;
-    font-weight: 700;
-    color: $text-white;
+    font-weight: 600;
+    color: $text-primary;
+    line-height: 1.4;
   }
 }
 
-/* -------- 催办 -------- */
-.urge {
+/* 提示条 */
+.notice {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: $space-2;
-  padding: $space-3 $space-4;
-  background: $accent-lemon;
+  padding: $space-3;
+  background: $primary-bg;
   border-radius: $radius-md;
-  transform: rotate(-0.8deg);
 
-  &-icon {
+  &--warn {
+    align-items: center;
+    background: $warning-bg;
+  }
+
+  &__icon {
+    flex-shrink: 0;
     width: 36rpx;
     height: 36rpx;
   }
 
-  &-text {
+  &__dot {
+    flex-shrink: 0;
+    width: 10rpx;
+    height: 10rpx;
+    margin-top: 14rpx;
+    border-radius: 50%;
+    background: $primary;
+  }
+
+  &__text {
+    flex: 1;
     font-size: $font-sm;
-    font-weight: 700;
+    font-weight: 500;
     color: $text-primary;
+    line-height: 1.5;
+
+    &--sub {
+      font-size: $font-xs;
+      font-weight: 400;
+      color: $text-secondary;
+      line-height: 1.6;
+    }
   }
 }
 
-/* -------- 周期 -------- */
+/* 周期 */
 .cycle {
   display: flex;
   align-items: center;
   gap: $space-3;
 
   &-icon {
+    flex-shrink: 0;
     width: 72rpx;
     height: 72rpx;
-    border-radius: 24rpx;
+    border-radius: $radius-md;
     background: $success-bg;
     display: flex;
     align-items: center;
@@ -491,6 +489,8 @@ function goComplete() { uni.navigateTo({ url: `/pages/task/complete?id=${taskId}
   }
 
   &-info {
+    flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 4rpx;
@@ -498,7 +498,7 @@ function goComplete() { uni.navigateTo({ url: `/pages/task/complete?id=${taskId}
 
   &-title {
     font-size: $font-sm;
-    font-weight: 800;
+    font-weight: 600;
     color: $text-primary;
   }
 
@@ -508,13 +508,15 @@ function goComplete() { uni.navigateTo({ url: `/pages/task/complete?id=${taskId}
   }
 }
 
-/* -------- 执行人 -------- */
+/* 执行人 */
 .panel-count {
   font-size: $font-xs;
   color: $text-hint;
 }
 
 .panel-empty {
+  display: block;
+  padding: $space-2 0;
   font-size: $font-sm;
   color: $text-hint;
 }
@@ -522,119 +524,123 @@ function goComplete() { uni.navigateTo({ url: `/pages/task/complete?id=${taskId}
 .people {
   display: flex;
   flex-direction: column;
-  gap: $space-2;
 }
 
 .person {
   display: flex;
   align-items: center;
   gap: $space-3;
-  padding: $space-2 $space-3;
-  background: $bg-page;
-  border-radius: $radius-md;
+  min-height: 96rpx;
+  border-bottom: 1rpx solid $border-light;
+
+  &:last-child {
+    border-bottom: none;
+  }
 
   &-avatar {
-    width: 64rpx;
-    height: 64rpx;
+    flex-shrink: 0;
+    width: 60rpx;
+    height: 60rpx;
     border-radius: 50%;
-    background: $accent-lemon;
+    background: $primary-bg;
     display: flex;
     align-items: center;
     justify-content: center;
 
     &-text {
       font-size: $font-sm;
-      font-weight: 800;
-      color: $text-primary;
+      font-weight: 600;
+      line-height: 1;
+      color: $primary;
     }
   }
 
   &-name {
     flex: 1;
+    min-width: 0;
     font-size: $font-sm;
-    font-weight: 700;
+    font-weight: 500;
     color: $text-primary;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   &-status {
-    padding: 6rpx 18rpx;
-    border-radius: $radius-full;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    height: 44rpx;
+    padding: 0 16rpx;
+    border-radius: $radius-xs;
     font-size: 22rpx;
-    font-weight: 700;
+    font-weight: 600;
+    line-height: 1;
   }
 }
 
-/* -------- 完成记录 -------- */
+/* 完成记录 */
 .finish-remark {
   display: block;
   font-size: $font-sm;
   color: $text-primary;
   line-height: 1.7;
   margin-bottom: $space-3;
+  word-break: break-all;
 }
 
 .finish-images {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: $space-2;
+}
+
+.finish-cell {
+  position: relative;
+  padding-top: 100%;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  background: $bg-subtle;
 }
 
 .finish-img {
-  width: 200rpx;
-  height: 200rpx;
-  border-radius: $radius-md;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
-/* -------- 提示 -------- */
-.hint {
-  display: flex;
-  align-items: flex-start;
-  gap: $space-2;
-  padding: $space-3 $space-4;
-  background: $primary-bg;
-  border-radius: $radius-md;
-
-  &-tag {
-    flex-shrink: 0;
-    padding: 2rpx 14rpx;
-    border-radius: 8rpx;
-    background: $primary;
-    color: $text-white;
-    font-size: 22rpx;
-    font-weight: 800;
-  }
-
-  &-text {
-    font-size: $font-xs;
-    color: $text-secondary;
-    line-height: 1.6;
-  }
-}
-
-/* -------- 管理工具 -------- */
+/* 管理工具 */
 .tools {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: $space-2;
 }
 
 .tool {
-  padding: 16rpx 32rpx;
-  border-radius: $radius-full;
-  background: $bg-page;
-  border: 2rpx solid $border-color;
-  font-size: $font-xs;
-  font-weight: 700;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-sm;
+  background: $bg-card;
+  border: 1rpx solid $border-color;
+  font-size: $font-sm;
+  font-weight: 500;
   color: $text-primary;
+  line-height: 1;
+  box-sizing: border-box;
 
   &:active {
-    opacity: 0.7;
+    background: $bg-hover;
   }
 
   &--danger {
     color: $danger;
-    background: $danger-bg;
-    border-color: transparent;
+
+    &:active {
+      background: $danger-bg;
+    }
   }
 }
 

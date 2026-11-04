@@ -1,140 +1,97 @@
 <template>
   <view class="create-bill-page">
-    <!-- 顶部绿色渐变头部 -->
-    <view class="page-header">
-      <view class="header-inner">
-        <view class="header-back" @click="handleBack">
-          <image class="header-back-icon" src="/static/icons/chevron-right.png" mode="aspectFit" />
+    <view class="nav">
+      <view class="nav-inner">
+        <view class="nav-back" aria-label="返回" @click="handleBack">
+          <view class="nav-back__chevron"></view>
         </view>
-        <view class="header-title-group">
-          <text class="header-title">记一笔账</text>
-          <text class="header-subtitle">{{ autoTitle }}</text>
-        </view>
+        <text class="nav-title">记一笔账</text>
+        <view class="nav-placeholder"></view>
       </view>
     </view>
 
-    <!-- 可滚动表单区域 -->
-    <scroll-view class="form-scroll" scroll-y>
-      <!-- ===== 1. 金额输入（大号展示 + 快捷金额） ===== -->
-      <view class="card amount-card">
-        <view class="amount-input-wrap" :class="{ 'is-focused': amountFocused }">
+    <view class="form-body">
+      <view class="ui-panel amount-panel">
+        <text class="amount-label">{{ autoTitle }}</text>
+        <view class="amount-wrap" :class="{ 'is-focused': amountFocused }">
           <text class="amount-prefix">¥</text>
           <input
             v-model="form.amount"
             class="amount-input"
             type="digit"
             placeholder="0.00"
+            placeholder-class="amount-placeholder"
             maxlength="10"
             @focus="amountFocused = true"
             @blur="amountFocused = false"
           />
-          <view v-if="form.amount && Number(form.amount) > 0" class="amount-suffix" @click="form.amount = ''">
-            <text class="amount-clear">✕</text>
+          <view v-if="form.amount && Number(form.amount) > 0" class="amount-clear" aria-label="清空金额" @click="form.amount = ''">
+            <view class="amount-clear__x"></view>
           </view>
         </view>
       </view>
 
-      <!-- ===== 2. 分摊设置 ===== -->
-      <view class="card settings-card">
-        <view class="settings-row">
-          <text class="settings-label">消费类型</text>
-          <picker :range="billTypeOptions" :range-key="'label'" :value="typeIndex" @change="onTypeChange">
-            <view class="settings-picker">
-              <text class="settings-picker-value">{{ billTypeOptions[typeIndex].label }}</text>
-              <image class="settings-arrow" src="/static/icons/chevron-right.png" mode="aspectFit" />
+      <text class="ui-form-label">分摊设置</text>
+      <view class="ui-form-group">
+        <picker :range="billTypeOptions" :range-key="'label'" :value="typeIndex" @change="onTypeChange">
+          <view class="ui-row">
+            <text class="ui-row__label">消费类型</text>
+            <view class="ui-row__value">
+              <text>{{ billTypeOptions[typeIndex].label }}</text>
+              <view class="ui-row__arrow"></view>
             </view>
-          </picker>
-        </view>
-        <view class="settings-divider"></view>
-        <view class="settings-row">
-          <text class="settings-label">分摊方式</text>
-          <picker :range="splitTypeOptions" :range-key="'label'" :value="splitIndex" @change="onSplitChange">
-            <view class="settings-picker">
-              <text class="settings-picker-value">{{ splitTypeOptions[splitIndex].label }}</text>
-              <image class="settings-arrow" src="/static/icons/chevron-right.png" mode="aspectFit" />
+          </view>
+        </picker>
+        <picker :range="splitTypeOptions" :range-key="'label'" :value="splitIndex" @change="onSplitChange">
+          <view class="ui-row">
+            <text class="ui-row__label">分摊方式</text>
+            <view class="ui-row__value">
+              <text>{{ splitTypeOptions[splitIndex].label }}</text>
+              <view class="ui-row__arrow"></view>
             </view>
-          </picker>
-        </view>
-        <view class="settings-hint">
-          <text>{{ splitTypeHint }}</text>
-        </view>
+          </view>
+        </picker>
+        <text class="split-hint">{{ splitTypeHint }}</text>
       </view>
 
-      <!-- ===== 3. 成员选择（金额直接显示在列表中） ===== -->
-      <view class="card member-card">
-        <view class="member-header">
-          <view class="member-header-left">
-            <text class="member-title">成员分摊</text>
-            <text class="member-count-badge" v-if="selectedMembers.length > 0">
-              已选 {{ selectedMembers.length }}
+      <view class="label-row">
+        <text class="ui-form-label">成员分摊<text v-if="selectedMembers.length > 0" class="label-count"> · 已选 {{ selectedMembers.length }}</text></text>
+        <text v-if="members.length > 0" class="label-action" @click="selectedMembers.length < members.length ? selectAll() : deselectAll()">
+          {{ selectedMembers.length < members.length ? '全选' : '取消全选' }}
+        </text>
+      </view>
+      <view class="ui-form-group">
+        <view
+          v-for="member in members"
+          :key="member.user_id"
+          class="member-item"
+          :class="{ 'is-selected': isSelected(member.user_id) }"
+          @click="toggleMember(member.user_id)"
+        >
+          <view class="member-check" :class="{ 'is-on': isSelected(member.user_id) }">
+            <view class="member-check__mark"></view>
+          </view>
+          <view class="member-avatar" :class="getAvatarColorClass(member.user_id)">
+            <text class="member-avatar-text">{{ getAvatarText(member) }}</text>
+          </view>
+          <view class="member-info">
+            <text class="member-name">{{ member.nickname || `用户 #${member.user_id}` }}</text>
+            <text v-if="isSelected(member.user_id) && form.amount && Number(form.amount) > 0 && form.split_type !== 1" class="member-amount num">
+              ¥{{ getMemberAmount(member.user_id) }}
             </text>
           </view>
-          <view
-            v-if="selectedMembers.length < members.length"
-            class="select-all-btn"
-            @click="selectAll"
-          >
-            <text class="select-all-text">全选</text>
+          <view v-if="isSelected(member.user_id) && form.split_type === 1" class="split-box" @click.stop>
+            <text class="split-box__affix">¥</text>
+            <input v-model="memberAmounts[member.user_id]" class="split-box__input" type="digit" placeholder="0.00" />
           </view>
-          <view v-else class="select-all-btn is-active" @click="deselectAll">
-            <text class="select-all-text">取消全选</text>
+          <view v-else-if="isSelected(member.user_id) && form.split_type === 2" class="split-box" @click.stop>
+            <input v-model="memberRatios[member.user_id]" class="split-box__input" type="digit" placeholder="0" />
+            <text class="split-box__affix">%</text>
           </view>
         </view>
-
-        <view class="member-list">
-          <view
-            v-for="member in members"
-            :key="member.user_id"
-            class="member-item"
-            :class="{ 'is-selected': isSelected(member.user_id) }"
-            @click="toggleMember(member.user_id)"
-          >
-            <view class="member-left">
-              <view class="member-avatar" :class="getAvatarColorClass(member.user_id)">
-                <text class="member-avatar-text">{{ getAvatarText(member) }}</text>
-              </view>
-              <view class="member-info">
-                <text class="member-name">{{ member.nickname || `用户 #${member.user_id}` }}</text>
-                <text v-if="isSelected(member.user_id) && form.amount && Number(form.amount) > 0" class="member-amount-hint">
-                  ¥{{ getMemberAmount(member.user_id) }}
-                </text>
-              </view>
-            </view>
-
-            <view class="member-right" @click.stop>
-              <view v-if="isSelected(member.user_id) && form.split_type === 1" class="split-input-group">
-                <text class="split-input-prefix">¥</text>
-                <input
-                  v-model="memberAmounts[member.user_id]"
-                  class="split-input"
-                  type="digit"
-                  placeholder="0.00"
-                />
-              </view>
-              <view v-else-if="isSelected(member.user_id) && form.split_type === 2" class="split-input-group">
-                <input
-                  v-model="memberRatios[member.user_id]"
-                  class="split-input"
-                  type="digit"
-                  placeholder="0"
-                />
-                <text class="split-input-suffix">%</text>
-              </view>
-              <view class="member-check">
-                <view class="check-circle" :class="{ 'is-checked': isSelected(member.user_id) }">
-                  <text v-if="isSelected(member.user_id)" class="check-mark">✓</text>
-                </view>
-              </view>
-            </view>
-          </view>
-        </view>
-
-        <view v-if="members.length === 0" class="member-empty">
-          <text class="member-empty-text">暂无宿舍成员</text>
-        </view>
+        <view v-if="members.length === 0" class="member-empty">暂无宿舍成员</view>
       </view>
 
-      <!-- ===== 4. 校验警告（合并到一处） ===== -->
       <view v-if="form.amount && Number(form.amount) > 0 && selectedMembers.length > 0 && form.split_type === 1 && !isCustomAmountValid" class="warn-bar">
         <text class="warn-bar-text">分摊金额合计 ¥{{ currentTotalAmount.toFixed(2) }}，需等于 ¥{{ Number(form.amount).toFixed(2) }}</text>
       </view>
@@ -142,47 +99,27 @@
         <text class="warn-bar-text">百分比合计 {{ currentTotalPercent.toFixed(1) }}%，需等于 100%</text>
       </view>
 
-      <!-- ===== 5. 备注（折叠） ===== -->
-      <view class="card remark-card">
-        <view class="remark-header" @click="showRemark = !showRemark">
-          <view class="remark-header-left">
-            <text class="remark-title">备注</text>
-            <text class="remark-hint">选填</text>
-          </view>
-          <view class="remark-toggle" :class="{ 'is-expanded': showRemark }">
-            <text class="remark-toggle-icon">▼</text>
-          </view>
+      <text class="ui-form-label">备注</text>
+      <view class="ui-form-group">
+        <view class="ui-field">
+          <textarea v-model="form.remark" class="ui-textarea remark-textarea" placeholder="如：已付给房东、包含水费（选填）" maxlength="200" />
         </view>
-        <textarea
-          v-if="showRemark"
-          v-model="form.remark"
-          class="remark-textarea"
-          placeholder="如：已付给房东、包含水费..."
-          maxlength="200"
-        />
       </view>
 
-      <view class="bottom-spacer"></view>
-      <view class="bottom-safe"></view>
-    </scroll-view>
+      <view class="ui-bottom-spacer"></view>
+    </view>
 
-    <!-- ===== 底部固定创建按钮 ===== -->
-    <view class="bottom-bar">
-      <button
-        class="btn-create"
-        :disabled="!canSubmit || submitting"
-        :class="{ 'is-loading': submitting }"
-        @click="handleSubmit"
+    <view class="ui-bottom-bar">
+      <view class="bar-summary">
+        <text class="bar-summary__amount num">¥{{ form.amount && Number(form.amount) > 0 ? Number(form.amount).toFixed(2) : '0.00' }}</text>
+        <text class="bar-summary__sub">{{ selectedMembers.length }} 人分摊</text>
+      </view>
+      <view
+        class="ui-btn ui-btn--primary bar-btn"
+        :class="{ 'is-disabled': !canSubmit || submitting }"
+        @click="canSubmit && !submitting && handleSubmit()"
       >
-        <view v-if="!submitting" class="btn-create-inner">
-          <text class="btn-create-text">确认创建</text>
-        </view>
-        <view v-else class="loading-spinner"></view>
-      </button>
-      <view class="bottom-summary" v-if="form.amount && Number(form.amount) > 0">
-        <text class="bottom-summary-amount">¥{{ Number(form.amount).toFixed(2) }}</text>
-        <text class="bottom-summary-sep">·</text>
-        <text class="bottom-summary-members">{{ selectedMembers.length }} 人分摊</text>
+        {{ submitting ? '创建中...' : '确认创建' }}
       </view>
     </view>
   </view>
@@ -461,430 +398,305 @@ async function handleSubmit() {
 @use '@/styles/variables.scss' as *;
 
 .create-bill-page {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background-color: $bg-page;
+  min-height: 100vh;
+  background: $bg-page;
 }
 
-.page-header {
-  flex-shrink: 0;
-  background: linear-gradient(135deg, #EFFBF6, #E6FFFA);
-  border-bottom: 1rpx solid rgba($success, 0.06);
-}
-
-.header-inner {
-  display: flex;
-  align-items: center;
-  gap: $space-3;
-  padding: calc(var(--status-bar-height) + 20rpx) $space-4 $space-4;
-}
-
-.header-back {
-  width: 64rpx;
-  height: 64rpx;
-  border-radius: $radius-full;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba($text-white, 0.7);
-  flex-shrink: 0;
-  transition: $transition-fast;
-  &:active { background-color: $bg-hover; }
-}
-
-.header-back-icon {
-  width: 32rpx;
-  height: 32rpx;
-  transform: rotate(180deg);
-}
-
-.header-title-group {
-  display: flex;
-  flex-direction: column;
-  gap: $space-1;
-}
-
-.header-title {
-  font-size: 40rpx;
-  font-weight: 800;
-  color: $text-primary;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-}
-
-.header-subtitle {
-  font-size: $font-xs;
-  color: $text-hint;
-  font-weight: 500;
-}
-
-.form-scroll {
-  flex: 1;
-  padding: $space-4 $space-4 0;
-  box-sizing: border-box;
-}
-
-.card {
+/* 自定义导航 */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
   background: $bg-card;
-  border-radius: $radius-lg;
-  padding: $space-5;
-  margin-bottom: $space-4;
-  box-shadow: $shadow-sm;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 6rpx;
-    background: $success;
-    opacity: 0.4;
-    border-radius: 0 $radius-sm $radius-sm 0;
-  }
+  border-bottom: 1rpx solid $border-light;
+  padding-top: var(--status-bar-height, 0px);
 }
 
-// ===== 1. 金额输入 + 快捷金额 =====
-.amount-card {
-  padding: $space-5 $space-5 $space-4;
-  text-align: center;
-}
-
-.amount-input-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 120rpx;
-  padding: $space-4 $space-6;
-  border: 3rpx solid $border-color;
-  border-radius: $radius-xl;
-  transition: $transition-base;
-  background-color: $bg-hover;
-  box-sizing: border-box;
-
-  &.is-focused {
-    border-color: $success;
-    background-color: $bg-card;
-    box-shadow: 0 0 0 6rpx rgba($success, 0.1);
-  }
-
-  .amount-prefix {
-    font-size: 44rpx;
-    font-weight: 800;
-    color: $success;
-    margin-right: $space-2;
-    line-height: 1.2;
-    flex-shrink: 0;
-  }
-
-  .amount-input {
-    font-size: 52rpx;
-    font-weight: 800;
-    color: $text-primary;
-    border: none;
-    padding: 0;
-    margin: 0;
-    background: none;
-    flex: 1;
-    min-width: 0;
-    height: 72rpx;
-    line-height: 72rpx;
-    text-align: center;
-    box-sizing: border-box;
-    &::placeholder {
-      color: $border-color;
-      font-weight: 600;
-    }
-  }
-
-  .amount-suffix {
-    flex-shrink: 0;
-    width: 48rpx;
-    height: 48rpx;
-    border-radius: 50%;
-    background-color: $border-color;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    &:active { background-color: $text-hint; }
-    .amount-clear {
-      font-size: 24rpx;
-      color: $bg-card;
-      font-weight: 700;
-    }
-  }
-}
-
-// ===== 2. 分摊设置 =====
-.settings-card {
-  padding: $space-3 $space-5;
-}
-
-.settings-divider {
-  height: 1rpx;
-  background-color: $border-light;
-  margin: 0;
-}
-
-.settings-row {
+.nav-inner {
+  height: 88rpx;
+  padding: 0 $space-2;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: $space-3 0;
 }
 
-.settings-label {
-  font-size: $font-base;
+.nav-back,
+.nav-placeholder {
+  width: 72rpx;
+  height: 72rpx;
+  flex-shrink: 0;
+}
+
+.nav-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+
+  &:active {
+    background: $bg-hover;
+  }
+
+  &__chevron {
+    width: 18rpx;
+    height: 18rpx;
+    border-left: 4rpx solid $text-primary;
+    border-bottom: 4rpx solid $text-primary;
+    transform: translateX(4rpx) rotate(45deg);
+  }
+}
+
+.nav-title {
+  font-size: $font-md;
+  font-weight: 600;
   color: $text-primary;
-  font-weight: 500;
+  line-height: 1;
 }
 
-.settings-picker {
+.form-body {
+  padding-top: $space-3;
+}
+
+/* 金额 */
+.amount-panel {
+  margin: 0 $page-gutter;
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.amount-label {
+  font-size: $font-xs;
+  color: $text-secondary;
+  line-height: 1.4;
+}
+
+.amount-wrap {
   display: flex;
   align-items: center;
   gap: $space-2;
-  padding: $space-2 $space-3;
-  background-color: $bg-hover;
-  border-radius: $radius-sm;
-  &:active { opacity: 0.7; }
-  .settings-picker-value {
-    font-size: $font-base;
-    color: $primary;
-    font-weight: 600;
-  }
-  .settings-arrow {
-    width: 24rpx;
-    height: 24rpx;
-    opacity: 0.4;
+  height: 112rpx;
+  border-bottom: 2rpx solid $border-color;
+  transition: $transition-fast;
+
+  &.is-focused {
+    border-bottom-color: $primary;
   }
 }
 
-.settings-hint {
-  padding: $space-2 0 $space-1;
-  text {
-    font-size: $font-xs;
-    color: $text-hint;
-    line-height: 1.5;
-  }
-}
-
-// ===== 3. 成员选择 =====
-.member-card {
-  padding: $space-4 $space-4;
-}
-
-.member-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: $space-4;
-  padding: 0 $space-1;
-}
-
-.member-header-left {
-  display: flex;
-  align-items: center;
-  gap: $space-3;
-}
-
-.member-title {
-  font-size: $font-base;
+.amount-prefix {
+  flex-shrink: 0;
+  font-family: $font-num;
+  font-size: 48rpx;
   font-weight: 700;
+  line-height: 1;
   color: $text-primary;
 }
 
-.member-count-badge {
-  font-size: $font-xs;
-  color: $primary;
-  background-color: $primary-bg;
-  padding: $space-1 $space-3;
-  border-radius: $radius-full;
-  font-weight: 600;
+.amount-input {
+  flex: 1;
+  min-width: 0;
+  height: 112rpx;
+  font-family: $font-num;
+  font-size: 64rpx;
+  font-weight: 700;
+  color: $text-primary;
+  caret-color: $primary;
 }
 
-.select-all-btn {
-  padding: $space-1 $space-4;
-  border-radius: $radius-full;
-  border: 2rpx solid $primary;
-  transition: $transition-fast;
-  &:active { opacity: 0.6; }
-  &.is-active {
-    background-color: $primary-bg;
-    border-color: $primary;
-  }
-  .select-all-text {
-    font-size: $font-xs;
-    color: $primary;
-    font-weight: 600;
-  }
-}
-
-.member-list {
+.amount-clear {
+  flex-shrink: 0;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background: $text-hint;
   display: flex;
-  flex-direction: column;
-  gap: $space-3;
+  align-items: center;
+  justify-content: center;
+
+  &__x {
+    position: relative;
+    width: 16rpx;
+    height: 16rpx;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 3rpx;
+      margin-top: -1.5rpx;
+      background: $bg-card;
+    }
+
+    &::before { transform: rotate(45deg); }
+    &::after { transform: rotate(-45deg); }
+  }
 }
 
-.member-item {
+.split-hint {
+  display: block;
+  padding: $space-2 0 $space-3;
+  font-size: $font-xs;
+  color: $text-hint;
+  line-height: 1.5;
+}
+
+.label-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: $space-3 $space-3;
+  padding-right: $page-gutter;
+}
+
+.label-count {
+  color: $text-secondary;
+  font-weight: 500;
+}
+
+.label-action {
+  font-size: $font-xs;
+  font-weight: 600;
+  color: $primary;
+  padding: 8rpx 0;
+}
+
+/* 成员 */
+.member-item {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  min-height: 112rpx;
+  border-bottom: 1rpx solid $border-light;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.member-check {
+  flex-shrink: 0;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
   border: 2rpx solid $border-color;
-  border-radius: $radius-lg;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: $transition-fast;
-  background-color: $bg-card;
 
-  &.is-selected {
+  &.is-on {
+    background: $primary;
     border-color: $primary;
-    background-color: $primary-bg;
   }
 
-  .member-left {
-    display: flex;
-    align-items: center;
-    gap: $space-3;
-    flex: 1;
-    min-width: 0;
+  &__mark {
+    width: 16rpx;
+    height: 9rpx;
+    border-left: 3rpx solid $bg-card;
+    border-bottom: 3rpx solid $bg-card;
+    transform: translateY(-2rpx) rotate(-45deg);
+  }
+}
+
+.member-avatar {
+  flex-shrink: 0;
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $primary;
+
+  &-text {
+    font-size: $font-sm;
+    font-weight: 600;
+    line-height: 1;
+    color: $text-white;
   }
 
-  .member-avatar {
-    width: 64rpx;
-    height: 64rpx;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  &.avatar-purple { background: #2563EB; }
+  &.avatar-green { background: #12A150; }
+  &.avatar-amber { background: #D97706; }
+  &.avatar-blue { background: #0EA5E9; }
+  &.avatar-rose { background: #E5484D; }
+  &.avatar-teal { background: #0D9488; }
+}
+
+.member-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.member-name {
+  font-size: $font-sm;
+  font-weight: 500;
+  color: $text-primary;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.member-amount {
+  font-size: $font-xs;
+  color: $primary;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.split-box {
+  flex-shrink: 0;
+  width: 200rpx;
+  height: 72rpx;
+  padding: 0 $space-2;
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  background: $bg-subtle;
+  border: 1rpx solid $border-color;
+  border-radius: $radius-sm;
+  box-sizing: border-box;
+
+  &__affix {
     flex-shrink: 0;
-    font-weight: 700;
-    color: $text-white;
-    font-size: $font-base;
-
-    &.avatar-purple { background: linear-gradient(135deg, #2F7CF6, #5B9BFF); }
-    &.avatar-green { background: linear-gradient(135deg, #14B88A, #4FD1A5); }
-    &.avatar-amber { background: linear-gradient(135deg, #FF9F2E, #FFC83D); }
-    &.avatar-blue { background: linear-gradient(135deg, #22A6F2, #5CC2FF); }
-    &.avatar-rose { background: linear-gradient(135deg, #FF6B8B, #FF9AAE); }
-    &.avatar-teal { background: linear-gradient(135deg, #12B5A5, #3DD6C4); }
+    font-size: $font-sm;
+    color: $text-secondary;
+    line-height: 1;
   }
 
-  .member-avatar-text {
-    font-size: 28rpx;
-    font-weight: 700;
-    color: $text-white;
-  }
-
-  .member-info {
+  &__input {
     flex: 1;
     min-width: 0;
-  }
-
-  .member-name {
-    font-size: $font-base;
+    height: 72rpx;
+    font-family: $font-num;
+    font-size: $font-sm;
+    font-weight: 600;
     color: $text-primary;
-    font-weight: 600;
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .member-amount-hint {
-    font-size: $font-xs;
-    color: $success;
-    margin-top: $space-1;
-    display: block;
-    font-weight: 600;
-  }
-
-  .member-right {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-  }
-
-  .split-input-group {
-    display: flex;
-    align-items: center;
-    border: 2rpx solid $primary;
-    border-radius: $radius-sm;
-    overflow: hidden;
-    background-color: $bg-card;
-  }
-
-  .split-input-prefix {
-    font-size: $font-sm;
-    color: $primary;
-    font-weight: 600;
-    padding: 0 $space-1 0 $space-2;
-  }
-
-  .split-input {
-    width: 120rpx;
-    height: 56rpx;
-    padding: 0 $space-1;
-    font-size: $font-base;
-    text-align: center;
-    border: none;
-    background: none;
-    color: $primary;
-    font-weight: 600;
-  }
-
-  .split-input-suffix {
-    font-size: $font-sm;
-    color: $primary;
-    font-weight: 600;
-    padding: 0 $space-2 0 $space-1;
-  }
-
-  .member-check {
-    margin-left: $space-2;
-  }
-
-  .check-circle {
-    width: 44rpx;
-    height: 44rpx;
-    border-radius: 50%;
-    border: 3rpx solid $border-color;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: $transition-fast;
-
-    &.is-checked {
-      background-color: $primary;
-      border-color: $primary;
-      box-shadow: 0 2rpx 8rpx rgba($primary, 0.3);
-    }
-
-    .check-mark {
-      font-size: 24rpx;
-      color: $text-white;
-      font-weight: 700;
-      line-height: 1;
-    }
+    text-align: right;
+    caret-color: $primary;
   }
 }
 
 .member-empty {
-  padding: $space-8 0;
+  padding: $space-5 0;
   text-align: center;
-  .member-empty-text {
-    font-size: $font-sm;
-    color: $text-hint;
-  }
+  font-size: $font-sm;
+  color: $text-hint;
 }
 
-// ===== 4. 校验警告 =====
 .warn-bar {
-  padding: $space-3 $space-4;
-  background-color: $warning-bg;
-  border-radius: $radius-md;
-  margin-bottom: $space-4;
+  margin: $space-3 $page-gutter 0;
+  padding: $space-2 $space-3;
+  border-radius: $radius-sm;
+  background: $warning-bg;
 }
 
 .warn-bar-text {
@@ -893,176 +705,35 @@ async function handleSubmit() {
   line-height: 1.5;
 }
 
-// ===== 5. 备注 =====
-.remark-card {
-  padding: $space-3 $space-5;
-}
-
-.remark-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: $space-2 0;
-  cursor: pointer;
-  &:active { opacity: 0.7; }
-}
-
-.remark-header-left {
-  display: flex;
-  align-items: center;
-  gap: $space-2;
-}
-
-.remark-title {
-  font-size: $font-base;
-  color: $text-primary;
-  font-weight: 600;
-}
-
-.remark-hint {
-  font-size: $font-xs;
-  color: $text-hint;
-  font-weight: 400;
-}
-
-.remark-toggle {
-  width: 44rpx;
-  height: 44rpx;
-  border-radius: 50%;
-  background-color: $bg-hover;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: $transition-base;
-
-  &.is-expanded {
-    transform: rotate(180deg);
-    background-color: $primary-bg;
-  }
-
-  .remark-toggle-icon {
-    font-size: 20rpx;
-    color: $text-hint;
-    line-height: 1;
-  }
-}
-
 .remark-textarea {
-  width: 100%;
-  height: 140rpx;
-  padding: $space-3 $space-4;
-  font-size: $font-sm;
-  color: $text-primary;
-  border: 2rpx solid $border-color;
-  border-radius: $radius-md;
-  background-color: $bg-hover;
-  transition: $transition-base;
-  box-sizing: border-box;
-  margin-top: $space-3;
-
-  &:focus {
-    border-color: $primary;
-    background-color: $bg-card;
-  }
-
-  &::placeholder {
-    color: $text-hint;
-  }
+  height: 160rpx;
 }
 
-.bottom-spacer {
-  height: 260rpx;
-}
-
-.bottom-safe {
-  height: 40rpx;
-}
-
-.bottom-bar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: $space-3 $space-4;
-  padding-bottom: calc($space-3 + constant(safe-area-inset-bottom));
-  padding-bottom: calc($space-3 + env(safe-area-inset-bottom));
-  background: linear-gradient(transparent, $bg-page 20%);
-  z-index: 50;
+/* 底部栏 */
+.bar-summary {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: $space-2;
-}
-
-.btn-create {
-  width: 100%;
-  height: 100rpx;
-  border-radius: $radius-xl;
-  background: $primary-gradient;
-  box-shadow: 0 8rpx 32rpx rgba(47, 124, 246, 0.35);
-  border: none;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  transition: $transition-base;
+  gap: 4rpx;
 
-  &:active { opacity: 0.85; }
-
-  &[disabled] {
-    opacity: 0.5;
-    transform: none;
-    box-shadow: none;
+  &__amount {
+    font-size: $font-md;
+    font-weight: 700;
+    color: $text-primary;
+    line-height: 1.2;
   }
 
-  &.is-loading { opacity: 0.8; }
+  &__sub {
+    font-size: 22rpx;
+    color: $text-hint;
+    line-height: 1.3;
+  }
 }
 
-.btn-create-inner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn-create-text {
-  font-size: $font-base;
-  font-weight: 700;
-  color: $text-white;
-  letter-spacing: 0.02em;
-}
-
-.bottom-summary {
-  display: flex;
-  align-items: center;
-  gap: $space-2;
-  padding: $space-1 0;
-}
-
-.bottom-summary-amount {
-  font-size: $font-sm;
-  color: $text-primary;
-  font-weight: 600;
-}
-
-.bottom-summary-sep {
-  font-size: $font-sm;
-  color: $text-hint;
-}
-
-.bottom-summary-members {
-  font-size: $font-xs;
-  color: $text-hint;
-}
-
-.loading-spinner {
-  width: 40rpx;
-  height: 40rpx;
-  border: 4rpx solid rgba($text-white, 0.3);
-  border-top-color: $text-white;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.bar-btn {
+  flex: none;
+  width: 300rpx;
 }
 </style>

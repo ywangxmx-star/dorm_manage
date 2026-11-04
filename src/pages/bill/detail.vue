@@ -1,32 +1,27 @@
 <template>
-  <view class="bill-detail-page" v-if="bill">
-    <view class="receipt">
-      <view class="receipt-head">
-        <text class="receipt-type">{{ billTypeText }} · {{ splitTypeText }}</text>
-        <view class="receipt-stamp" :class="{ 'is-settled': bill.is_settled }">
+  <view class="detail-page" v-if="bill">
+    <view class="ui-panel summary">
+      <view class="summary-top">
+        <text class="summary-type">{{ billTypeText }} · {{ splitTypeText }}</text>
+        <view class="state-tag" :class="bill.is_settled ? 'state-tag--ok' : 'state-tag--wait'">
           <text>{{ bill.is_settled ? '已结清' : '收款中' }}</text>
         </view>
       </view>
-      <text class="receipt-title">{{ bill.title }}</text>
-      <view class="receipt-amount">
-        <text class="receipt-amount-lbl">总金额</text>
-        <text class="receipt-amount-num">{{ formatAmount(bill.amount) }}</text>
-      </view>
+      <text class="summary-title">{{ bill.title }}</text>
+      <text class="summary-amount num">{{ formatAmount(bill.amount) }}</text>
 
-      <view class="receipt-cut"></view>
-
-      <view class="mine-row" :class="{ 'is-settled': mySplitSettled }">
-        <view class="mine-row-left">
-          <text class="mine-row-lbl">我要付</text>
-          <text class="mine-row-num">{{ formatAmount(mySplitAmount) }}</text>
+      <view class="mine" :class="{ 'is-settled': mySplitSettled }">
+        <view class="mine-left">
+          <text class="mine-lbl">我要付</text>
+          <text class="mine-num num">{{ formatAmount(mySplitAmount) }}</text>
         </view>
-        <text class="mine-row-tag">{{ mySplitSettled ? '我已结清' : '我未结清' }}</text>
+        <text class="mine-tag">{{ mySplitSettled ? '我已结清' : '我未结清' }}</text>
       </view>
 
       <view class="progress">
         <view class="progress-top">
-          <text class="progress-lbl">收款进度 {{ paidCount }}/{{ bill.splits.length }}</text>
-          <text class="progress-lbl">已收 {{ formatAmount(totalPaid) }} · 待收 {{ formatAmount(totalUnpaid) }}</text>
+          <text class="progress-lbl">收款进度 <text class="num">{{ paidCount }}/{{ bill.splits.length }}</text></text>
+          <text class="progress-lbl num">已收 {{ formatAmount(totalPaid) }} · 待收 {{ formatAmount(totalUnpaid) }}</text>
         </view>
         <view class="progress-track">
           <view class="progress-fill" :style="{ width: (bill.splits.length ? paidCount / bill.splits.length * 100 : 0) + '%' }"></view>
@@ -36,28 +31,28 @@
 
     <text class="ui-form-label">账单信息</text>
     <view class="ui-form-group">
-      <view class="kv">
-        <text class="kv-k">消费类型</text>
-        <text class="kv-v">{{ billTypeText }}</text>
+      <view class="ui-row">
+        <text class="ui-row__label">消费类型</text>
+        <text class="ui-row__value">{{ billTypeText }}</text>
       </view>
-      <view class="kv">
-        <text class="kv-k">分摊方式</text>
-        <text class="kv-v">{{ splitTypeText }}</text>
+      <view class="ui-row">
+        <text class="ui-row__label">分摊方式</text>
+        <text class="ui-row__value">{{ splitTypeText }}</text>
       </view>
-      <view class="kv" v-if="bill.remark">
-        <text class="kv-k">备注</text>
-        <text class="kv-v">{{ bill.remark }}</text>
+      <view class="ui-row" v-if="bill.remark">
+        <text class="ui-row__label">备注</text>
+        <text class="ui-row__value remark-val">{{ bill.remark }}</text>
       </view>
-      <view class="kv">
-        <text class="kv-k">创建时间</text>
-        <text class="kv-v">{{ formatTime(bill.create_time) }}</text>
+      <view class="ui-row">
+        <text class="ui-row__label">创建时间</text>
+        <text class="ui-row__value num">{{ formatTime(bill.create_time) }}</text>
       </view>
     </view>
 
     <text class="ui-form-label">谁付了多少</text>
-    <view class="split-list">
-      <view class="split" v-for="split in bill.splits" :key="split.id" :class="{ 'is-paid': split.pay_status === 2 }">
-        <view class="split-avatar">
+    <view class="ui-form-group">
+      <view class="split" v-for="split in bill.splits" :key="split.id">
+        <view class="split-avatar" :class="{ 'is-paid': split.pay_status === 2 }">
           <text class="split-avatar-text">{{ (split.nickname || '用').charAt(0) }}</text>
         </view>
         <view class="split-info">
@@ -65,10 +60,10 @@
             <text class="split-name">{{ split.nickname || `用户 #${split.user_id}` }}</text>
             <text v-if="split.user_id === bill.creator_id" class="split-creator">发起人</text>
           </view>
-          <text class="split-amount">应付 {{ formatAmount(split.should_pay) }}</text>
+          <text class="split-amount num">应付 {{ formatAmount(split.should_pay) }}</text>
         </view>
         <view v-if="split.pay_status === 2" class="split-tag split-tag--paid">已付</view>
-        <view v-else-if="split.user_id === currentUserId" class="split-pay" @click="handlePay">去支付</view>
+        <view v-else-if="split.user_id === currentUserId" class="ui-btn ui-btn--primary ui-btn--sm split-pay" @click="handlePay">去支付</view>
         <view v-else class="split-tag split-tag--wait">未付</view>
       </view>
     </view>
@@ -180,218 +175,177 @@ async function handleDelete() {
 <style lang="scss" scoped>
 @use '@/styles/variables.scss' as *;
 
-.bill-detail-page {
+.detail-page {
   min-height: 100vh;
   background: $bg-page;
-  padding: $space-4 0 calc(env(safe-area-inset-bottom) + 60rpx);
+  padding: $space-3 0 calc(#{$space-8} + env(safe-area-inset-bottom));
+  box-sizing: border-box;
 }
 
-/* 小票 */
-.receipt {
-  margin: 0 $space-5;
-  padding: $space-5;
-  background: $bg-card;
-  border-radius: $radius-xl;
-  box-shadow: $shadow-md;
+.summary {
+  margin: 0 $page-gutter;
   display: flex;
   flex-direction: column;
-  gap: $space-3;
-
-  &-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  &-type {
-    font-size: $font-xs;
-    font-weight: 700;
-    color: $primary;
-    padding: 8rpx 20rpx;
-    background: $primary-bg;
-    border-radius: $radius-full;
-  }
-
-  &-stamp {
-    padding: 8rpx 20rpx;
-    border: 3rpx solid $warning;
-    border-radius: $radius-sm;
-    color: $warning;
-    font-size: $font-xs;
-    font-weight: 900;
-    transform: rotate(6deg);
-
-    &.is-settled {
-      border-color: $success;
-      color: $success;
-    }
-  }
-
-  &-title {
-    font-size: 44rpx;
-    font-weight: 900;
-    color: $text-primary;
-    line-height: 1.3;
-  }
-
-  &-amount {
-    display: flex;
-    flex-direction: column;
-    gap: 4rpx;
-
-    &-lbl {
-      font-size: $font-xs;
-      color: $text-hint;
-    }
-
-    &-num {
-      font-size: 80rpx;
-      font-weight: 900;
-      color: $text-primary;
-      letter-spacing: -0.02em;
-      line-height: 1.1;
-    }
-  }
-
-  &-cut {
-    height: 0;
-    border-top: 3rpx dashed $border-color;
-    margin: $space-1 0;
-  }
+  gap: $space-1;
 }
 
-.mine-row {
+.summary-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: $space-3 $space-4;
-  background: $accent-lemon;
-  border-radius: $radius-lg;
+  gap: $space-2;
+}
 
-  &.is-settled {
-    background: $success-bg;
-  }
+.summary-type {
+  font-size: $font-xs;
+  color: $text-secondary;
+  line-height: 1.4;
+}
+
+.state-tag {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  height: 44rpx;
+  padding: 0 16rpx;
+  border-radius: $radius-xs;
+  font-size: 22rpx;
+  font-weight: 600;
+  line-height: 1;
+
+  &--ok { color: $success; background: $success-bg; }
+  &--wait { color: $warning; background: $warning-bg; }
+}
+
+.summary-title {
+  margin-top: $space-1;
+  font-size: $font-md;
+  font-weight: 600;
+  color: $text-primary;
+  line-height: 1.4;
+  word-break: break-all;
+}
+
+.summary-amount {
+  font-size: $font-xl;
+  font-weight: 700;
+  color: $text-primary;
+  line-height: 1.2;
+}
+
+.mine {
+  margin-top: $space-3;
+  padding: $space-3;
+  border-radius: $radius-md;
+  background: $primary-bg;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-2;
 
   &-left {
     display: flex;
     align-items: baseline;
     gap: $space-2;
+    min-width: 0;
   }
 
   &-lbl {
     font-size: $font-xs;
-    font-weight: 700;
-    color: $text-primary;
+    color: $text-secondary;
   }
 
   &-num {
-    font-size: $font-xl;
-    font-weight: 900;
-    color: $text-primary;
+    font-size: $font-md;
+    font-weight: 700;
+    color: $primary;
   }
 
   &-tag {
-    font-size: $font-xs;
-    font-weight: 700;
-    color: $text-primary;
+    flex-shrink: 0;
+    font-size: 22rpx;
+    font-weight: 600;
+    color: $primary;
+  }
+
+  &.is-settled {
+    background: $success-bg;
+
+    .mine-num,
+    .mine-tag { color: $success; }
   }
 }
 
 .progress {
+  margin-top: $space-3;
   display: flex;
   flex-direction: column;
-  gap: 12rpx;
+  gap: $space-2;
 
   &-top {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    gap: $space-2;
+    flex-wrap: wrap;
+    gap: 8rpx $space-2;
   }
 
   &-lbl {
     font-size: 22rpx;
     color: $text-secondary;
+    line-height: 1.4;
   }
 
   &-track {
-    height: 16rpx;
-    background: $border-light;
+    height: 10rpx;
     border-radius: $radius-full;
+    background: $bg-hover;
     overflow: hidden;
   }
 
   &-fill {
     height: 100%;
-    background: $success;
     border-radius: $radius-full;
-    transition: width 0.4s ease;
+    background: $success;
+    transition: width 0.3s ease;
   }
 }
 
-/* 信息 */
-.kv {
-  display: flex;
-  justify-content: space-between;
-  gap: $space-4;
-  padding: $space-3 0;
-  border-bottom: 2rpx dashed $border-color;
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  &-k {
-    flex-shrink: 0;
-    font-size: $font-sm;
-    color: $text-secondary;
-  }
-
-  &-v {
-    font-size: $font-sm;
-    font-weight: 700;
-    color: $text-primary;
-    text-align: right;
-    word-break: break-all;
-  }
-}
-
-/* 分摊 */
-.split-list {
-  display: flex;
-  flex-direction: column;
-  gap: $space-2;
-  padding: 0 $space-5;
+.remark-val {
+  white-space: normal;
+  word-break: break-all;
 }
 
 .split {
   display: flex;
   align-items: center;
   gap: $space-3;
-  padding: $space-3 $space-4;
-  background: $bg-card;
-  border-radius: $radius-lg;
-  border: 2rpx solid $border-light;
+  min-height: 112rpx;
+  border-bottom: 1rpx solid $border-light;
 
-  &.is-paid {
-    opacity: 0.75;
-  }
+  &:last-child { border-bottom: none; }
 }
 
 .split-avatar {
-  width: 72rpx;
-  height: 72rpx;
+  flex-shrink: 0;
+  width: 64rpx;
+  height: 64rpx;
   border-radius: 50%;
-  background: $primary;
+  background: $bg-hover;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+
+  &.is-paid { background: $success-bg; }
 
   &-text {
     font-size: $font-sm;
-    font-weight: 800;
-    color: $text-white;
+    font-weight: 600;
+    line-height: 1;
+    color: $text-secondary;
   }
+
+  &.is-paid &-text { color: $success; }
 }
 
 .split-info {
@@ -405,70 +359,77 @@ async function handleDelete() {
 .split-name-row {
   display: flex;
   align-items: center;
-  gap: $space-2;
+  gap: $space-1;
+  min-width: 0;
 }
 
 .split-name {
   font-size: $font-sm;
-  font-weight: 700;
+  font-weight: 500;
   color: $text-primary;
+  line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .split-creator {
-  padding: 2rpx 12rpx;
-  border-radius: $radius-full;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  height: 32rpx;
+  padding: 0 10rpx;
+  border-radius: 6rpx;
   background: $primary-bg;
   color: $primary;
   font-size: 20rpx;
-  font-weight: 700;
+  font-weight: 600;
+  line-height: 1;
 }
 
 .split-amount {
   font-size: $font-xs;
-  color: $text-secondary;
+  color: $text-hint;
+  line-height: 1.3;
 }
 
 .split-tag {
   flex-shrink: 0;
-  padding: 8rpx 20rpx;
-  border-radius: $radius-full;
-  font-size: $font-xs;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  height: 44rpx;
+  padding: 0 16rpx;
+  border-radius: $radius-xs;
+  font-size: 22rpx;
+  font-weight: 600;
+  line-height: 1;
 
-  &--paid {
-    background: $success-bg;
-    color: $success;
-  }
-
-  &--wait {
-    background: $warning-bg;
-    color: $warning;
-  }
+  &--paid { color: $success; background: $success-bg; }
+  &--wait { color: $text-secondary; background: $bg-hover; }
 }
 
 .split-pay {
-  flex-shrink: 0;
-  padding: 14rpx 32rpx;
-  border-radius: $radius-full;
-  background: $primary;
-  color: $text-white;
-  font-size: $font-xs;
-  font-weight: 800;
-  box-shadow: $shadow-primary;
+  flex: none;
+  width: auto;
 }
 
 .delete-section {
-  padding: $space-6 $space-5 0;
+  margin: $space-6 $page-gutter 0;
 }
 
 .delete-btn {
-  text-align: center;
-  padding: $space-3 0;
-  font-size: $font-sm;
-  font-weight: 700;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-md;
+  background: $bg-card;
+  border: 1rpx solid $border-color;
   color: $danger;
+  font-size: $font-sm;
+  font-weight: 500;
+  line-height: 1;
+
+  &:active { background: $danger-bg; }
 }
 </style>

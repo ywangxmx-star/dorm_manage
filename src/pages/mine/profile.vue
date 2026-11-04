@@ -1,29 +1,27 @@
 <template>
-  <view class="profile-page">
-    <view class="form card slide-up">
-      <!-- 头像 -->
-      <view class="avatar-section" @click="chooseAvatar">
-        <text class="section-label">头像</text>
-        <view class="avatar-right">
+  <view class="page">
+    <text class="ui-form-label">个人资料</text>
+    <view class="ui-form-group">
+      <view class="ui-row avatar-row" @click="chooseAvatar">
+        <text class="ui-row__label">头像</text>
+        <view class="ui-row__value">
           <image v-if="avatarPreview" :src="avatarPreview" class="avatar-img" mode="aspectFill" />
-          <view v-else class="avatar-placeholder">
-            <text>{{ nicknameFirst }}</text>
-          </view>
-          <image class="arrow-img" src="/static/icons/chevron-right.png" mode="aspectFill" />
+          <view v-else class="avatar-placeholder"><text class="avatar-placeholder__text">{{ nicknameFirst }}</text></view>
+          <view class="ui-row__arrow"></view>
         </view>
       </view>
-
-      <!-- 昵称 -->
-      <view class="field-section">
-        <text class="section-label">昵称</text>
-        <input v-model="nickname" class="field-input" placeholder="请输入昵称" maxlength="20" />
+      <view class="ui-field">
+        <text class="ui-field__label">昵称</text>
+        <input v-model="nickname" class="ui-input" placeholder="请输入昵称" maxlength="20" />
       </view>
     </view>
 
-    <button class="btn-primary save-btn" :class="{ 'is-loading': saving }" :disabled="!nickname.trim()" @click="handleSave">
-      <text v-if="!saving">保存</text>
-      <view v-else class="loading-spinner spinner-sm"></view>
-    </button>
+    <view class="ui-bottom-spacer"></view>
+    <view class="ui-bottom-bar">
+      <view class="ui-btn ui-btn--primary" :class="{ 'is-disabled': !nickname.trim() || saving }" @click="nickname.trim() && !saving && handleSave()">
+        {{ saving ? '保存中...' : '保存' }}
+      </view>
+    </view>
   </view>
 </template>
 
@@ -85,97 +83,35 @@ async function handleSave() {
 <style lang="scss" scoped>
 @use '@/styles/variables.scss' as *;
 
-.profile-page {
-  padding: $space-4;
+.page {
   min-height: 100vh;
   background: $bg-page;
+  padding-top: $space-1;
 }
 
-.form {
-  padding: 0;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 6rpx;
-    background: $primary;
-    opacity: 0.4;
-    border-radius: 0 $radius-sm $radius-sm 0;
-  }
+.avatar-row {
+  min-height: 128rpx;
 }
 
-.avatar-section {
+.avatar-img,
+.avatar-placeholder {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.avatar-placeholder {
+  background: $primary;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: $space-5;
-  border-bottom: 1rpx solid $border-light;
+  justify-content: center;
 
-  .section-label {
-    font-size: $font-base;
-    color: $text-primary;
-    font-weight: 500;
-  }
-
-  .avatar-right {
-    display: flex;
-    align-items: center;
-    gap: $space-3;
-  }
-
-  .avatar-img {
-    width: 96rpx;
-    height: 96rpx;
-    border-radius: 50%;
-    border: 2rpx solid $border-light;
-  }
-
-  .avatar-placeholder {
-    width: 96rpx;
-    height: 96rpx;
-    border-radius: 50%;
-    background: linear-gradient(135deg, $primary-light, $primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: $text-white;
+  &__text {
     font-size: $font-md;
     font-weight: 600;
+    line-height: 1;
+    color: $text-white;
   }
-
-  .arrow-img {
-    width: 32rpx;
-    height: 32rpx;
-  }
-}
-
-.field-section {
-  display: flex;
-  align-items: center;
-  padding: $space-5;
-
-  .section-label {
-    font-size: $font-base;
-    color: $text-primary;
-    font-weight: 500;
-    width: 120rpx;
-    flex-shrink: 0;
-  }
-
-  .field-input {
-    flex: 1;
-    font-size: $font-base;
-    color: $text-primary;
-    text-align: right;
-  }
-}
-
-.save-btn {
-  margin-top: $space-5;
 }
 </style>

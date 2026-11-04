@@ -1,105 +1,116 @@
 <template>
-  <view class="page">
-    <view class="intro">
-      <text class="intro-title">{{ isEdit ? '改一改这个任务' : '新任务来啦' }}</text>
-      <text class="intro-sub">分配给室友，到点自动提醒</text>
+  <view class="ui-page">
+    <view class="ui-header">
+      <text class="ui-header__title">{{ isEdit ? '编辑任务' : '新建任务' }}</text>
+      <text class="ui-header__sub">分配给室友，到点自动提醒</text>
     </view>
 
-    <text class="ui-form-label">做什么</text>
+    <text class="ui-form-label">基本信息</text>
     <view class="ui-form-group">
-      <view class="title-row">
-        <input v-model="form.title" class="input-title" placeholder="比如：倒垃圾、拖地" maxlength="12" />
-        <text class="count">{{ form.title.length }}/12</text>
+      <view class="ui-field">
+        <view class="ui-field__hd">
+          <text class="ui-field__label">任务名称<text class="ui-field__required">*</text></text>
+          <text class="ui-field__count">{{ form.title.length }}/12</text>
+        </view>
+        <input v-model="form.title" class="ui-input" placeholder="比如：倒垃圾、拖地" maxlength="12" />
       </view>
-      <view class="desc-wrap">
-        <textarea v-model="form.description" class="input-desc" placeholder="补充一下具体要求（选填）" maxlength="500" />
-        <text class="count count--desc">{{ form.description.length }}/500</text>
+      <view class="ui-field">
+        <view class="ui-field__hd">
+          <text class="ui-field__label">任务说明</text>
+          <text class="ui-field__count">{{ form.description.length }}/500</text>
+        </view>
+        <textarea v-model="form.description" class="ui-textarea" placeholder="补充一下具体要求（选填）" maxlength="500" />
       </view>
     </view>
 
     <view class="label-row">
-      <text class="ui-form-label">谁来做</text>
+      <text class="ui-form-label">执行人</text>
       <text class="label-extra">已选 {{ selectedExecutorIds.length }} 人</text>
     </view>
-    <view v-if="members.length > 0" class="member-grid">
-      <view
-        v-for="m in members"
-        :key="m.user_id"
-        class="member-chip"
-        :class="{ 'is-active': selectedExecutorIds.includes(m.user_id) }"
-        @click="toggleExecutor(m.user_id)"
-      >
-        <view class="member-avatar" :style="{ background: getAvatarColor(m.nickname) }">
-          <text class="member-avatar-text">{{ m.nickname.charAt(0) }}</text>
-          <view v-if="selectedExecutorIds.includes(m.user_id)" class="member-check">✓</view>
+    <view class="ui-form-group member-group">
+      <view v-if="members.length > 0" class="member-grid">
+        <view
+          v-for="m in members"
+          :key="m.user_id"
+          class="member-chip"
+          :class="{ 'is-active': selectedExecutorIds.includes(m.user_id) }"
+          @click="toggleExecutor(m.user_id)"
+        >
+          <view class="member-avatar" :style="{ background: getAvatarColor(m.nickname) }">
+            <text class="member-avatar-text">{{ m.nickname.charAt(0) }}</text>
+          </view>
+          <text class="member-name">{{ m.nickname }}</text>
+          <view class="member-check" :class="{ 'is-on': selectedExecutorIds.includes(m.user_id) }">
+            <view class="member-check__mark"></view>
+          </view>
         </view>
-        <text class="member-name">{{ m.nickname }}</text>
       </view>
-    </view>
-    <view v-else class="ui-form-group empty-text">暂无成员</view>
-
-    <text class="ui-form-label">有多急</text>
-    <view class="priority-row">
-      <view
-        v-for="opt in priorityOptions"
-        :key="opt.value"
-        class="priority-pill"
-        :class="{ 'is-active': form.priority === opt.value }"
-        :style="form.priority === opt.value ? { backgroundColor: opt.color, borderColor: opt.color } : {}"
-        @click="form.priority = opt.value"
-      >
-        <view class="priority-dot" :style="{ backgroundColor: form.priority === opt.value ? '#FFFFFF' : opt.color }"></view>
-        <text>{{ opt.label }}</text>
-      </view>
+      <view v-else class="empty-text">暂无成员</view>
     </view>
 
-    <text class="ui-form-label">什么时候</text>
+    <text class="ui-form-label">优先级</text>
+    <view class="ui-form-group choice-group">
+      <view class="ui-choice-row">
+        <view
+          v-for="opt in priorityOptions"
+          :key="opt.value"
+          class="ui-choice"
+          :class="{ 'is-active': form.priority === opt.value }"
+          @click="form.priority = opt.value"
+        >
+          <view class="priority-dot" :style="{ backgroundColor: opt.color }"></view>
+          <text>{{ opt.label }}</text>
+        </view>
+      </view>
+    </view>
+
+    <text class="ui-form-label">时间设置</text>
     <view class="ui-form-group">
       <picker mode="multiSelector" :range="dateTimeRange" :value="dateTimeValue" @change="onDeadlineChange">
-        <view class="row">
-          <text class="row-label">截止时间</text>
-          <view class="row-value">
-            <text>{{ deadlineText }}</text>
-            <text class="row-arrow">›</text>
+        <view class="ui-row">
+          <text class="ui-row__label">截止时间</text>
+          <view class="ui-row__value">
+            <text class="num">{{ deadlineText }}</text>
+            <view class="ui-row__arrow"></view>
           </view>
         </view>
       </picker>
-      <view class="row">
-        <view class="row-label-group">
-          <text class="row-label">周期任务</text>
-          <text class="row-hint">适合值日、轮流打扫</text>
+      <view class="ui-row">
+        <view class="ui-row__label-group">
+          <text class="ui-row__label">周期任务</text>
+          <text class="ui-row__hint">适合值日、轮流打扫</text>
         </view>
-        <switch :checked="form.is_cycle" @change="form.is_cycle = $event.detail.value" color="#2F7CF6" />
+        <switch :checked="form.is_cycle" @change="form.is_cycle = $event.detail.value" color="#2563EB" />
       </view>
       <template v-if="form.is_cycle">
         <picker :range="cycleTypes" :range-key="'label'" :value="cycleIndex" @change="onCycleChange">
-          <view class="row row--sub">
-            <text class="row-label">重复频率</text>
-            <view class="row-value">
+          <view class="ui-row ui-row--sub">
+            <text class="ui-row__label">重复频率</text>
+            <view class="ui-row__value">
               <text>{{ cycleTypes[cycleIndex].label }}</text>
-              <text class="row-arrow">›</text>
+              <view class="ui-row__arrow"></view>
             </view>
           </view>
         </picker>
         <picker v-if="cycleTypes[cycleIndex].value === 'monthly'" :range="dayOfMonthRange" :value="dayOfMonthIndex" @change="onDayOfMonthChange">
-          <view class="row row--sub">
-            <text class="row-label">每月几号</text>
-            <view class="row-value">
+          <view class="ui-row ui-row--sub">
+            <text class="ui-row__label">每月几号</text>
+            <view class="ui-row__value">
               <text>{{ dayOfMonthRange[dayOfMonthIndex] }} 号</text>
-              <text class="row-arrow">›</text>
+              <view class="ui-row__arrow"></view>
             </view>
           </view>
         </picker>
-        <view class="row row--sub">
-          <text class="row-label">设置结束时间</text>
-          <switch :checked="hasCycleEnd" @change="hasCycleEnd = $event.detail.value" color="#2F7CF6" />
+        <view class="ui-row ui-row--sub">
+          <text class="ui-row__label">设置结束时间</text>
+          <switch :checked="hasCycleEnd" @change="hasCycleEnd = $event.detail.value" color="#2563EB" />
         </view>
         <picker v-if="hasCycleEnd" mode="date" :value="cycleEndDate" @change="onCycleEndDateChange">
-          <view class="row row--sub">
-            <text class="row-label">结束日期</text>
-            <view class="row-value">
+          <view class="ui-row ui-row--sub">
+            <text class="ui-row__label">结束日期</text>
+            <view class="ui-row__value" :class="{ 'is-empty': !cycleEndDate }">
               <text>{{ cycleEndDate || '请选择' }}</text>
-              <text class="row-arrow">›</text>
+              <view class="ui-row__arrow"></view>
             </view>
           </view>
         </picker>
@@ -108,10 +119,10 @@
 
     <view class="ui-bottom-spacer"></view>
 
-    <view class="ui-bottom-bar bar">
-      <text class="bar-hint">发布后将通知所有执行人</text>
+    <view class="ui-bottom-bar ui-bottom-bar--stack">
+      <text class="ui-bottom-bar__hint">发布后将通知所有执行人</text>
       <view
-        class="ui-btn ui-btn--primary bar-btn"
+        class="ui-btn ui-btn--primary"
         :class="{ 'is-disabled': !canSubmit || submitting }"
         @click="handleSubmit"
       >
@@ -303,101 +314,41 @@ async function handleSubmit() {
 <style lang="scss" scoped>
 @use '@/styles/variables.scss' as *;
 
-.page {
-  min-height: 100vh;
-  background: $bg-page;
-  padding-top: $space-4;
-}
-
-.intro {
-  padding: 0 $space-5 $space-2;
-  display: flex;
-  flex-direction: column;
-  gap: 6rpx;
-
-  &-title {
-    font-size: 48rpx;
-    font-weight: 900;
-    color: $text-primary;
-    letter-spacing: -0.02em;
-  }
-
-  &-sub {
-    font-size: $font-sm;
-    color: $text-secondary;
-  }
-}
-
 .label-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-right: $space-5;
+  padding-right: $page-gutter;
 }
 
 .label-extra {
   font-size: $font-xs;
-  font-weight: 700;
-  color: $primary;
+  font-weight: 500;
+  color: $text-secondary;
 }
 
-.title-row {
-  display: flex;
-  align-items: center;
-  gap: $space-2;
-  padding: $space-2 0;
-  border-bottom: 2rpx dashed $border-color;
+.member-group,
+.choice-group {
+  padding-top: $space-4;
+  padding-bottom: $space-4;
 }
 
-.input-title {
-  flex: 1;
-  height: 88rpx;
-  font-size: 40rpx;
-  font-weight: 800;
-  color: $text-primary;
-}
-
-.count {
-  font-size: 22rpx;
-  color: $text-hint;
-
-  &--desc {
-    display: block;
-    text-align: right;
-    padding-bottom: $space-2;
-  }
-}
-
-.desc-wrap {
-  padding-top: $space-2;
-}
-
-.input-desc {
-  width: 100%;
-  height: 160rpx;
-  font-size: $font-sm;
-  color: $text-primary;
-  line-height: 1.6;
-}
-
-/* 执行人宫格 */
 .member-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $space-3;
-  padding: 0 $space-5 $space-4;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $space-2;
 }
 
 .member-chip {
-  width: 140rpx;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 10rpx;
-  padding: $space-3 0;
+  gap: $space-2;
+  height: 88rpx;
+  padding: 0 $space-3 0 $space-2;
+  border-radius: $radius-sm;
   background: $bg-card;
-  border-radius: $radius-lg;
-  border: 3rpx solid $border-light;
+  border: 1rpx solid $border-color;
+  box-sizing: border-box;
   transition: $transition-fast;
 
   &.is-active {
@@ -407,152 +358,69 @@ async function handleSubmit() {
 }
 
 .member-avatar {
-  position: relative;
-  width: 80rpx;
-  height: 80rpx;
+  flex-shrink: 0;
+  width: 56rpx;
+  height: 56rpx;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
 
   &-text {
-    font-size: $font-md;
-    font-weight: 800;
+    font-size: $font-sm;
+    font-weight: 600;
+    line-height: 1;
     color: $text-white;
   }
 }
 
-.member-check {
-  position: absolute;
-  right: -8rpx;
-  bottom: -8rpx;
-  width: 36rpx;
-  height: 36rpx;
-  border-radius: 50%;
-  background: $accent-lemon;
-  border: 4rpx solid $bg-card;
-  color: $text-primary;
-  font-size: 20rpx;
-  font-weight: 900;
-  line-height: 36rpx;
-  text-align: center;
-}
-
 .member-name {
-  max-width: 120rpx;
-  font-size: $font-xs;
-  font-weight: 600;
+  flex: 1;
+  min-width: 0;
+  font-size: $font-sm;
+  font-weight: 500;
   color: $text-primary;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.empty-text {
-  padding: $space-4;
-  font-size: $font-sm;
-  color: $text-hint;
-  text-align: center;
-}
-
-/* 优先级 */
-.priority-row {
-  display: flex;
-  gap: $space-2;
-  padding: 0 $space-5 $space-4;
-}
-
-.priority-pill {
-  flex: 1;
-  height: 80rpx;
+.member-check {
+  flex-shrink: 0;
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  border: 2rpx solid $border-color;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10rpx;
-  border-radius: $radius-full;
-  background: $bg-card;
-  border: 3rpx solid $border-color;
-  font-size: $font-sm;
-  font-weight: 700;
-  color: $text-primary;
 
-  &.is-active {
-    color: $text-white;
+  &.is-on {
+    background: $primary;
+    border-color: $primary;
+  }
+
+  &__mark {
+    width: 14rpx;
+    height: 8rpx;
+    border-left: 3rpx solid $bg-card;
+    border-bottom: 3rpx solid $bg-card;
+    transform: translateY(-2rpx) rotate(-45deg);
   }
 }
 
-.priority-dot {
-  width: 14rpx;
-  height: 14rpx;
-  border-radius: 50%;
-}
-
-/* 设置行 */
-.row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: $space-3;
-  min-height: 104rpx;
-  border-bottom: 2rpx dashed $border-color;
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  &--sub {
-    padding-left: $space-3;
-  }
-}
-
-picker:last-child .row {
-  border-bottom: none;
-}
-
-.row-label-group {
-  display: flex;
-  flex-direction: column;
-  gap: 2rpx;
-}
-
-.row-label {
+.empty-text {
+  padding: $space-3 0;
   font-size: $font-sm;
-  font-weight: 700;
-  color: $text-primary;
-}
-
-.row-hint {
-  font-size: 22rpx;
-  color: $text-hint;
-}
-
-.row-value {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-  font-size: $font-sm;
-  color: $text-secondary;
-}
-
-.row-arrow {
-  font-size: $font-md;
-  color: $text-hint;
-}
-
-/* 底栏 */
-.bar {
-  flex-direction: column;
-  align-items: stretch;
-  gap: $space-2;
-}
-
-.bar-hint {
-  font-size: 22rpx;
   color: $text-hint;
   text-align: center;
 }
 
-.bar-btn {
-  flex: none;
+.priority-dot {
+  flex-shrink: 0;
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
 }
 </style>
