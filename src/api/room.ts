@@ -1,4 +1,4 @@
-import { get, post, del } from './request'
+import { get, post, put, del } from './request'
 import type { ApiResponse, PageData } from '@/types/api'
 import type { CreateRoomParams, Member, Room } from '@/types/room'
 
@@ -36,4 +36,8 @@ export function leaveRoom(roomId: number): Promise<ApiResponse<null>> {
 
 export function transferOwnership(roomId: number, targetUserId: number): Promise<ApiResponse<Room>> {
   return post<Room>(`/rooms/${roomId}/transfer`, { target_user_id: targetUserId })
+}
+
+export function updateRoom(roomId: number, data: Partial<CreateRoomParams>): Promise<ApiResponse<Room>> {
+  return put<Room>(`/rooms/${roomId}`, data)
 }

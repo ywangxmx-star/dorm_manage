@@ -23,7 +23,29 @@
         <view class="room-hero-content">
           <text class="room-name">{{ room.room_name }}</text>
           <view class="room-type-tag tag tag-primary">{{ roomTypeText }}</view>
-          <text class="room-notice" v-if="room.notice">{{ room.notice }}</text>
+          <view class="notice-row" v-if="!editingNotice && (room.notice || isOwner)" @click="isOwner ? startEditNotice() : undefined">
+            <text class="room-notice">{{ room.notice || (isOwner ? '点击编辑公告' : '') }}</text>
+            <text v-if="isOwner" class="edit-hint">编辑</text>
+          </view>
+          <view class="notice-edit" v-if="editingNotice">
+            <textarea
+              v-model="noticeDraft"
+              class="notice-textarea"
+              placeholder="请输入公告"
+              maxlength="100"
+              @input="onNoticeInput"
+            />
+            <view class="notice-edit-actions">
+              <text class="notice-count">{{ noticeDraft.length }}/100</text>
+              <view class="action-btns">
+                <button class="btn-outline btn-sm" @click="cancelEditNotice">取消</button>
+                <button class="btn-primary btn-sm" :disabled="savingNotice" @click="saveNotice">
+                  <text v-if="!savingNotice">保存</text>
+                  <view v-else class="loading-spinner spinner-sm"></view>
+                </button>
+              </view>
+            </view>
+          </view>
         </view>
       </view>
 
@@ -45,6 +67,14 @@
         <view class="info-row">
           <text class="info-label">创建时间</text>
           <text class="info-value">{{ formatDate(room.create_time) }}</text>
+        </view>
+      </view>
+
+      <!-- 租务入口 -->
+      <view class="info-card card tenancy-entry" @click="goTenancy">
+        <view class="info-row">
+          <text class="info-label">租务管理</text>
+          <text class="info-value tenancy-arrow">验房 · 租金 · 退租 ›</text>
         </view>
       </view>
 
@@ -94,7 +124,7 @@ import { useRoomStore } from '@/stores/room'
 import { useAuthStore } from '@/stores/auth'
 import { useRequireLogin } from '@/composables/useRequireLogin'
 import { useShare, DEFAULT_SHARE } from '@/composables/useShare'
-import { getRoomDetail, deleteRoom, leaveRoom, transferOwnership, getMembers } from '@/api/room'
+import { getRoomDetail, updateRoom, deleteRoom, leaveRoom, transferOwnership, getMembers } from '@/api/room'
 import { formatDate } from '@/utils/date'
 import type { Room, Member } from '@/types/room'
 
@@ -108,6 +138,9 @@ let targetRoomId = 0
 const showTransferPicker = ref(false)
 const members = ref<Member[]>([])
 const transferring = ref(false)
+const editingNotice = ref(false)
+const noticeDraft = ref('')
+const savingNotice = ref(false)
 
 const isOwner = computed(() => room.value?.owner_id === authStore.userInfo?.id)
 
@@ -160,6 +193,11 @@ async function loadMembers() {
   }
 }
 
+function goTenancy() {
+  if (!room.value) return
+  uni.navigateTo({ url: `/pages/tenancy/hub?room_id=${room.value.id}` })
+}
+
 function handleTransfer() {
   loadMembers()
   showTransferPicker.value = true
@@ -188,6 +226,46 @@ async function confirmTransfer(member: Member) {
       }
     },
   })
+}
+
+function startEditNotice() {
+  if (!room.value) return
+  noticeDraft.value = room.value.notice || ''
+  editingNotice.value = true
+}
+
+function onNoticeInput(e: any) {
+  const value = e.detail.value || ''
+  if (value.length > 100) {
+    noticeDraft.value = value.slice(0, 100)
+  } else {
+    noticeDraft.value = value
+  }
+}
+
+function cancelEditNotice() {
+  editingNotice.value = false
+  noticeDraft.value = ''
+}
+
+async function saveNotice() {
+  if (!room.value || savingNotice.value) return
+  const notice = noticeDraft.value.trim()
+  if (notice === room.value.notice) {
+    editingNotice.value = false
+    return
+  }
+  savingNotice.value = true
+  try {
+    const detailRes = await updateRoom(room.value.id, { notice })
+    room.value = detailRes.data
+    editingNotice.value = false
+    uni.showToast({ title: '已更新', icon: 'success' })
+  } catch {
+    // handled by request interceptor
+  } finally {
+    savingNotice.value = false
+  }
 }
 
 function copyCode() {
@@ -372,11 +450,63 @@ function goJoinRoom() {
       margin-bottom: $space-3;
     }
 
-    .room-notice {
-      font-size: $font-sm;
-      color: $text-secondary;
-      display: block;
-      line-height: 1.6;
+    .notice-row {
+      display: flex;
+      align-items: flex-start;
+      gap: $space-2;
+
+      .room-notice {
+        flex: 1;
+        font-size: $font-sm;
+        color: $text-secondary;
+        line-height: 1.6;
+      }
+
+      .edit-hint {
+        flex-shrink: 0;
+        font-size: $font-xs;
+        color: $primary;
+      }
+    }
+
+    .notice-edit {
+      .notice-textarea {
+        width: 100%;
+        min-height: 120rpx;
+        padding: $space-3;
+        font-size: $font-sm;
+        color: $text-primary;
+        background: $bg-page;
+        border: 2rpx solid $border-color;
+        border-radius: $radius-md;
+        box-sizing: border-box;
+      }
+
+      .notice-edit-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: $space-3;
+
+        .notice-count {
+          font-size: $font-xs;
+          color: $text-hint;
+        }
+
+        .action-btns {
+          display: flex;
+          gap: $space-3;
+
+          .btn-sm {
+            min-width: 120rpx;
+            height: 64rpx;
+            line-height: 64rpx;
+            font-size: $font-sm;
+            margin: 0;
+            padding: 0 $space-4;
+          }
+        }
+      }
     }
   }
 }
@@ -438,6 +568,18 @@ function goJoinRoom() {
   box-shadow: $shadow-sm;
   position: relative;
   overflow: hidden;
+}
+
+.tenancy-entry {
+  &:active {
+    transform: scale(0.99);
+    box-shadow: $shadow-card;
+  }
+
+  .tenancy-arrow {
+    color: $primary;
+    font-weight: 600;
+  }
 
   &::before {
     content: '';

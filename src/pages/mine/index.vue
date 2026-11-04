@@ -66,6 +66,11 @@
         </view>
 
         <view class="ui-form-group list">
+          <view class="list-item" @click="goNotifications">
+            <image class="list-icon" src="/static/icons/bell.png" mode="aspectFit" />
+            <text class="list-text">消息通知</text>
+            <text class="list-arrow">›</text>
+          </view>
           <view class="list-item" @click="goFeedback">
             <image class="list-icon" src="/static/icons/star.png" mode="aspectFit" />
             <text class="list-text">意见反馈</text>
@@ -161,6 +166,9 @@ function goMyBills() { uni.switchTab({ url: '/pages/bill/list' }) }
 function goTaskList() { uni.switchTab({ url: '/pages/task/list' }) }
 function goBillList() { uni.switchTab({ url: '/pages/bill/list' }) }
 function goVote() { uni.navigateTo({ url: '/pages/vote/list' }) }
+function goNotifications() {
+  requireLogin(() => uni.navigateTo({ url: '/pages/notification/list' }))
+}
 function goFeedback() {
   requireLogin(() => uni.navigateTo({ url: '/pages/mine/feedback' }))
 }
@@ -194,7 +202,7 @@ function handleLogout() {
 }
 
 .page-scroll-inner {
-  padding-top: calc(env(safe-area-inset-top) + 40rpx);
+  padding-top: calc(var(--status-bar-height) + 40rpx);
 }
 
 .hero {
